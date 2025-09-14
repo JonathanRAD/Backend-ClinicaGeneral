@@ -11,14 +11,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
-@Entity // Le dice a JPA que esta clase es una tabla en la BD
-@Data   // Lombok: Crea automáticamente getters, setters, toString(), etc.
-@NoArgsConstructor // Lombok: Crea un constructor vacío
-@AllArgsConstructor // Lombok: Crea un constructor con todos los campos
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Paciente {
 
-    @Id // Marca este campo como la clave primaria (ID)
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Le dice a la BD que genere el ID automáticamente
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String dni;
@@ -26,4 +26,9 @@ public class Paciente {
     private String apellidos;
     private LocalDate fechaNacimiento;
     private String telefono;
+
+    // --- NUEVOS CAMPOS AÑADIDOS ---
+    private Double peso; // En kilogramos (ej: 70.5)
+    private Double altura; // En metros (ej: 1.75)
+    private Integer ritmoCardiaco; // En pulsaciones por minuto (ej: 80)
 }
