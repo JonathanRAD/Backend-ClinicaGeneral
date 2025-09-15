@@ -37,6 +37,7 @@ public class MedicoController {
                     medico.setNombres(detallesMedico.getNombres());
                     medico.setApellidos(detallesMedico.getApellidos());
                     medico.setEspecialidad(detallesMedico.getEspecialidad());
+                    medico.setFechaNacimiento(detallesMedico.getFechaNacimiento());
                     Medico medicoActualizado = medicoRepository.save(medico);
                     return ResponseEntity.ok(medicoActualizado);
                 }).orElse(ResponseEntity.notFound().build());

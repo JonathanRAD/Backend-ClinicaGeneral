@@ -4,7 +4,7 @@ package com.clinicabienestar.api.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDateTime;
+import java.time.Instant; 
 
 @Entity
 @Data
@@ -13,7 +13,7 @@ public class Cita {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime fechaHora;
+    private Instant fechaHora; 
     private String motivo;
     private String estado;
 

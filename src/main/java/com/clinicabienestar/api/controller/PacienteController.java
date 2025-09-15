@@ -39,6 +39,9 @@ public class PacienteController {
                     paciente.setApellidos(detallesPaciente.getApellidos());
                     paciente.setFechaNacimiento(detallesPaciente.getFechaNacimiento());
                     paciente.setTelefono(detallesPaciente.getTelefono());
+                    paciente.setPeso(detallesPaciente.getPeso());
+                    paciente.setAltura(detallesPaciente.getAltura());
+                    paciente.setRitmoCardiaco(detallesPaciente.getRitmoCardiaco());
                     Paciente pacienteActualizado = pacienteRepository.save(paciente);
                     return ResponseEntity.ok(pacienteActualizado);
                 }).orElse(ResponseEntity.notFound().build());

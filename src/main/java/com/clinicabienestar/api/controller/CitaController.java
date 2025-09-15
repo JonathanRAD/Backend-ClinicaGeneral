@@ -2,6 +2,7 @@
 
 package com.clinicabienestar.api.controller;
 
+import com.clinicabienestar.api.dto.CitaDTO; // <-- 1. IMPORTA EL NUEVO DTO
 import com.clinicabienestar.api.model.Cita;
 import com.clinicabienestar.api.model.Medico;
 import com.clinicabienestar.api.model.Paciente;
@@ -11,71 +12,55 @@ import com.clinicabienestar.api.repository.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/citas")
 @CrossOrigin(origins = "http://localhost:4200")
 public class CitaController {
 
-    @Autowired
-    private CitaRepository citaRepository;
-    @Autowired
-    private PacienteRepository pacienteRepository;
-    @Autowired
-    private MedicoRepository medicoRepository;
+    @Autowired private CitaRepository citaRepository;
+    @Autowired private PacienteRepository pacienteRepository;
+    @Autowired private MedicoRepository medicoRepository;
 
     @GetMapping
     public List<Cita> obtenerTodasLasCitas() {
         return citaRepository.findAll();
     }
 
-    // Usamos un Map para recibir los IDs y otros datos del frontend
+    // --- MÉTODO POST CORREGIDO PARA USAR DTO ---
     @PostMapping
-    public ResponseEntity<Cita> crearCita(@RequestBody Map<String, Object> payload) {
-        Long pacienteId = Long.parseLong(payload.get("pacienteId").toString());
-        Long medicoId = Long.parseLong(payload.get("medicoId").toString());
-
-        Paciente paciente = pacienteRepository.findById(pacienteId).orElse(null);
-        Medico medico = medicoRepository.findById(medicoId).orElse(null);
-
-        if (paciente == null || medico == null) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Cita> crearCita(@RequestBody CitaDTO citaDTO) { // <-- 2. USA EL DTO
+        Paciente paciente = pacienteRepository.findById(citaDTO.getPacienteId())
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+        Medico medico = medicoRepository.findById(citaDTO.getMedicoId())
+                .orElseThrow(() -> new RuntimeException("Médico no encontrado"));
 
         Cita cita = new Cita();
         cita.setPaciente(paciente);
         cita.setMedico(medico);
-        cita.setFechaHora(LocalDateTime.parse(payload.get("fechaHora").toString()));
-        cita.setMotivo(payload.get("motivo").toString());
+        cita.setFechaHora(citaDTO.getFechaHora()); // <-- 3. AHORA ES DIRECTO, SIN PARSE
+        cita.setMotivo(citaDTO.getMotivo());
         cita.setEstado("programada");
 
         Cita nuevaCita = citaRepository.save(cita);
         return ResponseEntity.ok(nuevaCita);
     }
 
+    // --- MÉTODO PUT CORREGIDO PARA USAR DTO ---
     @PutMapping("/{id}")
-    public ResponseEntity<Cita> actualizarCita(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
-        Long pacienteId = Long.parseLong(payload.get("pacienteId").toString());
-        Long medicoId = Long.parseLong(payload.get("medicoId").toString());
-
-        Cita cita = citaRepository.findById(id).orElse(null);
-        Paciente paciente = pacienteRepository.findById(pacienteId).orElse(null);
-        Medico medico = medicoRepository.findById(medicoId).orElse(null);
-
-        if (cita == null || paciente == null || medico == null) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Cita> actualizarCita(@PathVariable Long id, @RequestBody CitaDTO citaDTO) { // <-- 4. USA EL DTO
+        Cita cita = citaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+        Paciente paciente = pacienteRepository.findById(citaDTO.getPacienteId())
+                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+        Medico medico = medicoRepository.findById(citaDTO.getMedicoId())
+                .orElseThrow(() -> new RuntimeException("Médico no encontrado"));
 
         cita.setPaciente(paciente);
         cita.setMedico(medico);
-        cita.setFechaHora(LocalDateTime.parse(payload.get("fechaHora").toString()));
-        cita.setMotivo(payload.get("motivo").toString());
-        // El estado podría venir en el payload si se quisiera cambiar
-        // cita.setEstado(payload.get("estado").toString());
+        cita.setFechaHora(citaDTO.getFechaHora()); // <-- 5. AHORA ES DIRECTO, SIN PARSE
+        cita.setMotivo(citaDTO.getMotivo());
 
         Cita citaActualizada = citaRepository.save(cita);
         return ResponseEntity.ok(citaActualizada);
