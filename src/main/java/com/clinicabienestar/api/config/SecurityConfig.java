@@ -31,6 +31,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // <-- Asegúrate que esta línea esté
                 .authorizeHttpRequests(authRequest ->
                         authRequest
