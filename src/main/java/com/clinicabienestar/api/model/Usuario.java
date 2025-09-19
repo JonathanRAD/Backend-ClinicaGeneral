@@ -2,26 +2,28 @@
 
 package com.clinicabienestar.api.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Data
-// 1. Añadimos "implements UserDetails"
 public class Usuario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private String nombres; // <-- NUEVO CAMPO
+
+    @Column(nullable = false)
+    private String apellidos; // <-- NUEVO CAMPO
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -29,37 +31,39 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    // 2. Añadimos los métodos requeridos por la interfaz UserDetails
+    private int intentosFallidos;
+    private LocalDateTime bloqueoExpiracion;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Por ahora, le damos a todos los usuarios un rol simple de "USER"
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
     public String getUsername() {
-        // En nuestra aplicación, el "username" es el email
         return this.email;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // La cuenta nunca expira
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // La cuenta nunca se bloquea
+        if (bloqueoExpiracion == null) {
+            return true;
+        }
+        return bloqueoExpiracion.isBefore(LocalDateTime.now());
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Las credenciales nunca expiran
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // La cuenta siempre está habilitada
+        return true;
     }
 }
