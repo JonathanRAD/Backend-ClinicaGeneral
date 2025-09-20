@@ -2,7 +2,7 @@
 
 package com.clinicabienestar.api.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.*; // AÑADIR IMPORT
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,10 +20,10 @@ public class Usuario implements UserDetails {
     private Long id;
 
     @Column(nullable = false)
-    private String nombres; // <-- NUEVO CAMPO
+    private String nombres;
 
     @Column(nullable = false)
-    private String apellidos; // <-- NUEVO CAMPO
+    private String apellidos;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -31,14 +31,21 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    // --- CAMBIO DE ROL ---
+    @Enumerated(EnumType.STRING) // Le decimos a JPA que guarde el nombre del rol (ej: "MEDICO")
+    private Rol rol;
+    // --- FIN DEL CAMBIO ---
+
     private int intentosFallidos;
     private LocalDateTime bloqueoExpiracion;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        // Ahora el rol se asigna dinámicamente
+        return List.of(new SimpleGrantedAuthority(rol.name()));
     }
 
+    // ... (El resto de la clase se mantiene igual)
     @Override
     public String getUsername() {
         return this.email;

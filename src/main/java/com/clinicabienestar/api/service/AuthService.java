@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.clinicabienestar.api.model.Rol;
 
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
@@ -65,11 +66,12 @@ public class AuthService {
         }
         
         Usuario usuario = new Usuario();
-        usuario.setNombres(request.getNombres()); // <-- AÑADIDO
-        usuario.setApellidos(request.getApellidos()); // <-- AÑADIDO
+        usuario.setNombres(request.getNombres());
+        usuario.setApellidos(request.getApellidos());
         usuario.setEmail(request.getEmail());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         usuario.setIntentosFallidos(0);
+        usuario.setRol(Rol.PACIENTE); 
         
         usuarioRepository.save(usuario);
 

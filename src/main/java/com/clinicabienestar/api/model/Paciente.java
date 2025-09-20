@@ -2,10 +2,8 @@
 
 package com.clinicabienestar.api.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,9 +24,17 @@ public class Paciente {
     private String apellidos;
     private LocalDate fechaNacimiento;
     private String telefono;
+    private String direccion;
 
-    // --- NUEVOS CAMPOS AÑADIDOS ---
-    private Double peso; // En kilogramos (ej: 70.5)
-    private Double altura; // En metros (ej: 1.75)
-    private Integer ritmoCardiaco; // En pulsaciones por minuto (ej: 80)
+    private Double peso;
+    private Double altura;
+    private Integer ritmoCardiaco;
+
+    @OneToOne(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("paciente-historia") // Para evitar recursividad infinita
+    private HistoriaClinica historiaClinica;
+
+    @OneToOne(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("paciente-seguro") // Para evitar recursividad infinita
+    private SeguroMedico seguroMedico;
 }

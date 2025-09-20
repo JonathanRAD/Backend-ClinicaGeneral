@@ -2,34 +2,46 @@
 
 package com.clinicabienestar.api.controller;
 
+import com.clinicabienestar.api.model.HistoriaClinica;
 import com.clinicabienestar.api.model.Paciente;
 import com.clinicabienestar.api.repository.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate; 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/pacientes")
-@CrossOrigin(origins = "http://localhost:4200") // ¡Importante! Permite la conexión desde Angular
+@CrossOrigin(origins = "http://localhost:4200")
 public class PacienteController {
+    
 
-    @Autowired // Spring se encarga de inyectar una instancia del repositorio
+    @Autowired
     private PacienteRepository pacienteRepository;
 
-    // Endpoint para OBTENER TODOS los pacientes (GET /api/pacientes)
     @GetMapping
     public List<Paciente> obtenerTodosLosPacientes() {
         return pacienteRepository.findAll();
     }
 
-    // Endpoint para CREAR un nuevo paciente (POST /api/pacientes)
+    // --- MÉTODO CREAR PACIENTE MODIFICADO ---
     @PostMapping
     public Paciente crearPaciente(@RequestBody Paciente paciente) {
+        // 1. Crear una nueva historia clínica
+        HistoriaClinica nuevaHistoria = new HistoriaClinica();
+        nuevaHistoria.setFechaCreacion(LocalDate.now());
+        nuevaHistoria.setPaciente(paciente); // Asignar el paciente a la historia
+
+        // 2. Asignar la historia al paciente
+        paciente.setHistoriaClinica(nuevaHistoria);
+        
+        // 3. Guardar el paciente (gracias a CascadeType.ALL, la historia se guardará automáticamente)
         return pacienteRepository.save(paciente);
     }
 
-    // Endpoint para ACTUALIZAR un paciente (PUT /api/pacientes/{id})
+    // ... (el resto de los métodos se mantienen igual)
     @PutMapping("/{id}")
     public ResponseEntity<Paciente> actualizarPaciente(@PathVariable Long id, @RequestBody Paciente detallesPaciente) {
         return pacienteRepository.findById(id)
@@ -39,6 +51,7 @@ public class PacienteController {
                     paciente.setApellidos(detallesPaciente.getApellidos());
                     paciente.setFechaNacimiento(detallesPaciente.getFechaNacimiento());
                     paciente.setTelefono(detallesPaciente.getTelefono());
+                    paciente.setDireccion(detallesPaciente.getDireccion()); // <-- AÑADIR DIRECCIÓN
                     paciente.setPeso(detallesPaciente.getPeso());
                     paciente.setAltura(detallesPaciente.getAltura());
                     paciente.setRitmoCardiaco(detallesPaciente.getRitmoCardiaco());
@@ -47,14 +60,12 @@ public class PacienteController {
                 }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Endpoint para ELIMINAR un paciente (DELETE /api/pacientes/{id})
     @DeleteMapping("/{id}")
-public ResponseEntity<Void> eliminarPaciente(@PathVariable Long id) { // Renombrado para consistencia
-    return pacienteRepository.findById(id)
-            .map(paciente -> {
-                pacienteRepository.delete(paciente);
-                // Construimos explícitamente la respuesta correcta
-                return ResponseEntity.noContent().<Void>build();
-            }).orElse(ResponseEntity.notFound().build());
-}
+    public ResponseEntity<Void> eliminarPaciente(@PathVariable Long id) {
+        return pacienteRepository.findById(id)
+                .map(paciente -> {
+                    pacienteRepository.delete(paciente);
+                    return ResponseEntity.noContent().<Void>build();
+                }).orElse(ResponseEntity.notFound().build());
+    }
 }

@@ -21,4 +21,5 @@ public class Medico {
     private String apellidos;
     private String especialidad;
     private LocalDate fechaNacimiento; 
+    private String cmp;
 }

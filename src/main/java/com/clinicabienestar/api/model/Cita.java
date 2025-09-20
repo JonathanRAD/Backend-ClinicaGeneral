@@ -16,12 +16,14 @@ public class Cita {
     private Instant fechaHora; 
     private String motivo;
     private String estado;
+    private String consultorio;
+    private Integer numeroTurno; 
 
-    @ManyToOne // Anotación clave: Muchas citas pueden pertenecer a UN paciente
-    @JoinColumn(name = "paciente_id") // Define la columna de la clave foránea
+    @ManyToOne 
+    @JoinColumn(name = "paciente_id") 
     private Paciente paciente;
 
-    @ManyToOne // Muchas citas pueden ser atendidas por UN médico
+    @ManyToOne 
     @JoinColumn(name = "medico_id")
     private Medico medico;
 }
