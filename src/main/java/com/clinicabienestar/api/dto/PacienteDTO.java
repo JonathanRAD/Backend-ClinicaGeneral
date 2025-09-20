@@ -9,4 +9,5 @@ public class PacienteDTO {
     private String apellidos;
     private String dni;
     private String telefono;
+    private SeguroMedicoDTO seguroMedico; 
 }

@@ -37,11 +37,21 @@ public class SeguroMedicoController {
             seguro.setNombreAseguradora(seguroDTO.getNombreAseguradora());
             seguro.setNumeroPoliza(seguroDTO.getNumeroPoliza());
             seguro.setCobertura(seguroDTO.getCobertura());
+            paciente.setSeguroMedico(seguro);
+            pacienteRepository.save(paciente);
             
-            SeguroMedico seguroGuardado = seguroMedicoRepository.save(seguro);
+            return ResponseEntity.ok(seguro);
             
-            return ResponseEntity.ok(seguroGuardado);
-            
+        }).orElse(ResponseEntity.notFound().build());
+    }
+    @PutMapping("/{seguroId}")
+    public ResponseEntity<SeguroMedico> actualizarSeguro(@PathVariable Long seguroId, @RequestBody SeguroMedicoDTO seguroDTO) {
+        return seguroMedicoRepository.findById(seguroId).map(seguro -> {
+            seguro.setNombreAseguradora(seguroDTO.getNombreAseguradora());
+            seguro.setNumeroPoliza(seguroDTO.getNumeroPoliza());
+            seguro.setCobertura(seguroDTO.getCobertura());
+            SeguroMedico seguroActualizado = seguroMedicoRepository.save(seguro);
+            return ResponseEntity.ok(seguroActualizado);
         }).orElse(ResponseEntity.notFound().build());
     }
 

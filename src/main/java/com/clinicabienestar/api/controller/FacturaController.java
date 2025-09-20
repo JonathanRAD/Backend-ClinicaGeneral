@@ -39,19 +39,26 @@ public class FacturaController {
                 factura.setFechaEmision(LocalDate.now());
                 factura.setMontoPagado(facturaDTO.getMontoPagado());
 
-                // Gracias a la corrección en el DTO, esta línea ahora es segura
-                List<DetalleFactura> detalles = facturaDTO.getDetalles().stream().map(dto -> {
-                    DetalleFactura detalle = new DetalleFactura();
-                    detalle.setDescripcionServicio(dto.getDescripcionServicio());
-                    detalle.setCantidad(dto.getCantidad());
-                    detalle.setPrecioUnitario(dto.getPrecioUnitario());
-                    detalle.setFactura(factura);
-                    return detalle;
-                }).collect(Collectors.toList());
+                // --- MODIFICACIÓN IMPORTANTE ---
+                // Si no se envían detalles, usar el monto del DTO.
+                if (facturaDTO.getDetalles() == null || facturaDTO.getDetalles().isEmpty()) {
+                    factura.setMonto(facturaDTO.getMonto());
+                } else {
+                    List<DetalleFactura> detalles = facturaDTO.getDetalles().stream().map(dto -> {
+                        DetalleFactura detalle = new DetalleFactura();
+                        detalle.setDescripcionServicio(dto.getDescripcionServicio());
+                        detalle.setCantidad(dto.getCantidad());
+                        detalle.setPrecioUnitario(dto.getPrecioUnitario());
+                        detalle.setFactura(factura);
+                        return detalle;
+                    }).collect(Collectors.toList());
 
-                factura.setDetalles(detalles);
-                double montoTotal = detalles.stream().mapToDouble(d -> d.getCantidad() * d.getPrecioUnitario()).sum();
-                factura.setMonto(montoTotal);
+                    factura.setDetalles(detalles);
+                    double montoTotal = detalles.stream().mapToDouble(d -> d.getCantidad() * d.getPrecioUnitario()).sum();
+                    factura.setMonto(montoTotal);
+                }
+                // --- FIN DE LA MODIFICACIÓN ---
+
 
                 Factura nuevaFactura = facturaRepository.save(factura);
                 return ResponseEntity.ok(nuevaFactura);
@@ -66,20 +73,29 @@ public class FacturaController {
                     factura.setCita(cita);
                     factura.setEstado(facturaDTO.getEstado());
                     factura.setMontoPagado(facturaDTO.getMontoPagado());
+                    
+                    // --- MODIFICACIÓN IMPORTANTE ---
+                    if (facturaDTO.getDetalles() == null || facturaDTO.getDetalles().isEmpty()) {
+                        factura.setMonto(facturaDTO.getMonto());
+                        if (factura.getDetalles() != null) {
+                           factura.getDetalles().clear();
+                        }
+                    } else {
+                        factura.getDetalles().clear();
+                        List<DetalleFactura> nuevosDetalles = facturaDTO.getDetalles().stream().map(dto -> {
+                            DetalleFactura detalle = new DetalleFactura();
+                            detalle.setDescripcionServicio(dto.getDescripcionServicio());
+                            detalle.setCantidad(dto.getCantidad());
+                            detalle.setPrecioUnitario(dto.getPrecioUnitario());
+                            detalle.setFactura(factura);
+                            return detalle;
+                        }).collect(Collectors.toList());
+                        factura.getDetalles().addAll(nuevosDetalles);
 
-                    factura.getDetalles().clear();
-                    List<DetalleFactura> nuevosDetalles = facturaDTO.getDetalles().stream().map(dto -> {
-                        DetalleFactura detalle = new DetalleFactura();
-                        detalle.setDescripcionServicio(dto.getDescripcionServicio());
-                        detalle.setCantidad(dto.getCantidad());
-                        detalle.setPrecioUnitario(dto.getPrecioUnitario());
-                        detalle.setFactura(factura);
-                        return detalle;
-                    }).collect(Collectors.toList());
-                    factura.getDetalles().addAll(nuevosDetalles);
-
-                    double montoTotal = nuevosDetalles.stream().mapToDouble(d -> d.getCantidad() * d.getPrecioUnitario()).sum();
-                    factura.setMonto(montoTotal);
+                        double montoTotal = nuevosDetalles.stream().mapToDouble(d -> d.getCantidad() * d.getPrecioUnitario()).sum();
+                        factura.setMonto(montoTotal);
+                    }
+                    // --- FIN DE LA MODIFICACIÓN ---
 
                     Factura facturaActualizada = facturaRepository.save(factura);
                     return ResponseEntity.ok(facturaActualizada);

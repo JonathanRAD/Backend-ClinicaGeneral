@@ -1,7 +1,6 @@
 // RUTA: src/main/java/com/clinicabienestar/api/controller/CitaController.java
 
 package com.clinicabienestar.api.controller;
-
 import com.clinicabienestar.api.dto.CitaDTO;
 import com.clinicabienestar.api.model.Cita;
 import com.clinicabienestar.api.model.Medico;
@@ -13,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate; // <-- AÑADIR IMPORT
-import java.time.ZoneId; // <-- AÑADIR IMPORT
+import java.time.Instant;
+import java.time.LocalDate; 
+import java.time.ZoneId;
 import java.util.List;
+import java.time.temporal.ChronoUnit;
 
 @RestController
 @RequestMapping("/api/citas")
@@ -45,38 +46,45 @@ public class CitaController {
         cita.setFechaHora(citaDTO.getFechaHora());
         cita.setMotivo(citaDTO.getMotivo());
         cita.setEstado("programada");
-
-        // --- LÓGICA DE ASIGNACIÓN AUTOMÁTICA (RF-05) ---
         cita.setConsultorio(asignarConsultorio(medico.getEspecialidad()));
         cita.setNumeroTurno(calcularNumeroTurno(medico.getId(), LocalDate.ofInstant(citaDTO.getFechaHora(), ZoneId.systemDefault())));
-        // --- FIN DE LA LÓGICA ---
 
         Cita nuevaCita = citaRepository.save(cita);
         return ResponseEntity.ok(nuevaCita);
     }
     
-    // --- MÉTODOS PRIVADOS DE AYUDA ---
-
     private String asignarConsultorio(String especialidad) {
-        // Lógica simple de ejemplo. Esto podría venir de otra tabla en el futuro.
+        // Lógica expandida para asignar consultorios por área/piso
         return switch (especialidad.toLowerCase()) {
-            case "cardiología" -> "Piso 3, Consultorio 301";
-            case "pediatría" -> "Piso 2, Consultorio 205";
+            // Piso 1: Atención Primaria y General
             case "medicina general" -> "Piso 1, Consultorio 102";
+            case "dermatología" -> "Piso 1, Consultorio 105";
+
+            // Piso 2: Atención Especializada Infantil y Femenina
+            case "pediatría" -> "Piso 2, Consultorio 205";
+            case "ginecología" -> "Piso 2, Consultorio 210";
+
+            // Piso 3: Especialidades de Alta Complejidad
+            case "cardiología" -> "Piso 3, Consultorio 301";
+            case "neurología" -> "Piso 3, Consultorio 304";
+            case "traumatología" -> "Piso 3, Consultorio 308";
+
+            // Valor por defecto para cualquier otra especialidad no listada
             default -> "Piso 1, Admisión";
         };
     }
 
     private int calcularNumeroTurno(Long medicoId, LocalDate fechaCita) {
-        // Contamos cuántas citas tiene el médico para la fecha dada
-        long citasDelDia = citaRepository.findAll().stream()
-                .filter(c -> c.getMedico().getId().equals(medicoId) &&
-                             LocalDate.ofInstant(c.getFechaHora(), ZoneId.systemDefault()).equals(fechaCita))
-                .count();
+        // Define el inicio y el fin del día para la consulta a la base de datos
+        Instant startOfDay = fechaCita.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant endOfDay = fechaCita.plus(1, ChronoUnit.DAYS).atStartOfDay(ZoneId.systemDefault()).toInstant();
+
+        // Usa el nuevo método del repositorio, que es mucho más eficiente y preciso
+        long citasDelDia = citaRepository.countByMedicoAndDateRange(medicoId, startOfDay, endOfDay);
+        
         // El nuevo turno es el número de citas existentes + 1
         return (int) citasDelDia + 1;
     }
-
     // ... (El resto de la clase, como PUT y DELETE, se mantienen igual por ahora)
     @PutMapping("/{id}")
     public ResponseEntity<Cita> actualizarCita(@PathVariable Long id, @RequestBody CitaDTO citaDTO) {

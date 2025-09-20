@@ -13,6 +13,8 @@ import com.clinicabienestar.api.repository.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.clinicabienestar.api.dto.SeguroMedicoDTO; 
+import com.clinicabienestar.api.model.SeguroMedico;
 
 import java.time.LocalDateTime;
 
@@ -42,6 +44,15 @@ public class HistoriaClinicaController {
                 pacienteDTO.setApellidos(paciente.getApellidos());
                 pacienteDTO.setDni(paciente.getDni());
                 pacienteDTO.setTelefono(paciente.getTelefono());
+
+                SeguroMedico seguro = paciente.getSeguroMedico();
+                if (seguro != null) {
+                    SeguroMedicoDTO seguroDTO = new SeguroMedicoDTO();
+                    seguroDTO.setNombreAseguradora(seguro.getNombreAseguradora());
+                    seguroDTO.setNumeroPoliza(seguro.getNumeroPoliza());
+                    seguroDTO.setCobertura(seguro.getCobertura());
+                    pacienteDTO.setSeguroMedico(seguroDTO);
+                }
 
                 // Construir el DTO de respuesta
                 HistoriaClinicaDTO responseDTO = new HistoriaClinicaDTO();
