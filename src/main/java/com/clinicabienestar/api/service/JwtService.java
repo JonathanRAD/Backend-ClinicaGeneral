@@ -25,8 +25,15 @@ public class JwtService {
 
     // Genera un token JWT para un usuario
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    // AÑADIMOS EL ROL COMO UN "CLAIM" DENTRO DEL TOKEN
+    Map<String, Object> claims = new HashMap<>();
+    // Asumimos que userDetails es nuestra clase Usuario, lo cual es cierto con la configuración de Spring Security
+    if (userDetails instanceof com.clinicabienestar.api.model.Usuario) {
+        claims.put("rol", ((com.clinicabienestar.api.model.Usuario) userDetails).getRol().name());
     }
+    
+    return generateToken(claims, userDetails);
+}
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()

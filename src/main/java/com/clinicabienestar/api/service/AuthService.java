@@ -60,6 +60,22 @@ public class AuthService {
         }
     }
 
+    public void createUserByAdmin(RegisterRequest request) {
+        if (!esContrasenaSegura(request.getPassword())) {
+            throw new IllegalArgumentException("La contraseña no cumple con los requisitos de seguridad.");
+        }
+        
+        Usuario usuario = new Usuario();
+        usuario.setNombres(request.getNombres());
+        usuario.setApellidos(request.getApellidos());
+        usuario.setEmail(request.getEmail());
+        usuario.setPassword(passwordEncoder.encode(request.getPassword()));
+        usuario.setIntentosFallidos(0);
+        // El rol se toma directamente del request
+        usuario.setRol(request.getRol()); 
+        
+        usuarioRepository.save(usuario);
+    }
     public AuthResponse register(RegisterRequest request) {
         if (!esContrasenaSegura(request.getPassword())) {
             throw new IllegalArgumentException("La contraseña no cumple con los requisitos de seguridad.");

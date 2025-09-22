@@ -32,7 +32,7 @@ public class Usuario implements UserDetails {
     private String password;
 
     // --- CAMBIO DE ROL ---
-    @Enumerated(EnumType.STRING) // Le decimos a JPA que guarde el nombre del rol (ej: "MEDICO")
+    @Enumerated(EnumType.STRING) // Guarda el nombre del rol (ej: "MEDICO") en la BD
     private Rol rol;
     // --- FIN DEL CAMBIO ---
 

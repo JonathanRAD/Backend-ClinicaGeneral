@@ -7,6 +7,7 @@ import com.clinicabienestar.api.model.Paciente;
 import com.clinicabienestar.api.repository.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate; 
@@ -28,6 +29,7 @@ public class PacienteController {
 
     // --- MÉTODO CREAR PACIENTE MODIFICADO ---
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('RECEPCIONISTA', 'ADMINISTRADOR')")
     public Paciente crearPaciente(@RequestBody Paciente paciente) {
         // 1. Crear una nueva historia clínica
         HistoriaClinica nuevaHistoria = new HistoriaClinica();

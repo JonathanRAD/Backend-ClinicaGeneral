@@ -1,9 +1,9 @@
 package com.clinicabienestar.api.model;
 
 public enum Rol {
+    ADMINISTRADOR, // Para la "Dirección Médica"
     RECEPCIONISTA,
     MEDICO,
-    CAJERO,
-    ADMINISTRADOR,
-    PACIENTE // Rol para usuarios que se registran como pacientes
+    CAJERO,        // Para el "Área de Caja / Facturación"
+    PACIENTE       // Para usuarios registrados sin privilegios
 }
