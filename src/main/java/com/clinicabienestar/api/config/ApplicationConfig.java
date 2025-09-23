@@ -28,12 +28,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> usuarioRepository.findByEmail(username)
-                .map(usuario -> org.springframework.security.core.userdetails.User.builder()
-                        .username(usuario.getEmail())
-                        .password(usuario.getPassword())
-                        .roles("USER") // Puedes añadir más roles en el futuro
-                        .build())
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
     }
 
     /**
