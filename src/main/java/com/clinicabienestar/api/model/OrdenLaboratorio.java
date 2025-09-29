@@ -1,27 +1,35 @@
+// RUTA: src/main/java/com/clinicabienestar/api/model/OrdenLaboratorio.java
 package com.clinicabienestar.api.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
-@Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "ORDENES_LABORATORIO")
 public class OrdenLaboratorio {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ordenes_laboratorio_seq")
+    @SequenceGenerator(name = "ordenes_laboratorio_seq", sequenceName = "ORDENES_LABORATORIO_SEQ", allocationSize = 1)
     private Long id;
-
-    private LocalDate fechaOrden;
-    private String tipoExamen; // Ej: "Hemograma completo", "Perfil lipídico"
     
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "FECHA_ORDEN")
+    private LocalDate fechaOrden;
+    
+    @Column(name = "TIPO_EXAMEN")
+    private String tipoExamen;
+    
+    // ESTA ES LA CORRECCIÓN FINAL
+    @Lob 
+    @Column(name = "OBSERVACIONES", columnDefinition = "CLOB")
     private String observaciones;
 
-    // --- RELACIÓN ---
-    // Muchas órdenes pueden pertenecer a UNA consulta
     @ManyToOne
-    @JoinColumn(name = "consulta_id")
-    @JsonBackReference("consulta-ordenes")
+    @JoinColumn(name = "CONSULTA_ID")
     private Consulta consulta;
 }

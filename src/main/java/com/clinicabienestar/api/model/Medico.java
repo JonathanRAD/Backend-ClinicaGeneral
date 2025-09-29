@@ -1,25 +1,28 @@
-// RUTA: src/main/java/com/clinicabienestar/api/model/Medico.java
-
 package com.clinicabienestar.api.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Data;
 import java.time.LocalDate;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "MEDICOS")
 public class Medico {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "medicos_seq")
+    @SequenceGenerator(name = "medicos_seq", sequenceName = "MEDICOS_SEQ", allocationSize = 1)
     private Long id;
-
+    
     private String nombres;
     private String apellidos;
     private String especialidad;
-    private LocalDate fechaNacimiento; 
     private String cmp;
+    
+    @Column(name = "FECHA_NACIMIENTO")
+    private LocalDate fechaNacimiento;
 }

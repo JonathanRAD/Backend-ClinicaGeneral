@@ -1,38 +1,32 @@
 // RUTA: src/main/java/com/clinicabienestar/api/model/HistoriaClinica.java
-
 package com.clinicabienestar.api.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 @Entity
 @Data
+@Table(name = "HISTORIAS_CLINICAS")
 public class HistoriaClinica {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "historias_clinicas_seq")
+    @SequenceGenerator(name = "historias_clinicas_seq", sequenceName = "HISTORIAS_CLINICAS_SEQ", allocationSize = 1)
     private Long id;
 
-    private LocalDate fechaCreacion;
-    
-    @Column(columnDefinition = "TEXT")
-    private String antecedentes;
+    @Column(name = "FECHA_CREACION") private LocalDate fechaCreacion;
+    @Lob @Column(columnDefinition = "CLOB") private String antecedentes;
+    @Lob @Column(columnDefinition = "CLOB") private String alergias;
+    @Lob @Column(name = "ENFERMEDADES_CRONICAS", columnDefinition = "CLOB") private String enfermedadesCronicas;
 
-    @Column(columnDefinition = "TEXT")
-    private String alergias;
-
-    @Column(columnDefinition = "TEXT")
-    private String enfermedadesCronicas;
-
+    // CORRECCIÓN: La Historia Clinica es "dueña" de esta relación
     @OneToOne
-    @JoinColumn(name = "paciente_id", referencedColumnName = "id")
-    @JsonBackReference("paciente-historia")
+    @JoinColumn(name = "PACIENTE_ID", referencedColumnName = "id")
     private Paciente paciente;
-
-    // Una historia clínica puede tener MUCHAS consultas
-    @OneToMany(mappedBy = "historiaClinica", cascade = CascadeType.ALL, orphanRemoval = true)
+    
+    @OneToMany(mappedBy = "historiaClinica", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("historia-consultas")
     private List<Consulta> consultas;
 }

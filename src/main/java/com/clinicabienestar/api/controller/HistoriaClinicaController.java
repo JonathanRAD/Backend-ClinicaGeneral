@@ -37,7 +37,6 @@ public class HistoriaClinicaController {
                     return ResponseEntity.notFound().<HistoriaClinicaDTO>build();
                 }
 
-                // Construir el DTO de Paciente
                 PacienteDTO pacienteDTO = new PacienteDTO();
                 pacienteDTO.setId(paciente.getId());
                 pacienteDTO.setNombres(paciente.getNombres());
@@ -54,7 +53,6 @@ public class HistoriaClinicaController {
                     pacienteDTO.setSeguroMedico(seguroDTO);
                 }
 
-                // Construir el DTO de respuesta
                 HistoriaClinicaDTO responseDTO = new HistoriaClinicaDTO();
                 responseDTO.setId(historia.getId());
                 responseDTO.setFechaCreacion(historia.getFechaCreacion());

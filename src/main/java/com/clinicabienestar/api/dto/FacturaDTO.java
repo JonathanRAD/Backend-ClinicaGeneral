@@ -1,6 +1,7 @@
 package com.clinicabienestar.api.dto;
 
 import lombok.Data;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import java.util.List;
 public class FacturaDTO {
     private Long citaId;
     private String estado;
-    private Double montoPagado;
-    private Double monto; // <-- AÑADE ESTA LÍNEA
+    private BigDecimal montoPagado;
+    private BigDecimal monto;
     private List<DetalleFacturaDTO> detalles = new ArrayList<>();
 }

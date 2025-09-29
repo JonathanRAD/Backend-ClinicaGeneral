@@ -1,31 +1,42 @@
+// RUTA: src/main/java/com/clinicabienestar/api/model/ResultadoLaboratorio.java
 package com.clinicabienestar.api.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
-@Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "RESULTADOS_LABORATORIO")
 public class ResultadoLaboratorio {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "resultados_laboratorio_seq")
+    @SequenceGenerator(name = "resultados_laboratorio_seq", sequenceName = "RESULTADOS_LABORATORIO_SEQ", allocationSize = 1)
     private Long id;
 
+    @Column(name = "FECHA_RESULTADO")
     private LocalDate fechaResultado;
 
-    @Column(columnDefinition = "TEXT")
+    // --- ESTAS SON LAS CORRECCIONES ---
+    @Lob
+    @Column(name = "DESCRIPCION", columnDefinition = "CLOB")
     private String descripcion;
 
-    @Column(columnDefinition = "TEXT")
-    private String valores; // Podríamos usar un tipo más complejo en el futuro, pero TEXT es flexible
+    @Lob
+    @Column(name = "VALORES", columnDefinition = "CLOB")
+    private String valores;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob
+    @Column(name = "CONCLUSIONES", columnDefinition = "CLOB")
     private String conclusiones;
+    // --- FIN DE LAS CORRECCIONES ---
 
-    // --- RELACIÓN ---
     @OneToOne
-    @JoinColumn(name = "orden_laboratorio_id", referencedColumnName = "id")
-    @JsonBackReference("orden-resultado")
+    @JoinColumn(name = "ORDEN_LABORATORIO_ID")
     private OrdenLaboratorio ordenLaboratorio;
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,11 +40,7 @@ public class FacturaController {
                 factura.setFechaEmision(LocalDate.now());
                 factura.setMontoPagado(facturaDTO.getMontoPagado());
 
-                // --- MODIFICACIÓN IMPORTANTE ---
-                // Si no se envían detalles, usar el monto del DTO.
-                if (facturaDTO.getDetalles() == null || facturaDTO.getDetalles().isEmpty()) {
-                    factura.setMonto(facturaDTO.getMonto());
-                } else {
+                if (facturaDTO.getDetalles() != null && !facturaDTO.getDetalles().isEmpty()) {
                     List<DetalleFactura> detalles = facturaDTO.getDetalles().stream().map(dto -> {
                         DetalleFactura detalle = new DetalleFactura();
                         detalle.setDescripcionServicio(dto.getDescripcionServicio());
@@ -53,12 +50,14 @@ public class FacturaController {
                         return detalle;
                     }).collect(Collectors.toList());
 
-                    factura.setDetalles(detalles);
-                    double montoTotal = detalles.stream().mapToDouble(d -> d.getCantidad() * d.getPrecioUnitario()).sum();
+                    factura.setDetalles(detalles); // ¡Ahora existe!
+                    BigDecimal montoTotal = detalles.stream()
+                        .map(d -> d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
                     factura.setMonto(montoTotal);
+                } else {
+                    factura.setMonto(facturaDTO.getMonto());
                 }
-                // --- FIN DE LA MODIFICACIÓN ---
-
 
                 Factura nuevaFactura = facturaRepository.save(factura);
                 return ResponseEntity.ok(nuevaFactura);
@@ -74,14 +73,13 @@ public class FacturaController {
                     factura.setEstado(facturaDTO.getEstado());
                     factura.setMontoPagado(facturaDTO.getMontoPagado());
                     
-                    // --- MODIFICACIÓN IMPORTANTE ---
-                    if (facturaDTO.getDetalles() == null || facturaDTO.getDetalles().isEmpty()) {
-                        factura.setMonto(facturaDTO.getMonto());
-                        if (factura.getDetalles() != null) {
-                           factura.getDetalles().clear();
-                        }
-                    } else {
+                    if (factura.getDetalles() != null) {
                         factura.getDetalles().clear();
+                    } else {
+                        factura.setDetalles(new java.util.ArrayList<>());
+                    }
+
+                    if (facturaDTO.getDetalles() != null && !facturaDTO.getDetalles().isEmpty()) {
                         List<DetalleFactura> nuevosDetalles = facturaDTO.getDetalles().stream().map(dto -> {
                             DetalleFactura detalle = new DetalleFactura();
                             detalle.setDescripcionServicio(dto.getDescripcionServicio());
@@ -92,10 +90,13 @@ public class FacturaController {
                         }).collect(Collectors.toList());
                         factura.getDetalles().addAll(nuevosDetalles);
 
-                        double montoTotal = nuevosDetalles.stream().mapToDouble(d -> d.getCantidad() * d.getPrecioUnitario()).sum();
+                        BigDecimal montoTotal = nuevosDetalles.stream()
+                            .map(d -> d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())))
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
                         factura.setMonto(montoTotal);
+                    } else {
+                        factura.setMonto(facturaDTO.getMonto());
                     }
-                    // --- FIN DE LA MODIFICACIÓN ---
 
                     Factura facturaActualizada = facturaRepository.save(factura);
                     return ResponseEntity.ok(facturaActualizada);

@@ -1,46 +1,34 @@
 // RUTA: src/main/java/com/clinicabienestar/api/model/Consulta.java
-
 package com.clinicabienestar.api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference; 
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
-import java.util.List; 
 
 @Entity
 @Data
+@Table(name = "CONSULTAS")
 public class Consulta {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "consultas_seq")
+    @SequenceGenerator(name = "consultas_seq", sequenceName = "CONSULTAS_SEQ", allocationSize = 1)
     private Long id;
 
+    @Column(name = "FECHA_CONSULTA")
     private LocalDateTime fechaConsulta;
-    
-    @Column(columnDefinition = "TEXT")
-    private String motivo;
 
-    @Column(columnDefinition = "TEXT")
-    private String diagnostico;
+    @Lob @Column(columnDefinition = "CLOB") private String motivo;
+    @Lob @Column(columnDefinition = "CLOB") private String diagnostico;
+    @Lob @Column(columnDefinition = "CLOB") private String tratamiento;
 
-    @Column(columnDefinition = "TEXT")
-    private String tratamiento;
-
-    // --- RELACIONES ---
-
-    // Muchas consultas pertenecen a UNA historia clínica
-    @ManyToOne
-    @JoinColumn(name = "historia_clinica_id")
-    @JsonBackReference
+    // ESTA ES LA CORRECCIÓN CLAVE
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "HISTORIA_CLINICA_ID")
+    @JsonBackReference("historia-consultas")
     private HistoriaClinica historiaClinica;
-
-    // Muchas consultas son realizadas por UN médico
-    @ManyToOne
-    @JoinColumn(name = "medico_id")
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MEDICO_ID")
     private Medico medico;
-
-    @OneToMany(mappedBy = "consulta", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("consulta-ordenes")
-    private List<OrdenLaboratorio> ordenesLaboratorio;
 }

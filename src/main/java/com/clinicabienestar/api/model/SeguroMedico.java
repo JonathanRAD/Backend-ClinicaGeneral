@@ -1,22 +1,23 @@
+// RUTA: src/main/java/com/clinicabienestar/api/model/SeguroMedico.java
 package com.clinicabienestar.api.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
+@Table(name = "SEGUROS_MEDICOS")
 public class SeguroMedico {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seguros_medicos_seq")
+    @SequenceGenerator(name = "seguros_medicos_seq", sequenceName = "SEGUROS_MEDICOS_SEQ", allocationSize = 1)
     private Long id;
 
-    private String nombreAseguradora;
-    private String numeroPoliza;
+    @Column(name = "NOMBRE_ASEGURADORA") private String nombreAseguradora;
+    @Column(name = "NUMERO_POLIZA") private String numeroPoliza;
     private String cobertura;
 
-    @OneToOne
-    @JoinColumn(name = "paciente_id", referencedColumnName = "id")
-    @JsonBackReference("paciente-seguro")
+    // CORRECCIÓN: Esta es la parte "inversa" de la relación, no tiene @JoinColumn
+    @OneToOne(mappedBy = "seguroMedico")
     private Paciente paciente;
 }

@@ -1,54 +1,53 @@
-// RUTA: src/main/java/com/clinicabienestar/api/model/Usuario.java
-
 package com.clinicabienestar.api.model;
-
-import jakarta.persistence.*; // AÑADIR IMPORT
-import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-@Entity
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "USUARIOS")
 public class Usuario implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usuarios_seq")
+    @SequenceGenerator(name = "usuarios_seq", sequenceName = "USUARIOS_SEQ", allocationSize = 1)
     private Long id;
-
-    @Column(nullable = false)
+    
     private String nombres;
-
-    @Column(nullable = false)
     private String apellidos;
-
-    @Column(unique = true, nullable = false)
     private String email;
-
-    @Column(nullable = false)
     private String password;
-
-    // --- CAMBIO DE ROL ---
-    @Enumerated(EnumType.STRING) // Guarda el nombre del rol (ej: "MEDICO") en la BD
+    
+    @Enumerated(EnumType.STRING)
     private Rol rol;
-    // --- FIN DEL CAMBIO ---
-
-    private int intentosFallidos;
+    
+    @Column(name = "INTENTOS_FALLIDOS")
+    private Integer intentosFallidos;
+    
+    @Column(name = "BLOQUEO_EXPIRACION")
     private LocalDateTime bloqueoExpiracion;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Ahora el rol se asigna dinámicamente
         return List.of(new SimpleGrantedAuthority(rol.name()));
     }
 
-    // ... (El resto de la clase se mantiene igual)
     @Override
     public String getUsername() {
-        return this.email;
+        return email;
     }
 
     @Override
@@ -58,10 +57,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        if (bloqueoExpiracion == null) {
-            return true;
-        }
-        return bloqueoExpiracion.isBefore(LocalDateTime.now());
+        return true;
     }
 
     @Override

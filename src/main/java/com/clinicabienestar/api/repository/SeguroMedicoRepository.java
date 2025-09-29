@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface SeguroMedicoRepository extends JpaRepository<SeguroMedico, Long> {
-    // Método para buscar un seguro por el ID del paciente, que será útil
+    // Consulta para encontrar el seguro por el ID del paciente
     Optional<SeguroMedico> findByPacienteId(Long pacienteId);
 }

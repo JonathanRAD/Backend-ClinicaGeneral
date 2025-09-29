@@ -1,30 +1,39 @@
 // RUTA: src/main/java/com/clinicabienestar/api/model/Factura.java
-
 package com.clinicabienestar.api.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference; 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List; 
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Data
+@Data // <-- Esta anotación crea los getters y setters como getDetalles()
+@Table(name = "FACTURAS")
 public class Factura {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "facturas_seq")
+    @SequenceGenerator(name = "facturas_seq", sequenceName = "FACTURAS_SEQ", allocationSize = 1)
     private Long id;
 
-    private Double monto; 
-    private Double montoPagado; 
-    private LocalDate fechaEmision;
-    private String estado; 
+    private BigDecimal monto;
 
-    @ManyToOne
-    @JoinColumn(name = "cita_id")
+    @Column(name = "MONTO_PAGADO")
+    private BigDecimal montoPagado;
+
+    @Column(name = "FECHA_EMISION")
+    private LocalDate fechaEmision;
+    
+    private String estado;
+
+    @OneToOne
+    @JoinColumn(name = "CITA_ID")
     private Cita cita;
 
-    @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true)
+    // ESTA LÍNEA CREA LOS MÉTODOS getDetalles() y setDetalles()
+    @OneToMany(mappedBy = "factura", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference("factura-detalles")
-    private List<DetalleFactura> detalles;
+    private List<DetalleFactura> detalles = new ArrayList<>();
 }

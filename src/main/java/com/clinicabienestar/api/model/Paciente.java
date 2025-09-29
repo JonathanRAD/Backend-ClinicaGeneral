@@ -1,40 +1,37 @@
 // RUTA: src/main/java/com/clinicabienestar/api/model/Paciente.java
-
 package com.clinicabienestar.api.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Entity
+@Table(name = "PACIENTES")
 public class Paciente {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pacientes_seq")
+    @SequenceGenerator(name = "pacientes_seq", sequenceName = "PACIENTES_SEQ", allocationSize = 1)
     private Long id;
-
     private String dni;
     private String nombres;
     private String apellidos;
-    private LocalDate fechaNacimiento;
+    @Column(name = "FECHA_NACIMIENTO") private LocalDate fechaNacimiento;
     private String telefono;
     private String direccion;
+    private BigDecimal peso;
+    private BigDecimal altura;
+    @Column(name = "RITMO_CARDIACO") private Integer ritmoCardiaco;
 
-    private Double peso;
-    private Double altura;
-    private Integer ritmoCardiaco;
-
-    @OneToOne(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("paciente-historia") // Para evitar recursividad infinita
+    // CORRECCIÓN: Esta es la parte "inversa" de la relación
+    @OneToOne(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("paciente-historia")
     private HistoriaClinica historiaClinica;
 
-    @OneToOne(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("paciente-seguro") // Para evitar recursividad infinita
+    // CORRECCIÓN: El Paciente es "dueño" de esta relación
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "SEGURO_MEDICO_ID", referencedColumnName = "id")
     private SeguroMedico seguroMedico;
 }

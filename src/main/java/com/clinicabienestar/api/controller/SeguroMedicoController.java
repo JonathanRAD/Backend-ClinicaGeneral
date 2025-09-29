@@ -1,5 +1,3 @@
-// RUTA: src/main/java/com/clinicabienestar/api/controller/SeguroMedicoController.java
-
 package com.clinicabienestar.api.controller;
 
 import com.clinicabienestar.api.dto.SeguroMedicoDTO;
@@ -31,19 +29,21 @@ public class SeguroMedicoController {
             SeguroMedico seguro = paciente.getSeguroMedico();
             if (seguro == null) {
                 seguro = new SeguroMedico();
-                seguro.setPaciente(paciente);
+                paciente.setSeguroMedico(seguro);
             }
 
+            // CORRECCIÓN: Así se establece la relación
+            seguro.setPaciente(paciente);
             seguro.setNombreAseguradora(seguroDTO.getNombreAseguradora());
             seguro.setNumeroPoliza(seguroDTO.getNumeroPoliza());
             seguro.setCobertura(seguroDTO.getCobertura());
-            paciente.setSeguroMedico(seguro);
-            pacienteRepository.save(paciente);
-            
-            return ResponseEntity.ok(seguro);
+
+            SeguroMedico seguroGuardado = seguroMedicoRepository.save(seguro);
+            return ResponseEntity.ok(seguroGuardado);
             
         }).orElse(ResponseEntity.notFound().build());
     }
+    
     @PutMapping("/{seguroId}")
     public ResponseEntity<SeguroMedico> actualizarSeguro(@PathVariable Long seguroId, @RequestBody SeguroMedicoDTO seguroDTO) {
         return seguroMedicoRepository.findById(seguroId).map(seguro -> {
