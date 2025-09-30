@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface CitaRepository extends JpaRepository<Cita, Long> {
@@ -17,4 +18,6 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
         @Param("startOfDay") LocalDateTime startOfDay,
         @Param("endOfDay") LocalDateTime endOfDay
     );
+    @Query("SELECT c FROM Cita c JOIN c.paciente p WHERE p.usuario.id = :usuarioId")
+    List<Cita> findByPacienteUsuarioId(@Param("usuarioId") Long usuarioId);
 }

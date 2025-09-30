@@ -15,6 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.clinicabienestar.api.dto.SeguroMedicoDTO; 
 import com.clinicabienestar.api.model.SeguroMedico;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.clinicabienestar.api.model.Usuario;
+import com.clinicabienestar.api.model.Paciente;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDateTime;
 
@@ -27,6 +32,22 @@ public class HistoriaClinicaController {
     @Autowired private ConsultaRepository consultaRepository;
     @Autowired private MedicoRepository medicoRepository;
     @Autowired private PacienteRepository pacienteRepository;
+
+
+    @GetMapping("/mi-historial")
+    @PreAuthorize("hasAuthority('PACIENTE')")
+    public ResponseEntity<HistoriaClinicaDTO> obtenerMiHistoriaClinica() {
+        // 1. Obtener el usuario autenticado
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuarioActual = (Usuario) authentication.getPrincipal();
+
+        // 2. Encontrar el perfil de Paciente a través del Usuario
+        Paciente paciente = pacienteRepository.findByUsuarioId(usuarioActual.getId())
+                .orElseThrow(() -> new RuntimeException("Perfil de paciente no encontrado"));
+
+        // 3. El resto de la lógica es la misma que ya tenías
+        return obtenerHistoriaPorPacienteId(paciente.getId());
+    }
 
     @GetMapping("/paciente/{pacienteId}")
     public ResponseEntity<HistoriaClinicaDTO> obtenerHistoriaPorPacienteId(@PathVariable Long pacienteId) {

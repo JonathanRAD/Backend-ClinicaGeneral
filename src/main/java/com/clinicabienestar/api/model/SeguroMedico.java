@@ -1,6 +1,7 @@
 // RUTA: src/main/java/com/clinicabienestar/api/model/SeguroMedico.java
 package com.clinicabienestar.api.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference; // <-- IMPORTA ESTA CLASE
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,5 +20,6 @@ public class SeguroMedico {
 
     // CORRECCIÓN: Esta es la parte "inversa" de la relación, no tiene @JoinColumn
     @OneToOne(mappedBy = "seguroMedico")
+    @JsonBackReference("paciente-seguro") // <-- AÑADE ESTA ANOTACIÓN (con un nombre único)
     private Paciente paciente;
 }

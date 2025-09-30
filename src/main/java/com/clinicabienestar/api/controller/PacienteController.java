@@ -4,6 +4,9 @@ package com.clinicabienestar.api.controller;
 
 import com.clinicabienestar.api.model.HistoriaClinica;
 import com.clinicabienestar.api.model.Paciente;
+import com.clinicabienestar.api.model.Usuario;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.clinicabienestar.api.repository.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +24,41 @@ public class PacienteController {
     @Autowired
     private PacienteRepository pacienteRepository;
 
+
+    @GetMapping("/mi-perfil")
+    @PreAuthorize("hasAuthority('PACIENTE')")
+    public ResponseEntity<Paciente> obtenerMiPerfil() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuarioActual = (Usuario) authentication.getPrincipal();
+
+        return pacienteRepository.findByUsuarioId(usuarioActual.getId())
+                .map(ResponseEntity::ok) // Si lo encuentra, devuelve 200 OK con el paciente
+                .orElse(ResponseEntity.notFound().build()); // Si no, devuelve 404
+    }
+    @PutMapping("/mi-perfil")
+    @PreAuthorize("hasAuthority('PACIENTE')")
+    public ResponseEntity<Paciente> actualizarMiPerfil(@RequestBody Paciente detallesPaciente) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuarioActual = (Usuario) authentication.getPrincipal();
+
+        return pacienteRepository.findByUsuarioId(usuarioActual.getId())
+                .map(pacienteExistente -> {
+                    // Actualizamos solo los campos que el paciente puede modificar
+                    pacienteExistente.setDni(detallesPaciente.getDni());
+                    pacienteExistente.setTelefono(detallesPaciente.getTelefono());
+                    pacienteExistente.setDireccion(detallesPaciente.getDireccion());
+                    pacienteExistente.setFechaNacimiento(detallesPaciente.getFechaNacimiento());
+                    pacienteExistente.setPeso(detallesPaciente.getPeso());
+                    pacienteExistente.setAltura(detallesPaciente.getAltura());
+                    
+                    Paciente pacienteActualizado = pacienteRepository.save(pacienteExistente);
+                    return ResponseEntity.ok(pacienteActualizado);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
     // ESTE ES EL MÉTODO QUE FALTABA
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'RECEPCIONISTA', 'MEDICO')") // <-- AÑADE ESTA LÍNEA
     public List<Paciente> obtenerTodosLosPacientes() {
         return pacienteRepository.findAll();
     }

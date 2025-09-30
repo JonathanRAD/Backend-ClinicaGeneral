@@ -2,9 +2,11 @@
 package com.clinicabienestar.api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference; // <-- IMPORTANTE
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List; // <-- IMPORTANTE
 
 @Entity
 @Data
@@ -22,7 +24,6 @@ public class Consulta {
     @Lob @Column(columnDefinition = "CLOB") private String diagnostico;
     @Lob @Column(columnDefinition = "CLOB") private String tratamiento;
 
-    // ESTA ES LA CORRECCIÓN CLAVE
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "HISTORIA_CLINICA_ID")
     @JsonBackReference("historia-consultas")
@@ -31,4 +32,9 @@ public class Consulta {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEDICO_ID")
     private Medico medico;
+
+    // --- AÑADE ESTA SECCIÓN ---
+    @OneToMany(mappedBy = "consulta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference("consulta-ordenes")
+    private List<OrdenLaboratorio> ordenesLaboratorio;
 }

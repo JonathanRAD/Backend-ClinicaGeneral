@@ -1,6 +1,7 @@
 // RUTA: src/main/java/com/clinicabienestar/api/model/HistoriaClinica.java
 package com.clinicabienestar.api.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference; // <-- IMPORTA ESTA CLASE
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class HistoriaClinica {
     // CORRECCIÓN: La Historia Clinica es "dueña" de esta relación
     @OneToOne
     @JoinColumn(name = "PACIENTE_ID", referencedColumnName = "id")
+    @JsonBackReference("paciente-historia") // <-- AÑADE ESTA ANOTACIÓN
     private Paciente paciente;
     
     @OneToMany(mappedBy = "historiaClinica", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

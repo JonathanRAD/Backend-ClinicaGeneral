@@ -8,7 +8,15 @@ import com.clinicabienestar.api.repository.CitaRepository;
 import com.clinicabienestar.api.repository.MedicoRepository;
 import com.clinicabienestar.api.repository.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.clinicabienestar.api.model.Usuario;
+import org.springframework.security.access.prepost.PreAuthorize; 
+import org.springframework.security.core.Authentication; 
+import org.springframework.security.core.context.SecurityContextHolder; 
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -25,9 +33,52 @@ public class CitaController {
     @Autowired private PacienteRepository pacienteRepository;
     @Autowired private MedicoRepository medicoRepository;
 
+    // --- AÑADE ESTE NUEVO ENDPOINT ---
+    @GetMapping("/mis-citas")
+    @PreAuthorize("hasAuthority('PACIENTE')")
+    public ResponseEntity<List<Cita>> obtenerMisCitas() {
+        // 1. Obtener el usuario autenticado
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuarioActual = (Usuario) authentication.getPrincipal();
+
+        // 2. Usar el nuevo método del repositorio para buscar las citas
+        List<Cita> misCitas = citaRepository.findByPacienteUsuarioId(usuarioActual.getId());
+
+        // 3. Devolver la lista
+        return ResponseEntity.ok(misCitas);
+    }
+
     @GetMapping
     public List<Cita> obtenerTodasLasCitas() {
         return citaRepository.findAll();
+    }
+    // --- NUEVO ENDPOINT PARA QUE EL PACIENTE AGENTE SU CITA ---
+    @PostMapping("/agendar")
+    @PreAuthorize("hasAuthority('PACIENTE')")
+    public ResponseEntity<Cita> agendarCitaPaciente(@RequestBody CitaDTO citaDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuarioActual = (Usuario) authentication.getPrincipal();
+
+        Paciente paciente = pacienteRepository.findByUsuarioId(usuarioActual.getId())
+                .orElseThrow(() -> new RuntimeException("Perfil de paciente no encontrado para el usuario actual"));
+        
+        Medico medico = medicoRepository.findById(citaDTO.getMedicoId())
+                .orElseThrow(() -> new RuntimeException("Médico no encontrado"));
+
+        Cita cita = new Cita();
+        cita.setPaciente(paciente);
+        cita.setMedico(medico);
+        
+        LocalDateTime fechaHoraLocal = LocalDateTime.ofInstant(citaDTO.getFechaHora(), ZoneId.systemDefault());
+        cita.setFechaHora(fechaHoraLocal);
+        
+        cita.setMotivo(citaDTO.getMotivo());
+        cita.setEstado("programada");
+        cita.setConsultorio(asignarConsultorio(medico.getEspecialidad()));
+        cita.setNumeroTurno(calcularNumeroTurno(medico.getId(), fechaHoraLocal.toLocalDate()));
+
+        Cita nuevaCita = citaRepository.save(cita);
+        return ResponseEntity.ok(nuevaCita);
     }
 
     @PostMapping
@@ -92,6 +143,29 @@ public class CitaController {
         Cita citaActualizada = citaRepository.save(cita);
         return ResponseEntity.ok(citaActualizada);
     }
+    @DeleteMapping("/mis-citas/{id}")
+    @PreAuthorize("hasAuthority('PACIENTE')")
+    public ResponseEntity<Void> cancelarMiCita(@PathVariable Long id) {
+        // 1. Obtener el usuario autenticado
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuarioActual = (Usuario) authentication.getPrincipal();
+
+        // 2. Encontrar la cita que se quiere cancelar
+        Cita cita = citaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+
+        // 3. ¡VERIFICACIÓN DE SEGURIDAD CLAVE!
+        // Comprobamos que el ID de usuario del paciente de la cita coincide con el ID del usuario logueado.
+        if (!cita.getPaciente().getUsuario().getId().equals(usuarioActual.getId())) {
+            // Si no coinciden, significa que un paciente está intentando borrar la cita de otro.
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        // 4. Si la verificación pasa, eliminamos la cita
+        citaRepository.delete(cita);
+        
+        return ResponseEntity.noContent().build(); // Devuelve 204 No Content (éxito)
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarCita(@PathVariable Long id) {
@@ -102,3 +176,4 @@ public class CitaController {
                 }).orElse(ResponseEntity.notFound().build());
     }
 }
+

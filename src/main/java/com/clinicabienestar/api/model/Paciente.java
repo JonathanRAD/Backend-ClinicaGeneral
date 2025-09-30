@@ -33,5 +33,10 @@ public class Paciente {
     // CORRECCIÓN: El Paciente es "dueño" de esta relación
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "SEGURO_MEDICO_ID", referencedColumnName = "id")
+    @JsonManagedReference("paciente-seguro")
     private SeguroMedico seguroMedico;
+
+    @OneToOne
+    @JoinColumn(name = "USUARIO_ID", referencedColumnName = "id")
+    private Usuario usuario;
 }
