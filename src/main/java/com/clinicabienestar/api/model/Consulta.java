@@ -13,16 +13,15 @@ import java.util.List; // <-- IMPORTANTE
 @Table(name = "CONSULTAS")
 public class Consulta {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "consultas_seq")
-    @SequenceGenerator(name = "consultas_seq", sequenceName = "CONSULTAS_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "FECHA_CONSULTA")
     private LocalDateTime fechaConsulta;
-
-    @Lob @Column(columnDefinition = "CLOB") private String motivo;
-    @Lob @Column(columnDefinition = "CLOB") private String diagnostico;
-    @Lob @Column(columnDefinition = "CLOB") private String tratamiento;
+    
+    @Column(columnDefinition = "TEXT") private String motivo;
+    @Column(columnDefinition = "TEXT") private String diagnostico;
+    @Column(columnDefinition = "TEXT") private String tratamiento;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "HISTORIA_CLINICA_ID")

@@ -14,9 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.clinicabienestar.api.model.Usuario;
-import org.springframework.security.access.prepost.PreAuthorize; 
-import org.springframework.security.core.Authentication; 
-import org.springframework.security.core.context.SecurityContextHolder; 
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -35,7 +32,7 @@ public class CitaController {
 
     // --- AÑADE ESTE NUEVO ENDPOINT ---
     @GetMapping("/mis-citas")
-    @PreAuthorize("hasAuthority('PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<List<Cita>> obtenerMisCitas() {
         // 1. Obtener el usuario autenticado
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -54,7 +51,7 @@ public class CitaController {
     }
     // --- NUEVO ENDPOINT PARA QUE EL PACIENTE AGENTE SU CITA ---
     @PostMapping("/agendar")
-    @PreAuthorize("hasAuthority('PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<Cita> agendarCitaPaciente(@RequestBody CitaDTO citaDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Usuario usuarioActual = (Usuario) authentication.getPrincipal();
@@ -144,7 +141,7 @@ public class CitaController {
         return ResponseEntity.ok(citaActualizada);
     }
     @DeleteMapping("/mis-citas/{id}")
-    @PreAuthorize("hasAuthority('PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<Void> cancelarMiCita(@PathVariable Long id) {
         // 1. Obtener el usuario autenticado
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

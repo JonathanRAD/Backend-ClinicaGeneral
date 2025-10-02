@@ -16,10 +16,8 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
 public class Medico {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "medicos_seq")
-    @SequenceGenerator(name = "medicos_seq", sequenceName = "MEDICOS_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
     private String nombres;
     private String apellidos;
     private String especialidad;

@@ -11,8 +11,7 @@ import java.math.BigDecimal;
 @Table(name = "DETALLES_FACTURA")
 public class DetalleFactura {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "detalles_factura_seq")
-    @SequenceGenerator(name = "detalles_factura_seq", sequenceName = "DETALLES_FACTURA_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "DESCRIPCION_SERVICIO")

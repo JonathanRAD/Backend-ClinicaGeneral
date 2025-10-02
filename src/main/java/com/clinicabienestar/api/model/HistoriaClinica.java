@@ -13,14 +13,16 @@ import java.util.List;
 @Table(name = "HISTORIAS_CLINICAS")
 public class HistoriaClinica {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "historias_clinicas_seq")
-    @SequenceGenerator(name = "historias_clinicas_seq", sequenceName = "HISTORIAS_CLINICAS_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "FECHA_CREACION") private LocalDate fechaCreacion;
-    @Lob @Column(columnDefinition = "CLOB") private String antecedentes;
-    @Lob @Column(columnDefinition = "CLOB") private String alergias;
-    @Lob @Column(name = "ENFERMEDADES_CRONICAS", columnDefinition = "CLOB") private String enfermedadesCronicas;
+    @Column(name = "FECHA_CREACION")
+    private LocalDate fechaCreacion;
+    
+    // QUITA @Lob de estos tres campos
+    @Column(columnDefinition = "TEXT") private String antecedentes;
+    @Column(columnDefinition = "TEXT") private String alergias;
+    @Column(name = "ENFERMEDADES_CRONICAS", columnDefinition = "TEXT") private String enfermedadesCronicas;
 
     // CORRECCIÓN: La Historia Clinica es "dueña" de esta relación
     @OneToOne

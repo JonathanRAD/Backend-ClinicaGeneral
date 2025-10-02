@@ -1,3 +1,4 @@
+// RUTA: src/main/java/com/clinicabienestar/api/model/Usuario.java
 package com.clinicabienestar.api.model;
 
 import java.time.LocalDateTime;
@@ -22,8 +23,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "USUARIOS")
 public class Usuario implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usuarios_seq")
-    @SequenceGenerator(name = "usuarios_seq", sequenceName = "USUARIOS_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     private String nombres;
@@ -42,7 +42,11 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(rol.name()));
+        // =========== INICIO DEL CAMBIO ===========
+        // Agregamos el prefijo "ROLE_" que es el estándar de Spring Security.
+        // Esto asegura que hasRole() y hasAnyRole() funcionen correctamente.
+        return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));
+        // =========== FIN DEL CAMBIO ===========
     }
 
     @Override
@@ -57,7 +61,8 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        // Esta lógica estaba incompleta. La corregimos para que el bloqueo funcione.
+        return this.bloqueoExpiracion == null || this.bloqueoExpiracion.isBefore(LocalDateTime.now());
     }
 
     @Override

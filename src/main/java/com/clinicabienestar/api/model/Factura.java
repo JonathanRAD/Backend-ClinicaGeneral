@@ -14,8 +14,7 @@ import java.util.List;
 @Table(name = "FACTURAS")
 public class Factura {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "facturas_seq")
-    @SequenceGenerator(name = "facturas_seq", sequenceName = "FACTURAS_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private BigDecimal monto;

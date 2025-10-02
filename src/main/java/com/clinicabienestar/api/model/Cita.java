@@ -14,8 +14,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "CITAS") // Mapeo a la tabla CITAS
 public class Cita {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "citas_seq")
-    @SequenceGenerator(name = "citas_seq", sequenceName = "CITAS_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "FECHA_HORA") // Mapeo de columna

@@ -28,7 +28,7 @@ public class UsuarioController {
     private AuthService authService; // Reutilizaremos la lógica de creación
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> crearUsuarioPorAdmin(@RequestBody RegisterRequest request) {
         authService.createUserByAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -36,7 +36,7 @@ public class UsuarioController {
 
     // PUT: Endpoint para que un admin actualice un usuario
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<UsuarioDTO> actualizarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
@@ -63,16 +63,17 @@ public class UsuarioController {
 
     // Endpoint para que un admin obtenga todos los usuarios
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public List<UsuarioDTO> getAllUsuarios() {
         return usuarioRepository.findAll().stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
+
     // DELETE: Endpoint para que un admin elimine un usuario
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         // Asegúrate de no permitir que un admin se elimine a sí mismo
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -97,9 +98,6 @@ public class UsuarioController {
         dto.setApellidos(usuario.getApellidos());
         dto.setEmail(usuario.getEmail());
         dto.setRol(usuario.getRol());
-        // Asumimos que quieres mostrar la fecha de registro, si no, puedes omitirla.
-        // Si no tienes fecha de registro en tu entidad, puedes omitir la línea.
-        // dto.setFechaRegistro(usuario.getFechaRegistro()); 
         return dto;
     }
 }

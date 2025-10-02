@@ -35,7 +35,7 @@ public class HistoriaClinicaController {
 
 
     @GetMapping("/mi-historial")
-    @PreAuthorize("hasAuthority('PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<HistoriaClinicaDTO> obtenerMiHistoriaClinica() {
         // 1. Obtener el usuario autenticado
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

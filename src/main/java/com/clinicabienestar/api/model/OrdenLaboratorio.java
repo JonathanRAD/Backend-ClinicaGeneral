@@ -15,8 +15,7 @@ import java.time.LocalDate;
 @Table(name = "ORDENES_LABORATORIO")
 public class OrdenLaboratorio {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ordenes_laboratorio_seq")
-    @SequenceGenerator(name = "ordenes_laboratorio_seq", sequenceName = "ORDENES_LABORATORIO_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(name = "FECHA_ORDEN")
@@ -25,8 +24,7 @@ public class OrdenLaboratorio {
     @Column(name = "TIPO_EXAMEN")
     private String tipoExamen;
     
-    @Lob 
-    @Column(name = "OBSERVACIONES", columnDefinition = "CLOB")
+    @Column(name = "OBSERVACIONES", columnDefinition = "TEXT")
     private String observaciones;
 
     @ManyToOne

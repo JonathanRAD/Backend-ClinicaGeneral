@@ -10,8 +10,7 @@ import lombok.Data;
 @Table(name = "SEGUROS_MEDICOS")
 public class SeguroMedico {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seguros_medicos_seq")
-    @SequenceGenerator(name = "seguros_medicos_seq", sequenceName = "SEGUROS_MEDICOS_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "NOMBRE_ASEGURADORA") private String nombreAseguradora;
