@@ -7,7 +7,11 @@ RUN mvn clean package -DskipTests
 # ETAPA 2: Creación de la imagen final
 FROM openjdk:17-jdk-slim
 WORKDIR /app
-COPY --from=build /app/target/api-0.0.1-SNAPSHOT.jar app.jar
 
-EXPOSE 8080
-ENTRYPOINT ["java","-jar","/app.jar"]
+# --- CAMBIO ---
+# Copiamos el JAR manteniendo su nombre original
+COPY --from=build /app/target/api-0.0.1-SNAPSHOT.jar .
+
+# --- CAMBIO ---
+# Ejecutamos el JAR usando su nombre original
+ENTRYPOINT ["java","-jar","./api-0.0.1-SNAPSHOT.jar"]
