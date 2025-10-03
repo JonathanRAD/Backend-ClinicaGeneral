@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,9 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
-import static org.springframework.security.config.Customizer.withDefaults;
+import java.util.Arrays; // Importar Arrays
 
 @Configuration
 @EnableWebSecurity
@@ -33,12 +32,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
-                .cors(withDefaults()) // Habilita la configuración CORS definida en el Bean de abajo
+                .cors(Customizer.withDefaults()) // Habilita la configuración CORS definida en el Bean de abajo
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-                                // La ruta correcta es "/api/auth/**" para que coincida con tu AuthController.
                                 .requestMatchers("/api/auth/**").permitAll()
-                                // Para cualquier otra petición, se requiere autenticación.
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManager ->
@@ -49,11 +46,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        // --- AQUÍ ESTÁ EL CAMBIO ---
+        // Añadimos la URL del frontend de Vercel a los orígenes permitidos.
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://frontend-clinica-general.vercel.app"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
