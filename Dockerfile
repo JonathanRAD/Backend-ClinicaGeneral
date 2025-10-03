@@ -9,8 +9,8 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # --- AQUÍ ESTÁ EL CAMBIO ---
-# Copiamos el JAR ejecutable por su nombre específico
-COPY --from=build /app/target/api-0.0.1-SNAPSHOT.jar app.jar
+# Copiamos el JAR que se genera con el nombre "app.jar"
+COPY --from=build /app/target/app.jar app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app.jar"]
