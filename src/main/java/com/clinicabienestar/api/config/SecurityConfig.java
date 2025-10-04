@@ -50,7 +50,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // --- AQUÍ ESTÁ EL CAMBIO ---
         // Añadimos la URL del frontend de Vercel a los orígenes permitidos.
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://frontend-clinica-general.vercel.app"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://clinica-saludvida.vercel.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
