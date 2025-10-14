@@ -1,55 +1,35 @@
+// RUTA MODIFICADA: src/main/java/com/clinicabienestar/api/controller/LaboratorioController.java
 package com.clinicabienestar.api.controller;
 
 import com.clinicabienestar.api.dto.OrdenLaboratorioDTO;
 import com.clinicabienestar.api.dto.ResultadoLaboratorioDTO;
 import com.clinicabienestar.api.model.OrdenLaboratorio;
 import com.clinicabienestar.api.model.ResultadoLaboratorio;
-import com.clinicabienestar.api.repository.ConsultaRepository;
-import com.clinicabienestar.api.repository.OrdenLaboratorioRepository;
-import com.clinicabienestar.api.repository.ResultadoLaboratorioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.clinicabienestar.api.service.LaboratorioService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/laboratorio")
+@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")
 public class LaboratorioController {
 
-    @Autowired private OrdenLaboratorioRepository ordenRepository;
-    @Autowired private ResultadoLaboratorioRepository resultadoRepository;
-    @Autowired private ConsultaRepository consultaRepository;
+    private final LaboratorioService laboratorioService;
 
-    // Endpoint para CREAR una nueva orden de laboratorio para una consulta
     @PostMapping("/ordenes/consulta/{consultaId}")
+    @PreAuthorize("hasAnyRole('MEDICO', 'ADMINISTRador')")
     public ResponseEntity<OrdenLaboratorio> crearOrden(@PathVariable Long consultaId, @RequestBody OrdenLaboratorioDTO ordenDTO) {
-        return consultaRepository.findById(consultaId).map(consulta -> {
-            OrdenLaboratorio nuevaOrden = new OrdenLaboratorio();
-            nuevaOrden.setFechaOrden(LocalDate.now());
-            nuevaOrden.setTipoExamen(ordenDTO.getTipoExamen());
-            nuevaOrden.setObservaciones(ordenDTO.getObservaciones());
-            nuevaOrden.setConsulta(consulta);
-            
-            OrdenLaboratorio ordenGuardada = ordenRepository.save(nuevaOrden);
-            return ResponseEntity.ok(ordenGuardada);
-        }).orElse(ResponseEntity.notFound().build());
+        OrdenLaboratorio ordenGuardada = laboratorioService.crearOrden(consultaId, ordenDTO);
+        return ResponseEntity.ok(ordenGuardada);
     }
 
-    // Endpoint para CARGAR el resultado de una orden
     @PostMapping("/resultados/orden/{ordenId}")
+    @PreAuthorize("hasAnyRole('MEDICO', 'ADMINISTRADOR')") // O el rol que corresponda al personal de laboratorio
     public ResponseEntity<ResultadoLaboratorio> cargarResultado(@PathVariable Long ordenId, @RequestBody ResultadoLaboratorioDTO resultadoDTO) {
-        return ordenRepository.findById(ordenId).map(orden -> {
-            ResultadoLaboratorio nuevoResultado = new ResultadoLaboratorio();
-            nuevoResultado.setFechaResultado(LocalDate.now());
-            nuevoResultado.setDescripcion(resultadoDTO.getDescripcion());
-            nuevoResultado.setValores(resultadoDTO.getValores());
-            nuevoResultado.setConclusiones(resultadoDTO.getConclusiones());
-            nuevoResultado.setOrdenLaboratorio(orden);
-
-            ResultadoLaboratorio resultadoGuardado = resultadoRepository.save(nuevoResultado);
-            return ResponseEntity.ok(resultadoGuardado);
-        }).orElse(ResponseEntity.notFound().build());
+        ResultadoLaboratorio resultadoGuardado = laboratorioService.cargarResultado(ordenId, resultadoDTO);
+        return ResponseEntity.ok(resultadoGuardado);
     }
 }

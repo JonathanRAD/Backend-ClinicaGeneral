@@ -1,55 +1,47 @@
-// RUTA: src/main/java/com/clinicabienestar/api/controller/MedicoController.java
 
 package com.clinicabienestar.api.controller;
 
 import com.clinicabienestar.api.model.Medico;
-import com.clinicabienestar.api.repository.MedicoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.clinicabienestar.api.service.MedicoService; 
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/medicos")
+@RequiredArgsConstructor 
 @CrossOrigin(origins = "http://localhost:4200")
 public class MedicoController {
 
-    @Autowired
-    private MedicoRepository medicoRepository;
+    private final MedicoService medicoService; 
 
-    // GET: Obtener todos los médicos
     @GetMapping
     public List<Medico> obtenerTodosLosMedicos() {
-        return medicoRepository.findAll();
+        return medicoService.obtenerTodosLosMedicos();
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<Medico> obtenerMedicoPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(medicoService.obtenerMedicoPorId(id));
     }
 
-    // POST: Crear un nuevo médico
     @PostMapping
-    public Medico crearMedico(@RequestBody Medico medico) {
-        return medicoRepository.save(medico);
+    public ResponseEntity<Medico> crearMedico(@RequestBody Medico medico) {
+        Medico nuevoMedico = medicoService.crearMedico(medico);
+        return new ResponseEntity<>(nuevoMedico, HttpStatus.CREATED);
     }
 
-    // PUT: Actualizar un médico existente
     @PutMapping("/{id}")
     public ResponseEntity<Medico> actualizarMedico(@PathVariable Long id, @RequestBody Medico detallesMedico) {
-        return medicoRepository.findById(id)
-                .map(medico -> {
-                    medico.setNombres(detallesMedico.getNombres());
-                    medico.setApellidos(detallesMedico.getApellidos());
-                    medico.setEspecialidad(detallesMedico.getEspecialidad());
-                    medico.setFechaNacimiento(detallesMedico.getFechaNacimiento());
-                    Medico medicoActualizado = medicoRepository.save(medico);
-                    return ResponseEntity.ok(medicoActualizado);
-                }).orElse(ResponseEntity.notFound().build());
+        Medico medicoActualizado = medicoService.actualizarMedico(id, detallesMedico);
+        return ResponseEntity.ok(medicoActualizado);
     }
 
-    // DELETE: Eliminar un médico
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarMedico(@PathVariable Long id) {
-        return medicoRepository.findById(id)
-                .map(medico -> {
-                    medicoRepository.delete(medico);
-                    return ResponseEntity.noContent().<Void>build();
-                }).orElse(ResponseEntity.notFound().build());
+        medicoService.eliminarMedico(id);
+        return ResponseEntity.noContent().build();
     }
 }
