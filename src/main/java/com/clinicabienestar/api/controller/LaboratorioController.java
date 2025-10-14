@@ -20,7 +20,7 @@ public class LaboratorioController {
     private final LaboratorioService laboratorioService;
 
     @PostMapping("/ordenes/consulta/{consultaId}")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ADMINISTRador')")
+    @PreAuthorize("hasAnyRole('MEDICO', 'ADMINISTRADOR')")
     public ResponseEntity<OrdenLaboratorio> crearOrden(@PathVariable Long consultaId, @RequestBody OrdenLaboratorioDTO ordenDTO) {
         OrdenLaboratorio ordenGuardada = laboratorioService.crearOrden(consultaId, ordenDTO);
         return ResponseEntity.ok(ordenGuardada);
