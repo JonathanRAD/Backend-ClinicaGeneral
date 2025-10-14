@@ -1,8 +1,8 @@
-// RUTA: src/main/java/com/clinicabienestar/api/service/HistoriaClinicaService.java
 package com.clinicabienestar.api.service;
 
 import com.clinicabienestar.api.dto.*;
 import com.clinicabienestar.api.exception.ResourceNotFoundException;
+import com.clinicabienestar.api.mapper.HistoriaClinicaMapper; // <-- 1. IMPORTAR
 import com.clinicabienestar.api.model.*;
 import com.clinicabienestar.api.repository.ConsultaRepository;
 import com.clinicabienestar.api.repository.HistoriaClinicaRepository;
@@ -24,6 +24,7 @@ public class HistoriaClinicaService {
     private final PacienteRepository pacienteRepository;
     private final ConsultaRepository consultaRepository;
     private final MedicoRepository medicoRepository;
+    private final HistoriaClinicaMapper historiaClinicaMapper; // <-- 2. INYECTAR
 
     private Usuario getUsuarioActual() {
         return (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -48,7 +49,8 @@ public class HistoriaClinicaService {
             throw new ResourceNotFoundException("Historia clínica no encontrada para el paciente con ID: " + pacienteId);
         }
 
-        return convertirAHistoriaClinicaDTO(historia, paciente);
+        // <-- 3. USAR EL MAPPER
+        return historiaClinicaMapper.toDTO(historia, paciente);
     }
     
     public HistoriaClinica actualizarHistoriaClinica(Long id, HistoriaClinicaDTO historiaDTO) {
@@ -75,44 +77,11 @@ public class HistoriaClinicaService {
         nuevaConsulta.setDiagnostico(consultaDTO.getDiagnostico());
         nuevaConsulta.setTratamiento(consultaDTO.getTratamiento());
         
-        // Manejo de la relación bidireccional
         nuevaConsulta.setMedico(medico);
-        nuevaConsulta.setHistoriaClinica(historia); // Lado "dueño" de la relación
-        historia.getConsultas().add(nuevaConsulta); // Actualizamos el lado inverso
+        nuevaConsulta.setHistoriaClinica(historia); 
+        historia.getConsultas().add(nuevaConsulta);
 
         return consultaRepository.save(nuevaConsulta);
     }
-    
-    // Método privado para el mapeo/ensamblaje del DTO
-    private HistoriaClinicaDTO convertirAHistoriaClinicaDTO(HistoriaClinica historia, Paciente paciente) {
-        // Mapeo del Paciente a PacienteDTO
-        PacienteDTO pacienteDTO = new PacienteDTO();
-        pacienteDTO.setId(paciente.getId());
-        pacienteDTO.setNombres(paciente.getNombres());
-        pacienteDTO.setApellidos(paciente.getApellidos());
-        pacienteDTO.setDni(paciente.getDni());
-        pacienteDTO.setTelefono(paciente.getTelefono());
 
-        // Mapeo del Seguro (si existe)
-        SeguroMedico seguro = paciente.getSeguroMedico();
-        if (seguro != null) {
-            SeguroMedicoDTO seguroDTO = new SeguroMedicoDTO();
-            seguroDTO.setNombreAseguradora(seguro.getNombreAseguradora());
-            seguroDTO.setNumeroPoliza(seguro.getNumeroPoliza());
-            seguroDTO.setCobertura(seguro.getCobertura());
-            pacienteDTO.setSeguroMedico(seguroDTO);
-        }
-
-        // Ensamblaje final de HistoriaClinicaDTO
-        HistoriaClinicaDTO responseDTO = new HistoriaClinicaDTO();
-        responseDTO.setId(historia.getId());
-        responseDTO.setFechaCreacion(historia.getFechaCreacion());
-        responseDTO.setAntecedentes(historia.getAntecedentes());
-        responseDTO.setAlergias(historia.getAlergias());
-        responseDTO.setEnfermedadesCronicas(historia.getEnfermedadesCronicas());
-        responseDTO.setConsultas(historia.getConsultas()); // Se puede mantener la entidad completa si es necesario
-        responseDTO.setPaciente(pacienteDTO);
-
-        return responseDTO;
-    }
 }

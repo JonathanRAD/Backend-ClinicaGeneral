@@ -1,9 +1,9 @@
-// RUTA PROPUESTA: src/main/java/com/clinicabienestar/api/service/UsuarioService.java
 package com.clinicabienestar.api.service;
 
 import com.clinicabienestar.api.dto.UsuarioDTO;
 import com.clinicabienestar.api.exception.ForbiddenException;
 import com.clinicabienestar.api.exception.ResourceNotFoundException;
+import com.clinicabienestar.api.mapper.UsuarioMapper;
 import com.clinicabienestar.api.model.Usuario;
 import com.clinicabienestar.api.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,17 +12,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final UsuarioMapper usuarioMapper; 
 
     private Usuario getUsuarioActual() {
-        // Obtenemos el email del contexto de seguridad
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         return usuarioRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario actual no encontrado en la base de datos."));
@@ -31,14 +29,13 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public UsuarioDTO getMiPerfil() {
         Usuario usuarioActual = getUsuarioActual();
-        return convertirADTO(usuarioActual);
+        return usuarioMapper.toDTO(usuarioActual);
     }
 
     @Transactional(readOnly = true)
     public List<UsuarioDTO> getAllUsuarios() {
-        return usuarioRepository.findAll().stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        return usuarioMapper.toDTOList(usuarios);
     }
 
     public UsuarioDTO actualizarUsuario(Long id, UsuarioDTO usuarioDTO) {
@@ -48,10 +45,9 @@ public class UsuarioService {
         usuario.setNombres(usuarioDTO.getNombres());
         usuario.setApellidos(usuarioDTO.getApellidos());
         usuario.setRol(usuarioDTO.getRol());
-        // Nota: No permitimos cambiar email o contraseña desde aquí para simplificar
         
         Usuario actualizado = usuarioRepository.save(usuario);
-        return convertirADTO(actualizado);
+        return usuarioMapper.toDTO(actualizado);
     }
 
     public void eliminarUsuario(Long id) {
@@ -66,16 +62,5 @@ public class UsuarioService {
         }
 
         usuarioRepository.deleteById(id);
-    }
-
-    // Este método de conversión vive ahora en el servicio
-    private UsuarioDTO convertirADTO(Usuario usuario) {
-        UsuarioDTO dto = new UsuarioDTO();
-        dto.setId(usuario.getId());
-        dto.setNombres(usuario.getNombres());
-        dto.setApellidos(usuario.getApellidos());
-        dto.setEmail(usuario.getEmail());
-        dto.setRol(usuario.getRol());
-        return dto;
     }
 }

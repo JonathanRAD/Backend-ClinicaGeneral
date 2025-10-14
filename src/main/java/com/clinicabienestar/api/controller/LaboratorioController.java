@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/laboratorio")
@@ -21,14 +22,14 @@ public class LaboratorioController {
 
     @PostMapping("/ordenes/consulta/{consultaId}")
     @PreAuthorize("hasAnyRole('MEDICO', 'ADMINISTRADOR')")
-    public ResponseEntity<OrdenLaboratorio> crearOrden(@PathVariable Long consultaId, @RequestBody OrdenLaboratorioDTO ordenDTO) {
+    public ResponseEntity<OrdenLaboratorio> crearOrden(@PathVariable Long consultaId, @Valid @RequestBody OrdenLaboratorioDTO ordenDTO) {
         OrdenLaboratorio ordenGuardada = laboratorioService.crearOrden(consultaId, ordenDTO);
         return ResponseEntity.ok(ordenGuardada);
     }
 
     @PostMapping("/resultados/orden/{ordenId}")
     @PreAuthorize("hasAnyRole('MEDICO', 'ADMINISTRADOR')") // O el rol que corresponda al personal de laboratorio
-    public ResponseEntity<ResultadoLaboratorio> cargarResultado(@PathVariable Long ordenId, @RequestBody ResultadoLaboratorioDTO resultadoDTO) {
+    public ResponseEntity<ResultadoLaboratorio> cargarResultado(@PathVariable Long ordenId, @Valid @RequestBody ResultadoLaboratorioDTO resultadoDTO) {
         ResultadoLaboratorio resultadoGuardado = laboratorioService.cargarResultado(ordenId, resultadoDTO);
         return ResponseEntity.ok(resultadoGuardado);
     }

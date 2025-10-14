@@ -1,8 +1,8 @@
-// RUTA: src/main/java/com/clinicabienestar/api/service/FacturaService.java
 package com.clinicabienestar.api.service;
 
 import com.clinicabienestar.api.dto.FacturaDTO;
 import com.clinicabienestar.api.exception.ResourceNotFoundException;
+import com.clinicabienestar.api.mapper.FacturaMapper; // <-- 1. IMPORTAR
 import com.clinicabienestar.api.model.Cita;
 import com.clinicabienestar.api.model.DetalleFactura;
 import com.clinicabienestar.api.model.Factura;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
+// import java.util.stream.Collectors; // Ya no es necesario para el mapeo
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +24,7 @@ public class FacturaService {
 
     private final FacturaRepository facturaRepository;
     private final CitaRepository citaRepository;
+    private final FacturaMapper facturaMapper; // <-- 2. INYECTAR
 
     @Transactional(readOnly = true)
     public List<Factura> obtenerTodasLasFacturas() {
@@ -34,26 +35,18 @@ public class FacturaService {
         Cita cita = citaRepository.findById(facturaDTO.getCitaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada con ID: " + facturaDTO.getCitaId()));
 
-        Factura factura = new Factura();
-        factura.setCita(cita); // Relación con Cita
-        factura.setEstado(facturaDTO.getEstado());
+        // <-- 3. USAR EL MAPPER PARA LA CONVERSIÓN BASE
+        Factura factura = facturaMapper.toEntity(facturaDTO);
+        
+        // Asignar los campos ignorados por el mapper
+        factura.setCita(cita);
         factura.setFechaEmision(LocalDate.now());
-        factura.setMontoPagado(facturaDTO.getMontoPagado());
 
-        // Manejo de la relación bidireccional con DetalleFactura
-        if (facturaDTO.getDetalles() != null && !facturaDTO.getDetalles().isEmpty()) {
-            List<DetalleFactura> detalles = facturaDTO.getDetalles().stream().map(dto -> {
-                DetalleFactura detalle = new DetalleFactura();
-                detalle.setDescripcionServicio(dto.getDescripcionServicio());
-                detalle.setCantidad(dto.getCantidad());
-                detalle.setPrecioUnitario(dto.getPrecioUnitario());
-                detalle.setFactura(factura); // Establecer la relación en el lado "hijo"
-                return detalle;
-            }).collect(Collectors.toList());
-            
-            factura.getDetalles().addAll(detalles); // Añadir los detalles al "padre"
+        // Manejo de la relación bidireccional
+        if (factura.getDetalles() != null && !factura.getDetalles().isEmpty()) {
+            factura.getDetalles().forEach(detalle -> detalle.setFactura(factura)); // Establecer la referencia inversa
 
-            BigDecimal montoTotal = detalles.stream()
+            BigDecimal montoTotal = factura.getDetalles().stream()
                 .map(d -> d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
             factura.setMonto(montoTotal);
@@ -74,19 +67,12 @@ public class FacturaService {
         factura.setEstado(facturaDTO.getEstado());
         factura.setMontoPagado(facturaDTO.getMontoPagado());
         
-        // Limpiar detalles antiguos para evitar duplicados y manejar la relación
+        // Limpiar detalles antiguos y mapear los nuevos
         factura.getDetalles().clear();
-
-        if (facturaDTO.getDetalles() != null && !facturaDTO.getDetalles().isEmpty()) {
-            List<DetalleFactura> nuevosDetalles = facturaDTO.getDetalles().stream().map(dto -> {
-                DetalleFactura detalle = new DetalleFactura();
-                detalle.setDescripcionServicio(dto.getDescripcionServicio());
-                detalle.setCantidad(dto.getCantidad());
-                detalle.setPrecioUnitario(dto.getPrecioUnitario());
-                detalle.setFactura(factura); // Establecer la relación
-                return detalle;
-            }).collect(Collectors.toList());
-            
+        List<DetalleFactura> nuevosDetalles = facturaMapper.toEntity(facturaDTO).getDetalles();
+        
+        if (nuevosDetalles != null && !nuevosDetalles.isEmpty()) {
+            nuevosDetalles.forEach(detalle -> detalle.setFactura(factura));
             factura.getDetalles().addAll(nuevosDetalles);
 
             BigDecimal montoTotal = nuevosDetalles.stream()

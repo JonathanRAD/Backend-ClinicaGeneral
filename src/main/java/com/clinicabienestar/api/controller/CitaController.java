@@ -1,9 +1,9 @@
-// RUTA MODIFICADA: src/main/java/com/clinicabienestar/api/controller/CitaController.java
 package com.clinicabienestar.api.controller;
 
 import com.clinicabienestar.api.dto.CitaDTO;
 import com.clinicabienestar.api.model.Cita;
 import com.clinicabienestar.api.service.CitaService;
+import jakarta.validation.Valid; // <-- IMPORTAR
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,24 +29,24 @@ public class CitaController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA')")
     public List<Cita> obtenerTodasLasCitas() {
-    return citaService.obtenerTodasLasCitas();
-}
+        return citaService.obtenerTodasLasCitas();
+    }
 
     @PostMapping("/agendar")
     @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<Cita> agendarCitaPaciente(@RequestBody CitaDTO citaDTO) {
+    public ResponseEntity<Cita> agendarCitaPaciente(@Valid @RequestBody CitaDTO citaDTO) {
         return new ResponseEntity<>(citaService.agendarCitaPaciente(citaDTO), HttpStatus.CREATED);
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA')")
-    public ResponseEntity<Cita> crearCita(@RequestBody CitaDTO citaDTO) {
+    public ResponseEntity<Cita> crearCita(@Valid @RequestBody CitaDTO citaDTO) {
         return new ResponseEntity<>(citaService.crearCita(citaDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA')")
-    public ResponseEntity<Cita> actualizarCita(@PathVariable Long id, @RequestBody CitaDTO citaDTO) {
+    public ResponseEntity<Cita> actualizarCita(@PathVariable Long id, @Valid @RequestBody CitaDTO citaDTO) {
         return ResponseEntity.ok(citaService.actualizarCita(id, citaDTO));
     }
 

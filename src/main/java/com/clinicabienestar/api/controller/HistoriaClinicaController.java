@@ -1,4 +1,3 @@
-// RUTA MODIFICADA: src/main/java/com/clinicabienestar/api/controller/HistoriaClinicaController.java
 package com.clinicabienestar.api.controller;
 
 import com.clinicabienestar.api.dto.ConsultaDTO;
@@ -10,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/historias")
@@ -38,9 +38,8 @@ public class HistoriaClinicaController {
     }
 
     @PostMapping("/{historiaId}/consultas")
-    // --- CAMBIA ESTA LÍNEA ---
     @PreAuthorize("hasAnyRole('MEDICO', 'ADMINISTRADOR')")
-    public ResponseEntity<Consulta> agregarConsulta(@PathVariable Long historiaId, @RequestBody ConsultaDTO consultaDTO) {
+    public ResponseEntity<Consulta> agregarConsulta(@PathVariable Long historiaId, @Valid @RequestBody ConsultaDTO consultaDTO) {
         Consulta consultaGuardada = historiaClinicaService.agregarConsulta(historiaId, consultaDTO);
         return ResponseEntity.ok(consultaGuardada);
     }

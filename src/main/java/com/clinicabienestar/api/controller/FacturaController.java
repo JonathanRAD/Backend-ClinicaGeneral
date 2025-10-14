@@ -4,11 +4,13 @@ package com.clinicabienestar.api.controller;
 import com.clinicabienestar.api.dto.FacturaDTO;
 import com.clinicabienestar.api.model.Factura;
 import com.clinicabienestar.api.service.FacturaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -28,14 +30,14 @@ public class FacturaController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'CAJERO')")
-    public ResponseEntity<Factura> crearFactura(@RequestBody FacturaDTO facturaDTO) {
+    public ResponseEntity<Factura> crearFactura(@Valid @RequestBody FacturaDTO facturaDTO) {
         Factura nuevaFactura = facturaService.crearFactura(facturaDTO);
         return new ResponseEntity<>(nuevaFactura, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'CAJERO')")
-    public ResponseEntity<Factura> actualizarFactura(@PathVariable Long id, @RequestBody FacturaDTO facturaDTO) {
+    public ResponseEntity<Factura> actualizarFactura(@PathVariable Long id, @Valid @RequestBody FacturaDTO facturaDTO) {
         Factura facturaActualizada = facturaService.actualizarFactura(id, facturaDTO);
         return ResponseEntity.ok(facturaActualizada);
     }
