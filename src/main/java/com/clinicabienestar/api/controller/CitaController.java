@@ -27,7 +27,6 @@ public class CitaController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA')")
     public List<Cita> obtenerTodasLasCitas() {
         return citaService.obtenerTodasLasCitas();
     }
