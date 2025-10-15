@@ -1,14 +1,15 @@
+// RUTA: src/main/java/com/clinicabienestar/api/dto/RegisterRequest.java
 package com.clinicabienestar.api.dto;
 
 import com.clinicabienestar.api.model.Rol;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.Set;
 
 @Data
 @Builder
@@ -30,6 +31,7 @@ public class RegisterRequest {
     @NotBlank(message = "El apellido no puede estar vacío.")
     private String apellidos;
 
-    @NotNull(message = "El rol no puede ser nulo.")
     private Rol rol;
+
+    private Set<String> permisos;
 }

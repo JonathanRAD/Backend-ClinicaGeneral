@@ -1,4 +1,3 @@
-// RUTA MODIFICADA: src/main/java/com/clinicabienestar/api/controller/FacturaController.java
 package com.clinicabienestar.api.controller;
 
 import com.clinicabienestar.api.dto.FacturaDTO;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.List;
 
 @RestController
@@ -23,27 +21,27 @@ public class FacturaController {
     private final FacturaService facturaService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'CAJERO', 'RECEPCIONISTA')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'CAJERO', 'RECEPCIONISTA') or hasAuthority('VER_FACTURACION')")
     public List<Factura> obtenerTodasLasFacturas() {
         return facturaService.obtenerTodasLasFacturas();
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'CAJERO')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'CAJERO') or hasAuthority('GESTIONAR_FACTURACION')")
     public ResponseEntity<Factura> crearFactura(@Valid @RequestBody FacturaDTO facturaDTO) {
         Factura nuevaFactura = facturaService.crearFactura(facturaDTO);
         return new ResponseEntity<>(nuevaFactura, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'CAJERO')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'CAJERO') or hasAuthority('GESTIONAR_FACTURACION')")
     public ResponseEntity<Factura> actualizarFactura(@PathVariable Long id, @Valid @RequestBody FacturaDTO facturaDTO) {
         Factura facturaActualizada = facturaService.actualizarFactura(id, facturaDTO);
         return ResponseEntity.ok(facturaActualizada);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR') or hasAuthority('GESTIONAR_FACTURACION')")
     public ResponseEntity<Void> eliminarFactura(@PathVariable Long id) {
         facturaService.eliminarFactura(id);
         return ResponseEntity.noContent().build();

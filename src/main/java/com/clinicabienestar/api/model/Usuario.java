@@ -3,8 +3,8 @@ package com.clinicabienestar.api.model;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
-
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,6 +34,15 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Rol rol;
     
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "USUARIOS_PERMISOS",
+        joinColumns = @JoinColumn(name = "usuario_id"),
+        inverseJoinColumns = @JoinColumn(name = "permiso_id")
+    )
+    @Builder.Default // <-- CORRECCIÓN
+    private Set<Permiso> permisos = new HashSet<>();
+
     @Column(name = "INTENTOS_FALLIDOS")
     private Integer intentosFallidos;
     
@@ -42,11 +51,19 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // =========== INICIO DEL CAMBIO ===========
-        // Agregamos el prefijo "ROLE_" que es el estándar de Spring Security.
-        // Esto asegura que hasRole() y hasAnyRole() funcionen correctamente.
-        return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));
-        // =========== FIN DEL CAMBIO ===========
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        
+        if (rol != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + rol.name()));
+        }
+
+        if (permisos != null) {
+            permisos.forEach(permiso -> {
+                authorities.add(new SimpleGrantedAuthority(permiso.getNombre()));
+            });
+        }
+        
+        return authorities;
     }
 
     @Override
@@ -61,7 +78,6 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        // Esta lógica estaba incompleta. La corregimos para que el bloqueo funcione.
         return this.bloqueoExpiracion == null || this.bloqueoExpiracion.isBefore(LocalDateTime.now());
     }
 

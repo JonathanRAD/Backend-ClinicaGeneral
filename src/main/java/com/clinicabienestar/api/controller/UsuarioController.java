@@ -1,4 +1,3 @@
-// RUTA MODIFICADA: src/main/java/com/clinicabienestar/api/controller/UsuarioController.java
 package com.clinicabienestar.api.controller;
 
 import com.clinicabienestar.api.dto.RegisterRequest;
@@ -20,18 +19,17 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    private final AuthService authService; // Mantenemos este para la creación
+    private final AuthService authService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR') or hasAuthority('GESTIONAR_USUARIOS')")
     public ResponseEntity<Void> crearUsuarioPorAdmin(@RequestBody RegisterRequest request) {
-        // La creación ya usa un servicio, lo cual es correcto.
         authService.createUserByAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR') or hasAuthority('GESTIONAR_USUARIOS')")
     public ResponseEntity<UsuarioDTO> actualizarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
         return ResponseEntity.ok(usuarioService.actualizarUsuario(id, usuarioDTO));
     }
@@ -42,13 +40,13 @@ public class UsuarioController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR') or hasAuthority('VER_USUARIOS')")
     public List<UsuarioDTO> getAllUsuarios() {
         return usuarioService.getAllUsuarios();
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR') or hasAuthority('GESTIONAR_USUARIOS')")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         usuarioService.eliminarUsuario(id);
         return ResponseEntity.noContent().build();

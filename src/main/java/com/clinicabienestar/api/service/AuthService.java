@@ -1,14 +1,14 @@
 // RUTA: src/main/java/com/clinicabienestar/api/service/AuthService.java
-
 package com.clinicabienestar.api.service;
 
 import com.clinicabienestar.api.dto.AuthResponse;
 import com.clinicabienestar.api.dto.LoginRequest;
 import com.clinicabienestar.api.dto.RegisterRequest;
 import com.clinicabienestar.api.model.Paciente;
-
+import com.clinicabienestar.api.model.Permiso;
 import com.clinicabienestar.api.model.Usuario;
 import com.clinicabienestar.api.repository.PacienteRepository;
+import com.clinicabienestar.api.repository.PermisoRepository;
 import com.clinicabienestar.api.repository.UsuarioRepository;
 import com.clinicabienestar.api.model.HistoriaClinica;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 import com.clinicabienestar.api.model.Rol;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.time.LocalDate;
 
 @Service
@@ -34,11 +36,11 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    
+    private final PermisoRepository permisoRepository;
+
     private static final int MAX_INTENTOS_FALLIDOS = 3;
     private static final int TIEMPO_BLOQUEO_MINUTOS = 15;
 
-    // ... (El método login se mantiene igual que en la respuesta anterior)
     public AuthResponse login(LoginRequest request) {
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("Usuario o contraseña incorrectos."));
@@ -77,29 +79,34 @@ public class AuthService {
         usuario.setEmail(request.getEmail());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         usuario.setIntentosFallidos(0);
-        usuario.setRol(request.getRol()); 
+        usuario.setRol(request.getRol());
+        
+        if (request.getPermisos() != null && !request.getPermisos().isEmpty()) {
+            Set<Permiso> permisos = request.getPermisos().stream()
+                .map(permisoRepository::findByNombre)
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toSet());
+            usuario.setPermisos(permisos);
+        }
         
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
 
-        // --- LÓGICA AÑADIDA ---
-        // Si el rol del nuevo usuario es PACIENTE, crea y vincula su perfil.
         if (usuarioGuardado.getRol() == Rol.PACIENTE) {
-            // Verificamos si ya existe un paciente para este usuario para evitar duplicados
             if (pacienteRepository.findByUsuarioId(usuarioGuardado.getId()).isEmpty()) {
                 Paciente nuevoPaciente = new Paciente();
                 nuevoPaciente.setNombres(usuarioGuardado.getNombres());
                 nuevoPaciente.setApellidos(usuarioGuardado.getApellidos());
-                nuevoPaciente.setUsuario(usuarioGuardado); // <-- Vinculación clave
+                nuevoPaciente.setUsuario(usuarioGuardado);
                 pacienteRepository.save(nuevoPaciente);
             }
         }
     }
+
     public AuthResponse register(RegisterRequest request) {
         if (!esContrasenaSegura(request.getPassword())) {
             throw new IllegalArgumentException("La contraseña no cumple con los requisitos de seguridad.");
         }
         
-        // 1. Crear el usuario
         Usuario usuario = new Usuario();
         usuario.setNombres(request.getNombres());
         usuario.setApellidos(request.getApellidos());
@@ -110,22 +117,18 @@ public class AuthService {
         
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
 
-        // 2. Crear y vincular el paciente
         Paciente nuevoPaciente = new Paciente();
         nuevoPaciente.setNombres(usuarioGuardado.getNombres());
         nuevoPaciente.setApellidos(usuarioGuardado.getApellidos());
         nuevoPaciente.setUsuario(usuarioGuardado);
 
-        // --- 3. LÓGICA AÑADIDA: Crear y vincular la historia clínica ---
         HistoriaClinica nuevaHistoria = new HistoriaClinica();
         nuevaHistoria.setFechaCreacion(LocalDate.now());
-        nuevaHistoria.setPaciente(nuevoPaciente); // Vincula la historia al paciente
-        nuevoPaciente.setHistoriaClinica(nuevaHistoria); // Vincula el paciente a la historia
+        nuevaHistoria.setPaciente(nuevoPaciente);
+        nuevoPaciente.setHistoriaClinica(nuevaHistoria); 
 
-        // 4. Guardar el paciente (esto guardará la historia por cascada)
         pacienteRepository.save(nuevoPaciente);
 
-        // 5. Generar el token y devolver la respuesta
         String token = jwtService.generateToken(usuarioGuardado);
         return AuthResponse.builder().token(token).build();
     }

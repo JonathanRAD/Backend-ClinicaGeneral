@@ -1,5 +1,3 @@
-// RUTA: src/main/java/com/clinicabienestar/api/controller/AuthController.java
-
 package com.clinicabienestar.api.controller;
 
 import com.clinicabienestar.api.dto.AuthResponse;
@@ -26,7 +24,7 @@ public class AuthController {
     }
 
     @PostMapping("/create-user")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR') or hasAuthority('GESTIONAR_USUARIOS')")
     public ResponseEntity<Void> createUser(@Valid @RequestBody RegisterRequest request) {
         authService.createUserByAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();

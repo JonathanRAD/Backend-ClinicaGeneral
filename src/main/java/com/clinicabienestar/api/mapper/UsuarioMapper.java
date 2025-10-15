@@ -1,29 +1,43 @@
+// RUTA: src/main/java/com/clinicabienestar/api/mapper/UsuarioMapper.java
 package com.clinicabienestar.api.mapper;
 
 import com.clinicabienestar.api.dto.UsuarioDTO;
+import com.clinicabienestar.api.model.Permiso;
 import com.clinicabienestar.api.model.Usuario;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.Named;
 
-import java.util.List;
+import java.util.List; // <-- Importar List
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {
 
-    UsuarioMapper INSTANCE = Mappers.getMapper(UsuarioMapper.class);
+    // --- Mapeo de Entidad a DTO ---
 
-    @Mapping(target = "fechaRegistro", ignore = true)
-    UsuarioDTO toDTO(Usuario usuario);
+    @Mapping(source = "permisos", target = "permisos", qualifiedByName = "permisosToString")
+    UsuarioDTO toUsuarioDTO(Usuario usuario); // <-- El nombre correcto es toUsuarioDTO
 
-    // --- CORRECCIÓN ---
-    // Eliminamos la línea de "authorities"
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "intentosFallidos", ignore = true)
-    @Mapping(target = "bloqueoExpiracion", ignore = true)
-    Usuario toEntity(UsuarioDTO usuarioDTO);
+    // Método para convertir listas de entidades a listas de DTOs
+    List<UsuarioDTO> toUsuarioDTOList(List<Usuario> usuarios); // <-- AÑADIR ESTE MÉTODO
 
-    List<UsuarioDTO> toDTOList(List<Usuario> usuarios);
+    // --- Mapeo de DTO a Entidad ---
+    
+    // Al convertir de DTO a Entidad, ignoramos los permisos para manejarlos manualmente
+    @Mapping(target = "permisos", ignore = true) 
+    Usuario toUsuario(UsuarioDTO usuarioDTO);
 
-    List<Usuario> toEntityList(List<UsuarioDTO> usuarioDTOs);
+    // --- Métodos de ayuda para permisos ---
+
+    @Named("permisosToString")
+    default Set<String> permisosToString(Set<Permiso> permisos) {
+        if (permisos == null) {
+            return null;
+        }
+        return permisos.stream()
+                       .map(Permiso::getNombre)
+                       .collect(Collectors.toSet());
+    }
 }

@@ -2,6 +2,7 @@
 package com.clinicabienestar.api.service;
 
 import com.clinicabienestar.api.dto.CitaDTO;
+import com.clinicabienestar.api.dto.AgendarCitaPacienteDTO;
 import com.clinicabienestar.api.exception.ForbiddenException;
 import com.clinicabienestar.api.exception.ResourceNotFoundException;
 import com.clinicabienestar.api.model.Cita;
@@ -51,6 +52,19 @@ public class CitaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil de paciente no encontrado para el usuario actual"));
         
         return crearNuevaCita(citaDTO, paciente);
+    }
+    public Cita agendarCitaPaciente(AgendarCitaPacienteDTO citaDTO) {
+        Long usuarioId = getUsuarioActual().getId();
+        Paciente paciente = pacienteRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Perfil de paciente no encontrado para el usuario actual"));
+        
+        CitaDTO citaCompleta = new CitaDTO();
+        citaCompleta.setPacienteId(paciente.getId());
+        citaCompleta.setMedicoId(citaDTO.getMedicoId());
+        citaCompleta.setFechaHora(citaDTO.getFechaHora());
+        citaCompleta.setMotivo(citaDTO.getMotivo());
+
+        return crearNuevaCita(citaCompleta, paciente);
     }
 
     public Cita crearCita(CitaDTO citaDTO) {
