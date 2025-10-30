@@ -89,7 +89,6 @@ public class EmailService {
             Message message = new Message();
             message.setRaw(encodedEmail);
 
-            // "me" usa el email asociado al Refresh Token (jjnmcontacto@gmail.com)
             service.users().messages().send("me", message).execute();
             
             System.out.println("DEBUG (Async con Google API OAuth): Correo HTML enviado a " + to);
