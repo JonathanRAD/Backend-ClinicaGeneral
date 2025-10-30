@@ -44,8 +44,6 @@ public class AuthService {
     private final PermisoRepository permisoRepository;
     private final EmailService emailService;
 
-    @Value("${app.frontend.url}")
-    private String frontendUrl;
 
     private static final int MAX_INTENTOS_FALLIDOS = 3;
     private static final int TIEMPO_BLOQUEO_MINUTOS = 15;
@@ -187,7 +185,7 @@ public class AuthService {
         usuario.setResetPasswordTokenExpiry(LocalDateTime.now().plusMinutes(EXPIRACION_TOKEN_MINUTOS));
         usuarioRepository.save(usuario);
 
-        String resetLink = frontendUrl + "/reset-password/" + token;
+        String resetLink = "https://clinica-saludvida.vercel.app" + "/reset-password/" + token;
         String subject = "Restablecimiento de Contraseña - Clínica Bienestar";
         String htmlContent = crearPlantillaHtmlReseteo(
             usuario.getNombres(),

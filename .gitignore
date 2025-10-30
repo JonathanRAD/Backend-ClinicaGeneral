@@ -33,3 +33,5 @@ build/
 .vscode/
 
 *.json
+# Ignorar el archivo de propiedades de desarrollo local
+application-dev.properties
