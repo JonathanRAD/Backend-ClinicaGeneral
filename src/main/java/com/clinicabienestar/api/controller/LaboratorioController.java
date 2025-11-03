@@ -20,14 +20,14 @@ public class LaboratorioController {
     private final LaboratorioService laboratorioService;
 
     @PostMapping("/ordenes/consulta/{consultaId}")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ADMINISTRADOR') or hasAuthority('EDITAR_HISTORIAL_CLINICO')")
+    @PreAuthorize("hasAuthority('EDITAR_HISTORIAL_CLINICO')")
     public ResponseEntity<OrdenLaboratorio> crearOrden(@PathVariable Long consultaId, @Valid @RequestBody OrdenLaboratorioDTO ordenDTO) {
         OrdenLaboratorio ordenGuardada = laboratorioService.crearOrden(consultaId, ordenDTO);
         return ResponseEntity.ok(ordenGuardada);
     }
 
     @PostMapping("/resultados/orden/{ordenId}")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ADMINISTRADOR') or hasAuthority('EDITAR_HISTORIAL_CLINICO')")
+    @PreAuthorize("hasAuthority('EDITAR_HISTORIAL_CLINICO')")
     public ResponseEntity<ResultadoLaboratorio> cargarResultado(@PathVariable Long ordenId, @Valid @RequestBody ResultadoLaboratorioDTO resultadoDTO) {
         ResultadoLaboratorio resultadoGuardado = laboratorioService.cargarResultado(ordenId, resultadoDTO);
         return ResponseEntity.ok(resultadoGuardado);

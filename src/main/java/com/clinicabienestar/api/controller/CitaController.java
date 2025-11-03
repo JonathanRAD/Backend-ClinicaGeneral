@@ -28,7 +28,7 @@ public class CitaController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR') or hasAuthority('GESTIONAR_CITAS')")
+    @PreAuthorize("hasAuthority('GESTIONAR_CITAS')")
     public List<Cita> obtenerTodasLasCitas() {
         return citaService.obtenerTodasLasCitas();
     }
@@ -40,13 +40,13 @@ public class CitaController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA') or hasAuthority('GESTIONAR_CITAS')")
+    @PreAuthorize("hasAuthority('GESTIONAR_CITAS')")
     public ResponseEntity<Cita> crearCita(@Valid @RequestBody CitaDTO citaDTO) {
         return new ResponseEntity<>(citaService.crearCita(citaDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA') or hasAuthority('GESTIONAR_CITAS')")
+    @PreAuthorize("hasAuthority('GESTIONAR_CITAS')")
     public ResponseEntity<Cita> actualizarCita(@PathVariable Long id, @Valid @RequestBody CitaDTO citaDTO) {
         return ResponseEntity.ok(citaService.actualizarCita(id, citaDTO));
     }
@@ -59,7 +59,7 @@ public class CitaController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA') or hasAuthority('GESTIONAR_CITAS')")
+    @PreAuthorize("hasAuthority('GESTIONAR_CITAS')")
     public ResponseEntity<Void> eliminarCita(@PathVariable Long id) {
         citaService.eliminarCita(id);
         return ResponseEntity.noContent().build();

@@ -19,21 +19,21 @@ public class SeguroMedicoController {
     private final SeguroMedicoService seguroMedicoService;
 
     @PostMapping("/paciente/{pacienteId}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA') or hasAuthority('GESTIONAR_PACIENTES')")
+    @PreAuthorize("hasAuthority('GESTIONAR_PACIENTES')")
     public ResponseEntity<SeguroMedico> guardarSeguro(@PathVariable Long pacienteId, @RequestBody SeguroMedicoDTO seguroDTO) {
         SeguroMedico seguroGuardado = seguroMedicoService.guardarSeguro(pacienteId, seguroDTO);
         return ResponseEntity.ok(seguroGuardado);
     }
     
     @PutMapping("/{seguroId}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA') or hasAuthority('GESTIONAR_PACIENTES')")
+    @PreAuthorize("hasAuthority('GESTIONAR_PACIENTES')")
     public ResponseEntity<SeguroMedico> actualizarSeguro(@PathVariable Long seguroId, @RequestBody SeguroMedicoDTO seguroDTO) {
         SeguroMedico seguroActualizado = seguroMedicoService.actualizarSeguro(seguroId, seguroDTO);
         return ResponseEntity.ok(seguroActualizado);
     }
 
     @GetMapping("/validar/paciente/{pacienteId}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA', 'MEDICO', 'CAJERO') or hasAuthority('VER_PACIENTES')")
+    @PreAuthorize("hasAuthority('VER_PACIENTES')")
     public ResponseEntity<Map<String, Object>> validarSeguroPorPaciente(@PathVariable Long pacienteId) {
         Map<String, Object> response = seguroMedicoService.validarSeguroPorPaciente(pacienteId);
         return ResponseEntity.ok(response);

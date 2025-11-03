@@ -26,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/create-user")
-    @PreAuthorize("hasRole('ADMINISTRADOR') or hasAuthority('GESTIONAR_USUARIOS')")
+    @PreAuthorize("hasAuthority('GESTIONAR_USUARIOS')")
     public ResponseEntity<Void> createUser(@Valid @RequestBody RegisterRequest request) {
         authService.createUserByAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();

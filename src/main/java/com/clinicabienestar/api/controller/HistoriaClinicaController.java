@@ -26,19 +26,19 @@ public class HistoriaClinicaController {
     }
 
     @GetMapping("/paciente/{pacienteId}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'MEDICO', 'RECEPCIONISTA') or hasAuthority('VER_HISTORIAL_CLINICO')")
+    @PreAuthorize("hasAuthority('VER_HISTORIAL_CLINICO')")
     public ResponseEntity<HistoriaClinicaDTO> obtenerHistoriaPorPacienteId(@PathVariable Long pacienteId) {
         return ResponseEntity.ok(historiaClinicaService.obtenerHistoriaPorPacienteId(pacienteId));
     }
     
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'MEDICO') or hasAuthority('EDITAR_HISTORIAL_CLINICO')")
+    @PreAuthorize("hasAuthority('EDITAR_HISTORIAL_CLINICO')")
     public ResponseEntity<HistoriaClinica> actualizarHistoriaClinica(@PathVariable Long id, @RequestBody HistoriaClinicaDTO historiaDTO) {
         return ResponseEntity.ok(historiaClinicaService.actualizarHistoriaClinica(id, historiaDTO));
     }
 
     @PostMapping("/{historiaId}/consultas")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ADMINISTRADOR') or hasAuthority('EDITAR_HISTORIAL_CLINICO')")
+    @PreAuthorize("hasAuthority('EDITAR_HISTORIAL_CLINICO')")
     public ResponseEntity<Consulta> agregarConsulta(@PathVariable Long historiaId, @Valid @RequestBody ConsultaDTO consultaDTO) {
         Consulta consultaGuardada = historiaClinicaService.agregarConsulta(historiaId, consultaDTO);
         return ResponseEntity.ok(consultaGuardada);

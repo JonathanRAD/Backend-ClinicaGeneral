@@ -30,21 +30,21 @@ public class MedicoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR') or hasAuthority('GESTIONAR_MEDICOS')")
+    @PreAuthorize("hasAuthority('GESTIONAR_MEDICOS')")
     public ResponseEntity<Medico> crearMedico(@RequestBody Medico medico) {
         Medico nuevoMedico = medicoService.crearMedico(medico);
         return new ResponseEntity<>(nuevoMedico, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR') or hasAuthority('GESTIONAR_MEDICOS')")
+    @PreAuthorize("hasAuthority('GESTIONAR_MEDICOS')")
     public ResponseEntity<Medico> actualizarMedico(@PathVariable Long id, @RequestBody Medico detallesMedico) {
         Medico medicoActualizado = medicoService.actualizarMedico(id, detallesMedico);
         return ResponseEntity.ok(medicoActualizado);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR') or hasAuthority('GESTIONAR_MEDICOS')")
+    @PreAuthorize("hasAuthority('GESTIONAR_MEDICOS')")
     public ResponseEntity<Void> eliminarMedico(@PathVariable Long id) {
         medicoService.eliminarMedico(id);
         return ResponseEntity.noContent().build();

@@ -32,26 +32,26 @@ public class PacienteController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA', 'MEDICO') or hasAuthority('VER_PACIENTES')")
+    @PreAuthorize("hasAuthority('VER_PACIENTES')")
     public List<PacienteDTO> obtenerTodosLosPacientes() {
         return pacienteService.obtenerTodosLosPacientes();
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('RECEPCIONISTA', 'ADMINISTRADOR') or hasAuthority('GESTIONAR_PACIENTES')")
+    @PreAuthorize("hasAuthority('GESTIONAR_PACIENTES')")
     public ResponseEntity<Paciente> crearPaciente(@RequestBody Paciente paciente) {
         Paciente nuevoPaciente = pacienteService.crearPaciente(paciente);
         return new ResponseEntity<>(nuevoPaciente, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA', 'MEDICO') or hasAuthority('GESTIONAR_PACIENTES')")
+    @PreAuthorize("hasAuthority('GESTIONAR_PACIENTES')")
     public ResponseEntity<Paciente> actualizarPaciente(@PathVariable Long id, @RequestBody Paciente detallesPaciente) {
         return ResponseEntity.ok(pacienteService.actualizarPaciente(id, detallesPaciente));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RECEPCIONISTA') or hasAuthority('GESTIONAR_PACIENTES')")
+    @PreAuthorize("hasAuthority('GESTIONAR_PACIENTES')")
     public ResponseEntity<Void> eliminarPaciente(@PathVariable Long id) {
         pacienteService.eliminarPaciente(id);
         return ResponseEntity.noContent().build();

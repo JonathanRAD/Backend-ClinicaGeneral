@@ -45,18 +45,18 @@ public class DataLoader implements CommandLineRunner {
 
         // =========== INICIO DEL CAMBIO ===========
         // --- Asignación de todos los permisos al rol de Administrador ---
-        List<Usuario> administradores = usuarioRepository.findAll().stream()
-                .filter(u -> u.getRol() == Rol.ADMINISTRADOR)
-                .toList();
+        // List<Usuario> administradores = usuarioRepository.findAll().stream()
+        //         .filter(u -> u.getRol() == Rol.ADMINISTRADOR)
+        //         .toList();
 
-        List<Permiso> todosLosPermisos = permisoRepository.findAll();
+        // List<Permiso> todosLosPermisos = permisoRepository.findAll();
 
-        if (!administradores.isEmpty() && !todosLosPermisos.isEmpty()) {
-            administradores.forEach(admin -> {
-                admin.setPermisos(new HashSet<>(todosLosPermisos));
-                usuarioRepository.save(admin);
-            });
-        }
+        // if (!administradores.isEmpty() && !todosLosPermisos.isEmpty()) {
+        //     administradores.forEach(admin -> {
+        //         admin.setPermisos(new HashSet<>(todosLosPermisos));
+        //         usuarioRepository.save(admin);
+        //     });
+        // }
         // =========== FIN DEL CAMBIO ===========
     }
 }
