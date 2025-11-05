@@ -7,6 +7,7 @@ import com.clinicabienestar.api.model.Usuario;
 import com.clinicabienestar.api.repository.PermisoRepository;
 import com.clinicabienestar.api.repository.UsuarioRepository; // <-- 1. Importa el repositorio de usuarios
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -18,10 +19,12 @@ public class DataLoader implements CommandLineRunner {
 
     private final PermisoRepository permisoRepository;
     private final UsuarioRepository usuarioRepository; // <-- 2. Inyéctalo en el constructor
+    private final PasswordEncoder passwordEncoder;
 
-    public DataLoader(PermisoRepository permisoRepository, UsuarioRepository usuarioRepository) {
+    public DataLoader(PermisoRepository permisoRepository, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.permisoRepository = permisoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -43,20 +46,28 @@ public class DataLoader implements CommandLineRunner {
             }
         });
 
-        // =========== INICIO DEL CAMBIO ===========
-        // --- Asignación de todos los permisos al rol de Administrador ---
-        // List<Usuario> administradores = usuarioRepository.findAll().stream()
-        //         .filter(u -> u.getRol() == Rol.ADMINISTRADOR)
-        //         .toList();
+        if (usuarioRepository.count() == 0) {
+            
+            System.out.println(">>> Base de datos de usuarios vacía. Creando Super Admin por defecto...");
 
-        // List<Permiso> todosLosPermisos = permisoRepository.findAll();
+            // Obtenemos todos los permisos que acabamos de crear
+            List<Permiso> todosLosPermisos = permisoRepository.findAll();
 
-        // if (!administradores.isEmpty() && !todosLosPermisos.isEmpty()) {
-        //     administradores.forEach(admin -> {
-        //         admin.setPermisos(new HashSet<>(todosLosPermisos));
-        //         usuarioRepository.save(admin);
-        //     });
-        // }
-        // =========== FIN DEL CAMBIO ===========
+            Usuario superAdmin = new Usuario();
+            superAdmin.setNombres("Super");
+            superAdmin.setApellidos("Admin");
+            superAdmin.setEmail("admin@gmail.com"); // <-- Puedes cambiar este email
+
+            superAdmin.setPassword(passwordEncoder.encode("Elmaspro_123")); // <-- ¡CAMBIA ESTA CONTRASEÑA!
+            
+            superAdmin.setRol(Rol.ADMINISTRADOR); //
+            superAdmin.setPermisos(new HashSet<>(todosLosPermisos)); // Asigna todos los permisos
+            superAdmin.setIntentosFallidos(0);
+
+            usuarioRepository.save(superAdmin);
+            
+            System.out.println(">>> Usuario Super Admin 'admin@clinica.com' creado exitosamente. <<<");
+        }
+    
     }
 }
