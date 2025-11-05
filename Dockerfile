@@ -5,7 +5,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # ETAPA 2: Creación de la imagen final
-FROM openjdk:17-jre-slim
+FROM openjdk:17-alpine
 WORKDIR /app
 
 # Copiamos el JAR manteniendo su nombre original
