@@ -5,7 +5,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # ETAPA 2: Creación de la imagen final
-FROM openjdk:17-alpine
+FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
 
 # Copiamos el JAR manteniendo su nombre original
