@@ -37,7 +37,7 @@ public class CitaService {
 
     @Transactional(readOnly = true)
     public List<Cita> obtenerTodasLasCitas() {
-        return citaRepository.findAll();
+        return citaRepository.listarTodasSP();
     }
     
     @Transactional(readOnly = true)
@@ -68,21 +68,22 @@ public class CitaService {
     }
 
     public Cita crearCita(CitaDTO citaDTO) {
-        Paciente paciente = pacienteRepository.findById(citaDTO.getPacienteId())
-                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado con ID: " + citaDTO.getPacienteId()));
+        Paciente paciente = pacienteRepository.buscarPorIdSP(citaDTO.getPacienteId()); // Optimizado con SP
+        if(paciente == null) throw new ResourceNotFoundException("Paciente no encontrado");
         
         return crearNuevaCita(citaDTO, paciente);
     }
 
     public Cita actualizarCita(Long id, CitaDTO citaDTO) {
-        Cita cita = citaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada con ID: " + id));
+        // USANDO SP para buscar
+        Cita cita = citaRepository.buscarPorIdSP(id);
+        if(cita == null) throw new ResourceNotFoundException("Cita no encontrada con ID: " + id);
         
-        // Aquí presto atención a las relaciones que mencionaste.
-        Paciente paciente = pacienteRepository.findById(citaDTO.getPacienteId())
-                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado con ID: " + citaDTO.getPacienteId()));
-        Medico medico = medicoRepository.findById(citaDTO.getMedicoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Médico no encontrado con ID: " + citaDTO.getMedicoId()));
+        Paciente paciente = pacienteRepository.buscarPorIdSP(citaDTO.getPacienteId());
+        if(paciente == null) throw new ResourceNotFoundException("Paciente no encontrado");
+
+        Medico medico = medicoRepository.buscarPorIdSP(citaDTO.getMedicoId());
+        if(medico == null) throw new ResourceNotFoundException("Médico no encontrado");
 
         cita.setPaciente(paciente);
         cita.setMedico(medico);
@@ -95,29 +96,31 @@ public class CitaService {
 
     public void cancelarMiCita(Long id) {
         Long usuarioId = getUsuarioActual().getId();
+        // Usamos JPA normal aquí para acceder a las relaciones anidadas de forma segura
         Cita cita = citaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada con ID: " + id));
 
-        // Verificación de seguridad clave
         if (!cita.getPaciente().getUsuario().getId().equals(usuarioId)) {
             throw new ForbiddenException("No tiene permiso para cancelar una cita que no es suya.");
         }
 
-        citaRepository.delete(cita);
+        // USANDO SP para eliminar
+        citaRepository.eliminarCitaSP(id);
     }
 
     public void eliminarCita(Long id) {
-        if (!citaRepository.existsById(id)) {
+        if (citaRepository.buscarPorIdSP(id) == null) {
             throw new ResourceNotFoundException("Cita no encontrada con ID: " + id);
         }
-        citaRepository.deleteById(id);
+        // USANDO SP
+        citaRepository.eliminarCitaSP(id);
     }
 
     // --- Métodos privados de lógica de negocio ---
 
     private Cita crearNuevaCita(CitaDTO citaDTO, Paciente paciente) {
-        Medico medico = medicoRepository.findById(citaDTO.getMedicoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Médico no encontrado con ID: " + citaDTO.getMedicoId()));
+        Medico medico = medicoRepository.buscarPorIdSP(citaDTO.getMedicoId());
+        if(medico == null) throw new ResourceNotFoundException("Médico no encontrado");
 
         Cita cita = new Cita();
         cita.setPaciente(paciente);

@@ -17,4 +17,5 @@ public class PacienteDTO {
     private BigDecimal peso;
     private BigDecimal altura;
     private Integer ritmoCardiaco;
+    private Boolean activo;
 }

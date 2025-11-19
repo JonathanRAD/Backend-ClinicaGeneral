@@ -31,12 +31,11 @@ public class PacienteService {
     public Paciente obtenerPerfilPacienteActual() {
         Long usuarioId = getUsuarioActual().getId();
         return pacienteRepository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Perfil de paciente no encontrado para el usuario actual."));
+                .orElseThrow(() -> new ResourceNotFoundException("Perfil de paciente no encontrado."));
     }
 
     public Paciente actualizarPerfilPacienteActual(Paciente detallesPaciente) {
         Paciente pacienteExistente = obtenerPerfilPacienteActual();
-
         pacienteExistente.setDni(detallesPaciente.getDni());
         pacienteExistente.setTelefono(detallesPaciente.getTelefono());
         pacienteExistente.setDireccion(detallesPaciente.getDireccion());
@@ -49,7 +48,7 @@ public class PacienteService {
 
     @Transactional(readOnly = true)
     public List<PacienteDTO> obtenerTodosLosPacientes() {
-        List<Paciente> pacientes = pacienteRepository.findAll();
+        List<Paciente> pacientes = pacienteRepository.listarTodosSP();
         return pacienteMapper.toDTOList(pacientes);
     }
 
@@ -64,8 +63,10 @@ public class PacienteService {
     }
 
     public Paciente actualizarPaciente(Long id, Paciente detallesPaciente) {
-        Paciente pacienteExistente = pacienteRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado con ID: " + id));
+        Paciente pacienteExistente = pacienteRepository.buscarPorIdSP(id);
+        if (pacienteExistente == null) {
+             throw new ResourceNotFoundException("Paciente no encontrado con ID: " + id);
+        }
 
         pacienteExistente.setDni(detallesPaciente.getDni());
         pacienteExistente.setNombres(detallesPaciente.getNombres());
@@ -81,10 +82,9 @@ public class PacienteService {
     }
 
     public void eliminarPaciente(Long id) {
-        if (!pacienteRepository.existsById(id)) {
+        if (pacienteRepository.buscarPorIdSP(id) == null) {
             throw new ResourceNotFoundException("Paciente no encontrado con ID: " + id);
         }
-        pacienteRepository.deleteById(id);
+        pacienteRepository.eliminarPacienteSP(id);
     }
-
 }

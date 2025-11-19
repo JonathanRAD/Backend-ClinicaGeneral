@@ -11,29 +11,31 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional // Todos los métodos públicos serán transaccionales
+@Transactional
 public class MedicoService {
 
     private final MedicoRepository medicoRepository;
 
-    @Transactional(readOnly = true) // Optimizamos las operaciones de solo lectura
+    @Transactional(readOnly = true)
     public List<Medico> obtenerTodosLosMedicos() {
-        return medicoRepository.findAll();
+        return medicoRepository.listarTodosSP();
     }
     
     @Transactional(readOnly = true)
     public Medico obtenerMedicoPorId(Long id) {
-        return medicoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Médico no encontrado con ID: " + id));
+        Medico medico = medicoRepository.buscarPorIdSP(id);
+        if (medico == null) {
+            throw new ResourceNotFoundException("Médico no encontrado con ID: " + id);
+        }
+        return medico;
     }
 
     public Medico crearMedico(Medico medico) {
-        // Aquí podrías añadir validaciones antes de guardar, por ejemplo, verificar si el CMP ya existe.
         return medicoRepository.save(medico);
     }
 
     public Medico actualizarMedico(Long id, Medico detallesMedico) {
-        Medico medico = obtenerMedicoPorId(id); // Reutilizamos el método para encontrar o lanzar excepción
+        Medico medico = obtenerMedicoPorId(id); 
 
         medico.setNombres(detallesMedico.getNombres());
         medico.setApellidos(detallesMedico.getApellidos());
@@ -44,7 +46,9 @@ public class MedicoService {
     }
 
     public void eliminarMedico(Long id) {
-        Medico medico = obtenerMedicoPorId(id); // Aseguramos que el médico exista antes de intentar borrar
-        medicoRepository.delete(medico);
+        if (medicoRepository.buscarPorIdSP(id) == null) {
+            throw new ResourceNotFoundException("Médico no encontrado con ID: " + id);
+        }
+        medicoRepository.eliminarMedicoSP(id);
     }
 }

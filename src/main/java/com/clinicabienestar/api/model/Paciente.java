@@ -24,6 +24,9 @@ public class Paciente {
     private BigDecimal altura;
     @Column(name = "RITMO_CARDIACO") private Integer ritmoCardiaco;
 
+    @Column(columnDefinition = "boolean default true")
+    private Boolean activo = true;
+
     // CORRECCIÓN: Esta es la parte "inversa" de la relación
     @OneToOne(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference("paciente-historia")
