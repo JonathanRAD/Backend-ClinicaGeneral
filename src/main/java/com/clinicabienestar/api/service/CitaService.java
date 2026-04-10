@@ -13,6 +13,7 @@ import com.clinicabienestar.api.repository.CitaRepository;
 import com.clinicabienestar.api.repository.MedicoRepository;
 import com.clinicabienestar.api.repository.PacienteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,10 @@ public class CitaService {
     private final CitaRepository citaRepository;
     private final PacienteRepository pacienteRepository;
     private final MedicoRepository medicoRepository;
+    private final EmailService emailService;
+
+    @Value("${google.oauth.email-from}")
+    private String adminEmail;
 
     private Usuario getUsuarioActual() {
         return (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -125,16 +130,50 @@ public class CitaService {
         Cita cita = new Cita();
         cita.setPaciente(paciente);
         cita.setMedico(medico);
-        
+
         LocalDateTime fechaHoraLocal = LocalDateTime.ofInstant(citaDTO.getFechaHora(), ZoneId.systemDefault());
         cita.setFechaHora(fechaHoraLocal);
-        
+
         cita.setMotivo(citaDTO.getMotivo());
         cita.setEstado("programada");
         cita.setConsultorio(asignarConsultorio(medico.getEspecialidad()));
         cita.setNumeroTurno(calcularNumeroTurno(medico.getId(), fechaHoraLocal.toLocalDate()));
 
-        return citaRepository.save(cita);
+        Cita citaGuardada = citaRepository.save(cita);
+
+        // --- Notificaciones por email (asíncronas, no bloquean la respuesta) ---
+        String nombrePaciente = paciente.getNombres() + " " + paciente.getApellidos();
+        String nombreMedico = "Dr(a). " + medico.getNombres() + " " + medico.getApellidos();
+
+        // Correo al paciente (solo si tiene usuario con email registrado)
+        if (paciente.getUsuario() != null && paciente.getUsuario().getEmail() != null) {
+            emailService.sendCitaConfirmationEmail(
+                    paciente.getUsuario().getEmail(),
+                    nombrePaciente,
+                    nombreMedico,
+                    medico.getEspecialidad(),
+                    citaGuardada.getFechaHora(),
+                    citaGuardada.getMotivo(),
+                    citaGuardada.getConsultorio(),
+                    citaGuardada.getNumeroTurno(),
+                    false // esAdmin = false → correo personalizado para el paciente
+            );
+        }
+
+        // Correo al administrador
+        emailService.sendCitaConfirmationEmail(
+                adminEmail,
+                nombrePaciente,
+                nombreMedico,
+                medico.getEspecialidad(),
+                citaGuardada.getFechaHora(),
+                citaGuardada.getMotivo(),
+                citaGuardada.getConsultorio(),
+                citaGuardada.getNumeroTurno(),
+                true // esAdmin = true → aviso para el admin
+        );
+
+        return citaGuardada;
     }
 
     private String asignarConsultorio(String especialidad) {
