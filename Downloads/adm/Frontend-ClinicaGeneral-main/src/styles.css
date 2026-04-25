@@ -1,0 +1,814 @@
+
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.custom-dialog-container .mdc-dialog__surface {
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+.custom-dialog-container .mat-mdc-dialog-title {
+  padding: 24px 24px 16px 24px !important;
+  font-weight: 600;
+  color: #1a202c;
+  border-bottom: 1px solid #e2e8f0;
+}
+.custom-dialog-container .mat-mdc-dialog-content {
+  padding: 20px 24px !important;
+  max-height: 70vh !important;
+}
+.custom-dialog-container .mat-mdc-dialog-actions {
+  padding: 16px 24px !important;
+  background-color: #f7fafc;
+  border-top: 1px solid #e2e8f0;
+  gap: 8px;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-container > main {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+}
+
+.app-container > main > *:first-child {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+body.dark-theme {
+  --mat-sys-surface: #000000;
+  --mat-sys-on-surface: #e0e0e0;
+  --mat-sys-surface-container: #1e1e1e;
+
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+
+body.dark-theme .main-content { background-color: var(--mat-sys-surface); }
+body.dark-theme .sidebar { background-color: #121212 !important; }
+body.dark-theme .text-gray-800,
+body.dark-theme h1, body.dark-theme h2, body.dark-theme h3 {
+  color: #f1f1f1 !important;
+}
+
+body.dark-theme .navbar { background-color: #1e1e1e !important; }
+body.dark-theme .navbar-brand { color: #ffffff; }
+body.dark-theme .nav-link { color: rgba(255, 255, 255, 0.85); }
+body.dark-theme .nav-link:hover,
+body.dark-theme .nav-link.active { color: #ffffff; }
+body.dark-theme .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+body.dark-theme .mat-mdc-card {
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+}
+body.dark-theme .mat-card .card-header {
+  background-color: #2a2a2a;
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+body.dark-theme .mat-card-title {
+  color: #ffffff;
+}
+
+body.dark-theme .stat-label,
+body.dark-theme .text-muted { color: rgba(255, 255, 255, 0.7) !important; }
+body.dark-theme .mat-mdc-list-item-unscoped-content,
+body.dark-theme .mat-mdc-list-item .mat-mdc-list-item-title,
+body.dark-theme .mat-mdc-list-item .mat-mdc-list-item-supporting-text {
+  color: var(--mat-sys-on-surface) !important;
+}
+
+body.dark-theme .mdc-dialog__surface { background-color: #2d2d2d !important; }
+body.dark-theme .mat-mdc-text-field-wrapper { background-color: transparent !important; }
+body.dark-theme .mat-mdc-input-element,
+body.dark-theme .mat-mdc-select-value,
+body.dark-theme .mat-datepicker-toggle .mat-icon,
+body.dark-theme .mat-mdc-select-arrow { color: #ffffff !important; }
+body.dark-theme .mat-mdc-form-field-label { color: rgba(255, 255, 255, 0.9) !important; }
+body.dark-theme .mdc-notched-outline > * { border-color: rgba(255, 255, 255, 0.4) !important; }
+body.dark-theme .mat-mdc-input-element::placeholder { color: rgba(255, 255, 255, 0.5) !important; }
+body.dark-theme .mat-mdc-form-field-error { color: #f89ea1 !important; }
+body.dark-theme .mat-form-field-invalid .mdc-notched-outline > * { border-color: #f89ea1 !important; }
+body.dark-theme .mat-form-field.mat-focused .mat-form-field-label,
+body.dark-theme .mat-form-field.mat-focused .mdc-notched-outline > * {
+  color: #bb86fc !important;
+  border-color: #bb86fc !important;
+}
+
+body.dark-theme .mat-raised-button.mat-primary { color: #ffffff !important; }
+body.dark-theme .mat-mdc-dialog-actions { background-color: #333333; }
+body.dark-theme .mat-mdc-dialog-actions .mat-mdc-button:disabled {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.3);
+}
+body.dark-theme .mat-mdc-slide-toggle .mdc-switch__track::after { background: #bb86fc; }
+
+body.dark-theme .mat-mdc-table {
+  background: var(--mat-sys-surface-container);
+}
+body.dark-theme .mat-mdc-cell,
+body.dark-theme .mat-mdc-header-cell {
+  color: var(--mat-sys-on-surface);
+}
+body.dark-theme .mat-mdc-row,
+body.dark-theme .mat-mdc-header-row {
+  background: transparent;
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+body.dark-theme .mat-mdc-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+body.dark-theme .mat-mdc-no-data-row .mat-mdc-cell {
+  color: rgba(255, 255, 255, 0.5);
+}
+body.dark-theme .mat-mdc-cell .mat-icon-button mat-icon {
+  color: var(--mat-sys-on-surface) !important;
+  opacity: 0.7;
+}
+body.dark-theme .mat-mdc-cell .mat-icon-button:hover mat-icon {
+  opacity: 1;
+}
+body.dark-theme .mat-mdc-paginator {
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+}
+body.dark-theme .mat-mdc-paginator .mat-mdc-icon-button .mat-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+body.dark-theme .mat-mdc-paginator .mat-mdc-form-field .mdc-notched-outline > * {
+  border-color: rgba(255, 255, 255, 0.23) !important;
+}
+body.dark-theme .mat-mdc-paginator .mat-mdc-select-arrow {
+  color: rgba(255, 255, 255, 0.7);
+}
+body.dark-theme .table-toolbar .mat-mdc-text-field-wrapper,
+body.dark-theme .table-toolbar .mat-input-element {
+  color: var(--mat-sys-on-surface) !important;
+}
+body.dark-theme .form-control {
+  background-color: #2a2a2a;
+  color: #f1f1f1;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-theme .form-control:focus {
+  background-color: #2a2a2a;
+  color: #f1f1f1;
+  border-color: #bb86fc;
+  box-shadow: 0 0 0 0.25rem rgba(187, 134, 252, 0.25);
+}
+
+body.dark-theme .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+body.dark-theme .info-panel::before {
+  background: linear-gradient(135deg, rgba(18, 24, 38, 0.85), rgba(10, 14, 24, 0.95));
+}
+
+body.dark-theme .form-panel {
+  background-color: #1a202c;
+}
+
+body.dark-theme .form-container {
+  background-color: #2d3748;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .form-container h2,
+body.dark-theme .form-container .form-label {
+  color: #f1f1f1;
+}
+
+body.dark-theme .form-container .text-muted,
+body.dark-theme .form-container a {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+body.dark-theme .form-container a:hover {
+  color: #ffffff !important;
+}
+.notificacion-exito {
+  background-color: #28a745; 
+  color: white;
+}
+.notificacion-exito .mat-mdc-button.mat-mdc-snack-bar-action {
+  color: white;
+}
+.notificacion-error {
+  background-color: #dc3545;
+  color: white;
+}
+.notificacion-error .mat-mdc-button.mat-mdc-snack-bar-action {
+  color: white;
+}
+
+:root {
+  --color-primario: #3498db; 
+  --color-primario-hover: #2980b9;
+  --color-acento: #2ecc71; 
+  --color-acento-hover: #27ae60;
+  --color-peligro: #e74c3c; 
+  --color-advertencia: #f39c12; 
+
+  --color-fondo-panel: #f4f7fc; 
+  --color-fondo-sidebar: #2c3e50; 
+  --color-fondo-tarjeta: #ffffff; 
+
+  --color-texto-principal: #34495e;
+  --color-texto-secundario: #7f8c8d;
+  --color-texto-claro: #ffffff;
+
+  --sombra-tarjeta: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --borde-radio: 12px;
+}
+
+body {
+  background-color: var(--color-fondo-panel);
+  color: var(--color-texto-principal);
+}
+
+.container-fluid > .d-flex.justify-content-between {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e0e7ee;
+  margin-bottom: 2rem !important;
+}
+
+.container-fluid .h3 {
+  font-weight: 700;
+  color: var(--color-texto-principal);
+}
+
+.mat-mdc-raised-button.mat-primary {
+  --mdc-protected-button-container-color: var(--color-primario);
+}
+.mat-mdc-raised-button.mat-accent {
+  --mdc-protected-button-container-color: var(--color-acento);
+}
+.mat-mdc-raised-button.mat-warn {
+  --mdc-protected-button-container-color: var(--color-peligro);
+}
+
+.mat-mdc-dialog-title {
+  color: var(--color-fondo-sidebar);
+}
+.mat-horizontal-stepper-content {
+  overflow: visible !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DARK MODE — Estilos completos
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Transición global suave ────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  transition: background-color 0.3s ease, color 0.2s ease,
+              border-color 0.2s ease, box-shadow 0.2s ease;
+}
+/* No animar canvas ni íconos decorativos */
+canvas, .kpi-bg-icon { transition: none !important; }
+
+/* ── Fondo general ──────────────────────────────────────────────────────── */
+body.dark-theme {
+  --color-fondo-panel:   #111827;
+  --color-fondo-tarjeta: #1f2937;
+  --color-texto-principal: #f1f5f9;
+  
+  /* Variables específicas del Portal (Cliente) para Modo Oscuro */
+  --portal-border-color: rgba(255,255,255,0.08);
+  --portal-item-bg: #1f2937;
+  --portal-item-hover: rgba(96,165,250,0.15);
+  --portal-item-border: rgba(255,255,255,0.05);
+  --portal-nav-bg: #1f2937;
+  --portal-nav-active-bg: rgba(96,165,250,0.15);
+  --portal-circle-bg: rgba(255,255,255,0.05);
+  --portal-completado-bg: rgba(46, 204, 113, 0.15);
+  --portal-completado-border: rgba(46, 204, 113, 0.3);
+  --portal-bg-timeline: #111827;
+  --portal-border-muted: #374151;
+  --portal-icon-muted: #4b5563;
+  --portal-text-muted: #94a3b8;
+  
+  background-color: #111827 !important;
+  color: #f1f5f9;
+}
+
+body.dark-theme .main-content { background-color: #111827 !important; }
+
+/* ── Dashboard — header ─────────────────────────────────────────────────── */
+body.dark-theme .dashboard-title    { color: #f1f5f9 !important; }
+body.dark-theme .dashboard-subtitle { color: #94a3b8 !important; }
+
+/* ── Dashboard — chart cards y activity cards ───────────────────────────── */
+body.dark-theme .chart-card,
+body.dark-theme .activity-card {
+  background-color: #1f2937 !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.45) !important;
+}
+
+body.dark-theme .chart-card mat-card-title,
+body.dark-theme .activity-card mat-card-title,
+body.dark-theme .mat-mdc-card-title { color: #f1f5f9 !important; }
+
+body.dark-theme .mat-mdc-card-subtitle { color: #94a3b8 !important; }
+
+/* ── Activity list ──────────────────────────────────────────────────────── */
+body.dark-theme .activity-item:hover { background: rgba(255,255,255,0.04); }
+body.dark-theme .activity-name  { color: #f1f5f9; }
+body.dark-theme .activity-sub   { color: #94a3b8; }
+body.dark-theme .activity-arrow { color: #374151; }
+body.dark-theme .activity-empty { color: #6b7280; }
+body.dark-theme .badge-programada {
+  background: rgba(96,165,250,0.15);
+  color: #60a5fa;
+}
+
+/* ── Tabla genérica ─────────────────────────────────────────────────────── */
+body.dark-theme .mat-mdc-card { background-color: #1f2937 !important; }
+body.dark-theme .card-header  {
+  background-color: #1f2937;
+  border-bottom-color: rgba(255,255,255,0.08);
+}
+body.dark-theme .mat-mdc-table  { background: #1f2937 !important; }
+body.dark-theme .mat-mdc-header-cell {
+  background-color: #111827 !important;
+  color: #94a3b8 !important;
+}
+body.dark-theme .mat-mdc-cell   { color: #e2e8f0 !important; }
+body.dark-theme .mat-mdc-row:hover { background: rgba(255,255,255,0.04) !important; }
+body.dark-theme .mat-mdc-row,
+body.dark-theme .mat-mdc-header-row {
+  border-bottom-color: rgba(255,255,255,0.06) !important;
+}
+body.dark-theme .mat-mdc-paginator {
+  background-color: #1f2937 !important;
+  color: #94a3b8 !important;
+}
+body.dark-theme .mat-mdc-select-value,
+body.dark-theme .mat-mdc-paginator .mat-mdc-icon-button .mat-icon {
+  color: #94a3b8 !important;
+}
+
+/* ── Search input en tabla ──────────────────────────────────────────────── */
+body.dark-theme .mdc-notched-outline > * { border-color: rgba(255,255,255,0.2) !important; }
+body.dark-theme .mat-mdc-floating-label  { color: #94a3b8 !important; }
+body.dark-theme .mat-mdc-input-element   { color: #f1f5f9 !important; }
+
+/* ── Botón Exportar PDF en dark ─────────────────────────────────────────── */
+body.dark-theme .btn-export-pdf {
+  color: #f87171 !important;
+  border-color: #f87171 !important;
+}
+body.dark-theme .btn-export-pdf:hover {
+  background: #f87171 !important;
+  color: #111827 !important;
+}
+
+/* ── Headings de páginas ────────────────────────────────────────────────── */
+body.dark-theme .container-fluid .h3,
+body.dark-theme h1, body.dark-theme h2, body.dark-theme h3 {
+  color: #f1f5f9 !important;
+}
+body.dark-theme .container-fluid > .d-flex.justify-content-between {
+  border-bottom-color: rgba(255,255,255,0.08);
+}
+
+/* ── Diálogos / modales ─────────────────────────────────────────────────── */
+body.dark-theme .mdc-dialog__surface {
+  background-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+}
+body.dark-theme .mat-mdc-dialog-title { color: #f1f5f9 !important; }
+body.dark-theme .mat-mdc-dialog-actions {
+  background-color: #111827 !important;
+  border-top-color: rgba(255,255,255,0.08) !important;
+}
+body.dark-theme .custom-dialog-container .mat-mdc-dialog-title {
+  color: #f1f5f9 !important;
+  border-bottom-color: rgba(255,255,255,0.08) !important;
+}
+body.dark-theme .custom-dialog-container .mat-mdc-dialog-actions {
+  background-color: #111827 !important;
+}
+
+/* ── Selects y datepicker ───────────────────────────────────────────────── */
+body.dark-theme .mat-mdc-select-arrow         { color: #94a3b8 !important; }
+body.dark-theme .mat-datepicker-toggle .mat-icon { color: #94a3b8 !important; }
+body.dark-theme .mat-calendar { background-color: #1f2937 !important; color: #f1f5f9 !important; }
+
+/* ── Snackbar notificaciones — sin cambio (ya tienen colores propios) ───── */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DARK MODE — Correcciones adicionales (2da pasada)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Facturación: panel detalle ─────────────────────────────────────────── */
+body.dark-theme .detail-card {
+  background-color: #1f2937 !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+}
+
+body.dark-theme .total-section {
+  background-color: #111827 !important;
+  color: #f1f5f9 !important;
+}
+
+body.dark-theme .section-title { color: #94a3b8 !important; }
+body.dark-theme .info-section p { color: #e2e8f0 !important; }
+
+body.dark-theme .placeholder-icon,
+body.dark-theme .placeholder-icon-small { color: #374151 !important; }
+
+body.dark-theme .no-selection-template p,
+body.dark-theme .no-details-template    { color: #6b7280 !important; }
+
+/* Tabla Bootstrap dentro del preview de reportes */
+body.dark-theme .table,
+body.dark-theme .table-striped > tbody > tr,
+body.dark-theme .table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: #1f2937 !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+body.dark-theme .table > thead > tr > th {
+  background-color: #111827 !important;
+  color: #94a3b8 !important;
+  border-color: rgba(255,255,255,0.1) !important;
+}
+
+body.dark-theme .table-hover > tbody > tr:hover > * {
+  background-color: rgba(255,255,255,0.05) !important;
+  color: #f1f5f9 !important;
+}
+
+/* ── Mat-Select overlay (vive en el CDK overlay, fuera del body) ─────────
+   Se aplica con :host-context o con el selector del panel   ─────────────── */
+.dark-theme-overlay.mat-mdc-select-panel,
+body.dark-theme .mat-mdc-select-panel {
+  background-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+}
+
+/* El overlay del mat-select se adjunta al cdk-overlay-container */
+body.dark-theme {
+  --mat-select-panel-background-color: #1f2937;
+}
+
+.cdk-overlay-container .mat-mdc-select-panel {
+  background-color: var(--mat-select-panel-background-color, #ffffff);
+}
+
+body.dark-theme ~ .cdk-overlay-container .mat-mdc-select-panel,
+body.dark-theme ~ .cdk-overlay-container .mat-mdc-option {
+  background-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+}
+
+body.dark-theme ~ .cdk-overlay-container .mat-mdc-option:hover,
+body.dark-theme ~ .cdk-overlay-container .mat-mdc-option.mdc-list-item--selected {
+  background-color: rgba(96,165,250,0.15) !important;
+}
+
+/* ── Fallback global para overlays de Material cuando body tiene dark-theme */
+body.dark-theme + .cdk-overlay-container .mat-mdc-select-panel { background: #1f2937; }
+
+/* ── Botón stroked en diálogos dark ─────────────────────────────────────── */
+body.dark-theme .mat-mdc-button:not([color]) {
+  color: #94a3b8 !important;
+  border-color: rgba(255,255,255,0.2) !important;
+}
+
+/* ── Reportes: cards de tipo reporte ────────────────────────────────────── */
+body.dark-theme .mat-mdc-card .mat-mdc-card-header,
+body.dark-theme mat-card-header { color: #f1f5f9 !important; }
+
+body.dark-theme mat-card-subtitle,
+body.dark-theme .mat-mdc-card p { color: #94a3b8 !important; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DARK MODE — CDK Overlay Container (mat-select, mat-autocomplete, etc.)
+   El AppComponent aplica .dark-theme al cdk-overlay-container directamente
+   ══════════════════════════════════════════════════════════════════════════ */
+.dark-theme .mat-mdc-select-panel {
+  background-color: #1f2937 !important;
+}
+
+.dark-theme .mat-mdc-option {
+  background-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-theme .mat-mdc-option:hover,
+.dark-theme .mat-mdc-option.mat-mdc-option-active {
+  background-color: rgba(96, 165, 250, 0.15) !important;
+}
+
+.dark-theme .mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text {
+  color: #60a5fa !important;
+}
+
+/* Autocomplete panel */
+.dark-theme .mat-mdc-autocomplete-panel {
+  background-color: #1f2937 !important;
+}
+
+/* Datepicker */
+.dark-theme .mat-datepicker-content {
+  background-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+}
+.dark-theme .mat-calendar-body-cell-content { color: #f1f5f9 !important; }
+.dark-theme .mat-calendar-body-selected      { background-color: #3b82f6 !important; }
+.dark-theme .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border-color: #3b82f6 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DARK MODE — 3ra pasada: Tabs, Expansion panels, Menus, Bootstrap borders
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Mat-Tab Group ──────────────────────────────────────────────────────── */
+body.dark-theme .mat-mdc-tab-group,
+body.dark-theme .mat-mdc-tab-body-wrapper,
+body.dark-theme .mat-mdc-tab-body-content {
+  background-color: #111827 !important;
+}
+
+body.dark-theme .mat-mdc-tab-header {
+  background-color: #1f2937 !important;
+  border-bottom-color: rgba(255,255,255,0.08) !important;
+}
+
+body.dark-theme .mat-mdc-tab .mdc-tab__text-label,
+body.dark-theme .mat-mdc-tab-link .mdc-tab__text-label {
+  color: #94a3b8 !important;
+}
+
+body.dark-theme .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: #60a5fa !important;
+}
+
+body.dark-theme .mat-mdc-tab-body { background-color: #111827 !important; }
+
+/* ── Mat-Expansion Panel (Historial de Consultas) ───────────────────────── */
+body.dark-theme .mat-expansion-panel {
+  background-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+}
+
+body.dark-theme .mat-expansion-panel-header {
+  background-color: #1f2937 !important;
+}
+
+body.dark-theme .mat-expansion-panel-header:hover {
+  background-color: rgba(255,255,255,0.04) !important;
+}
+
+body.dark-theme .mat-expansion-panel-header-title { color: #f1f5f9 !important; }
+body.dark-theme .mat-expansion-panel-header-description { color: #94a3b8 !important; }
+body.dark-theme .mat-expansion-panel-body { background-color: #1f2937 !important; }
+
+body.dark-theme .mat-expansion-indicator svg { fill: #94a3b8 !important; }
+
+/* ── Bootstrap border/rounded (órdenes de laboratorio) ─────────────────── */
+body.dark-theme .border {
+  border-color: rgba(255,255,255,0.1) !important;
+}
+
+body.dark-theme .border.rounded,
+body.dark-theme .rounded.p-3 {
+  background-color: #111827 !important;
+  color: #e2e8f0 !important;
+}
+
+/* ── Mat-Divider en dark ────────────────────────────────────────────────── */
+body.dark-theme .mat-divider { border-top-color: rgba(255,255,255,0.08) !important; }
+
+/* ── Mat-Menu (Exportar Excel / CSV dropdown) — en CDK overlay ─────────── */
+.dark-theme .mat-mdc-menu-panel {
+  background-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-theme .mat-mdc-menu-item {
+  color: #f1f5f9 !important;
+}
+
+.dark-theme .mat-mdc-menu-item:hover,
+.dark-theme .mat-mdc-menu-item.cdk-keyboard-focused {
+  background-color: rgba(96,165,250,0.12) !important;
+}
+
+.dark-theme .mat-mdc-menu-item .mat-icon { color: #94a3b8 !important; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PORTAL DE PACIENTES — DARK MODE (diseño rediseñado)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Hero section del inicio ─────────────────────────────────────────────── */
+body.dark-theme .portal-inicio {
+  background: #0f172a;
+}
+body.dark-theme .hero-section {
+  background: linear-gradient(135deg, #0a1628 0%, #0d47a1 55%, #01579b 100%);
+}
+body.dark-theme .kpi-strip { background: rgba(0,0,0,0.2); }
+body.dark-theme .kpi-chip { background: rgba(255,255,255,0.05); }
+
+/* ── Cards del grid principal ───────────────────────────────────────────── */
+body.dark-theme .grid-card {
+  background: #1e293b !important;
+  border-color: rgba(255,255,255,0.06) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+}
+body.dark-theme .card-label { color: #64748b; }
+body.dark-theme .actividades-list li {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.06);
+  color: #e2e8f0;
+}
+body.dark-theme .actividades-list li:hover { background: rgba(96,165,250,0.12); }
+body.dark-theme .actividades-list li.done { background: rgba(46,204,113,0.08); }
+body.dark-theme .circle-bg { stroke: rgba(255,255,255,0.06); }
+body.dark-theme .progreso-pct { fill: #f1f5f9; }
+body.dark-theme .acceso-btn {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.06);
+  color: #e2e8f0;
+}
+body.dark-theme .acceso-btn:hover { background: rgba(96,165,250,0.12); }
+
+/* ── Mis Citas ──────────────────────────────────────────────────────────── */
+body.dark-theme .cita-card {
+  background: #1e293b !important;
+  border-color: rgba(255,255,255,0.07) !important;
+}
+body.dark-theme .fecha-container { border-color: rgba(255,255,255,0.07); }
+body.dark-theme .medico-nombre { color: #f1f5f9; }
+body.dark-theme .timeline-container::before { background: rgba(255,255,255,0.08); }
+body.dark-theme .timeline-dot { background: #0f172a; }
+body.dark-theme .no-citas { 
+  background: rgba(255,255,255,0.03) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* ── Mi Historial ───────────────────────────────────────────────────────── */
+body.dark-theme .condition-card {
+  background: #1e293b !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3) !important;
+}
+body.dark-theme .cond-body p { color: #94a3b8; }
+body.dark-theme .consulta-medico-row { background: rgba(96,165,250,0.07); }
+body.dark-theme .dato-item { border-color: rgba(255,255,255,0.06); }
+body.dark-theme .dato-label { color: #64748b; }
+body.dark-theme .receta-card { background: rgba(111,66,193,0.12); }
+body.dark-theme .orden-card  { background: rgba(25,135,84,0.1); }
+body.dark-theme .empty-state { color: #4b5563; }
+
+/* ── Médicos ────────────────────────────────────────────────────────────── */
+body.dark-theme .medicos-portal { background: #0f172a; }
+body.dark-theme .medico-card {
+  background: #1e293b !important;
+  border-color: rgba(255,255,255,0.07) !important;
+}
+body.dark-theme .medico-card:hover { border-color: rgba(96,165,250,0.3) !important; }
+body.dark-theme .medico-bio { color: #94a3b8; }
+body.dark-theme .filtros-card {
+  background: #1e293b !important;
+  border-color: rgba(255,255,255,0.07) !important;
+}
+
+/* ── Mi Perfil ──────────────────────────────────────────────────────────── */
+body.dark-theme .profile-avatar-card { background: #1e293b !important; }
+body.dark-theme .profile-name { color: #f1f5f9; }
+body.dark-theme .profile-email { color: #94a3b8; }
+
+/* ── Servicios ──────────────────────────────────────────────────────────── */
+body.dark-theme .services-container { background: #1e293b; }
+body.dark-theme .services-menu {
+  background: #111827 !important;
+  border-color: rgba(255,255,255,0.07) !important;
+}
+body.dark-theme .menu-item { color: #e2e8f0; }
+body.dark-theme .menu-item:hover { background: rgba(255,255,255,0.06); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DARK MODE — 4ta pasada: Correcciones tablas Bootstrap + Material
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tabla Bootstrap general (thead siempre oscuro, tbody claro) ─────────── */
+body.dark-theme .table {
+  --bs-table-bg: #1f2937;
+  --bs-table-color: #e2e8f0;
+  --bs-table-border-color: rgba(255, 255, 255, 0.08);
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-theme .table > thead {
+  background-color: #111827 !important;
+}
+
+body.dark-theme .table > thead > tr > th {
+  background-color: #111827 !important;
+  color: #94a3b8 !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-theme .table > tbody > tr > td {
+  background-color: #1f2937 !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+body.dark-theme .table > tbody > tr:hover > td {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* ── details-table (facturación) ────────────────────────────────────────── */
+body.dark-theme .details-table > thead > tr > th {
+  background-color: #0f172a !important;
+  color: #94a3b8 !important;
+  border-color: rgba(255,255,255,0.1) !important;
+}
+
+body.dark-theme .details-table > tbody > tr > td {
+  background-color: #1f2937 !important;
+  color: #e2e8f0 !important;
+}
+
+/* ── theme-card (órdenes y recetas en historia clínica) ─────────────────── */
+body.dark-theme .theme-card {
+  background-color: #111827 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-theme .theme-card p,
+body.dark-theme .theme-card strong {
+  color: #e2e8f0 !important;
+}
+
+body.dark-theme .theme-card small {
+  color: #94a3b8 !important;
+}
+
+body.dark-theme .theme-card ul,
+body.dark-theme .theme-card li {
+  color: #cbd5e1 !important;
+}
+
+body.dark-theme .theme-card hr {
+  border-color: rgba(255,255,255,0.1) !important;
+}
+
+/* ── mat-header-cell background fix (sin fondo blanco al cargar) ─────────── */
+body.dark-theme .mat-mdc-header-cell {
+  background-color: #111827 !important;
+  color: #94a3b8 !important;
+}
+
+/* Ensure card-header border-bottom en tablas está en tono oscuro */
+body.dark-theme .card-header {
+  background-color: #1f2937 !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Facturación: badge de estado en dark ────────────────────────────────── */
+body.dark-theme .badge.pagada   { background: rgba(34,197,94,0.2);  color: #4ade80; }
+body.dark-theme .badge.pendiente { background: rgba(251,191,36,0.2); color: #fbbf24; }
+body.dark-theme .badge.anulada  { background: rgba(239,68,68,0.2);  color: #f87171; }
+
+/* ── Facturación: total-section fondo ───────────────────────────────────── */
+body.dark-theme .total-section p {
+  color: #e2e8f0 !important;
+}
+
+body.dark-theme .total-section .text-success {
+  color: #4ade80 !important;
+}
+
+/* ── Zona de Peligro en dark (Mi Perfil) ─────────────────────────────────── */
+body.dark-theme .danger-zone-card {
+  background-color: rgba(220, 38, 38, 0.08) !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+}
+

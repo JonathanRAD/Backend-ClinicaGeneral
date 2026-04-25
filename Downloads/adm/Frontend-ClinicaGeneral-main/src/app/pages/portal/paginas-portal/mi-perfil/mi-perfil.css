@@ -1,0 +1,193 @@
+/* ══════════════════════════════════════════════════════
+   MI PERFIL — Premium Responsive
+══════════════════════════════════════════════════════ */
+.mi-perfil-page {
+  padding: 2rem 2.5rem 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.page-header { margin-bottom: 1.75rem; }
+.page-title { font-size: 1.75rem; font-weight: 800; margin: 0; }
+
+.spinner-container {
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center; padding: 4rem 0;
+}
+.alerta-error {
+  background: rgba(220,53,69,0.08); color: #842029;
+  border: 1px solid rgba(220,53,69,0.2);
+  border-radius: 12px; padding: 14px 18px; margin-bottom: 1.5rem;
+}
+
+mat-form-field { width: 100%; }
+
+/* Card de avatar */
+.profile-avatar-card {
+  border-radius: 20px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07) !important;
+  padding: 1.5rem !important;
+  text-align: center;
+}
+
+.avatar-container { margin: 0 auto 1rem; width: fit-content; }
+
+.profile-avatar-circle {
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1565c0, #00acc1);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem; font-weight: 800;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(21,101,192,0.3);
+  letter-spacing: -1px;
+}
+
+.profile-name {
+  font-size: 1.3rem; font-weight: 700;
+  margin: 0.75rem 0 0.25rem;
+}
+.profile-email {
+  font-size: 0.88rem;
+  color: var(--color-texto-secundario);
+  margin-bottom: 1.25rem;
+}
+
+.btn-cambiar-pass {
+  width: 100%;
+  border-radius: 10px !important;
+  margin-top: 1rem !important;
+}
+
+/* ── Botón eliminar cuenta ─────────────────────────── */
+.btn-eliminar-cuenta {
+  width: 100%;
+  border-radius: 10px !important;
+  color: #c62828 !important;
+  border-color: rgba(198, 40, 40, 0.4) !important;
+  transition: background 0.2s, border-color 0.2s !important;
+}
+.btn-eliminar-cuenta:hover:not([disabled]) {
+  background: rgba(198, 40, 40, 0.06) !important;
+  border-color: #c62828 !important;
+}
+
+.error-eliminacion-inline {
+  font-size: 0.82rem;
+  color: #c62828;
+  background: rgba(198,40,40,0.07);
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+/* ── Panel OTP de eliminación ─────────────────────── */
+.otp-delete-panel {
+  background: #fff5f5;
+  border: 1px solid rgba(198,40,40,0.25);
+  border-radius: 20px;
+  padding: 1.5rem;
+  text-align: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.otp-delete-header .otp-delete-icon {
+  font-size: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #c62828;
+  margin-bottom: 0.5rem;
+}
+
+.otp-delete-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #c62828;
+  margin: 0 0 0.5rem;
+}
+
+.otp-delete-header p {
+  font-size: 0.83rem;
+  color: #555;
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+/* Inputs OTP */
+.otp-inputs-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.otp-delete-input {
+  width: 42px;
+  height: 52px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: monospace;
+  border: 2px solid rgba(198,40,40,0.35);
+  border-radius: 10px;
+  background: #fff;
+  color: #c62828;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.otp-delete-input:focus {
+  border-color: #c62828;
+  box-shadow: 0 0 0 3px rgba(198,40,40,0.15);
+}
+
+.error-eliminacion-otp {
+  font-size: 0.82rem;
+  color: #c62828;
+  margin: 0.5rem 0;
+}
+
+.btn-confirmar-eliminar {
+  width: 100%;
+  background: #c62828 !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-confirmar-eliminar[disabled] {
+  opacity: 0.5 !important;
+}
+
+.btn-cancelar-eliminar {
+  width: 100%;
+  color: #555 !important;
+  font-size: 0.85rem !important;
+}
+
+/* Card de formulario */
+mat-card {
+  border-radius: 20px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07) !important;
+}
+mat-card-header { padding: 1.25rem 1.25rem 0 !important; }
+mat-card-content { padding: 1.25rem !important; }
+mat-card-actions { padding: 0 1.25rem 1.25rem !important; }
+
+/* Responsive */
+@media (max-width: 991px) {
+  .mi-perfil-page { padding: 1.5rem; }
+}
+@media (max-width: 767px) {
+  .mi-perfil-page { padding: 1.25rem 1rem 2rem; }
+  .row { gap: 1rem; }
+  .col-lg-4, .col-lg-8 { width: 100% !important; max-width: 100% !important; }
+}
+@media (max-width: 480px) {
+  .mi-perfil-page { padding: 1rem 0.875rem 1.5rem; }
+  .otp-delete-input { width: 36px; height: 46px; font-size: 1.25rem; }
+}

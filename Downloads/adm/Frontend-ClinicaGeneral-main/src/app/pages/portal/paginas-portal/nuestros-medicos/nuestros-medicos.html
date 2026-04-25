@@ -1,0 +1,76 @@
+<div class="medicos-portal">
+
+  <!-- Header -->
+  <div class="medicos-header">
+    <div class="medicos-title-wrap">
+      <mat-icon class="header-icon">groups</mat-icon>
+      <div>
+        <h1 class="medicos-title">Nuestro Staff Médico</h1>
+        <p class="medicos-subtitle">Profesionales de confianza listos para atenderte</p>
+      </div>
+    </div>
+    <a mat-raised-button routerLink="/portal/agendar-cita" color="primary" id="btn-agendar-medicos">
+      <mat-icon>add_circle</mat-icon> Agendar Cita
+    </a>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros-card">
+    <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+      <mat-label>Buscar por nombre</mat-label>
+      <input matInput (input)="nombreBusqueda.set($any($event.target).value)" placeholder="Ej: Dr. García">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="specialty-field" subscriptSizing="dynamic">
+      <mat-label>Especialidad</mat-label>
+      <mat-select [(ngModel)]="especialidadSeleccionada" (ngModelChange)="especialidadSeleccionada.set($event)">
+        <mat-option value="todos">Todas las especialidades</mat-option>
+        <mat-option *ngFor="let esp of especialidades()" [value]="esp">{{ esp }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Cargando -->
+  <div *ngIf="cargando()" class="loading-state">
+    <app-spinner></app-spinner>
+    <p>Cargando médicos...</p>
+  </div>
+
+  <!-- Grid -->
+  <div *ngIf="!cargando()" class="medicos-grid">
+    <div *ngFor="let medico of medicosFiltrados()" class="medico-card" id="medico-{{ medico.id }}">
+      <div class="medico-card-top">
+        <div class="medico-avatar" [style.background]="getAvatarColor(medico.apellidos)">
+          {{ medico.nombres.charAt(0) }}{{ medico.apellidos.charAt(0) }}
+        </div>
+        <div class="medico-header-info">
+          <h3 class="medico-nombre">{{ medico.nombres }} {{ medico.apellidos }}</h3>
+          <span class="specialty-chip"
+                [style.background]="getSpecialtyBg(medico.especialidad)"
+                [style.color]="getSpecialtyColor(medico.especialidad)">
+            {{ medico.especialidad }}
+          </span>
+        </div>
+      </div>
+      <p class="medico-bio">
+        Con amplia experiencia en {{ medico.especialidad }}, el Dr(a). {{ medico.apellidos }}
+        ofrece atención personalizada y de alta calidad para cada paciente.
+      </p>
+      <div class="medico-card-footer">
+        <button mat-stroked-button (click)="verPerfil(medico)" id="btn-perfil-{{ medico.id }}">
+          <mat-icon>person</mat-icon> Ver Perfil
+        </button>
+        <button mat-flat-button color="primary" (click)="agendarCitaConMedico(medico)" id="btn-agendar-{{ medico.id }}">
+          <mat-icon>event</mat-icon> Agendar
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="medicosFiltrados().length === 0 && !cargando()" class="medicos-empty">
+      <mat-icon>search_off</mat-icon>
+      <h4>Sin resultados</h4>
+      <p>No se encontraron médicos con los filtros actuales.</p>
+    </div>
+  </div>
+
+</div>

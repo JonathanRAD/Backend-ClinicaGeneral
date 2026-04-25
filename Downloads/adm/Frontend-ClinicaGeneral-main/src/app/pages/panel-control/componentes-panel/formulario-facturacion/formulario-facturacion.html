@@ -1,0 +1,39 @@
+
+<h2 mat-dialog-title>{{ esModoEdicion ? 'Editar Factura' : 'Registrar Nuevo Pago' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="facturaForm" class="factura-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Cita Asociada</mat-label>
+      <mat-select formControlName="citaId">
+        <mat-option *ngFor="let cita of citas()" [value]="cita.id">
+          {{ cita.paciente.nombres }} {{ cita.paciente.apellidos }} ({{ cita.fechaHora | date:'short' }})
+        </mat-option>
+      </mat-select>
+      <mat-error>Debe seleccionar una cita.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Monto a Pagar (S/)</mat-label>
+      <input matInput type="number" formControlName="monto" placeholder="Ej: 150.50">
+      <mat-error *ngIf="facturaForm.get('monto')?.hasError('required')">El monto es requerido.</mat-error>
+      <mat-error *ngIf="facturaForm.get('monto')?.hasError('pattern')">Ingrese un monto válido.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Estado del Pago</mat-label>
+      <mat-select formControlName="estado">
+        <mat-option *ngFor="let estado of estadosFactura" [value]="estado">
+          {{ estado | titlecase }}
+        </mat-option>
+      </mat-select>
+      <mat-error>Debe seleccionar un estado.</mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="guardar()" [disabled]="facturaForm.invalid">
+    {{ esModoEdicion ? 'Actualizar Factura' : 'Guardar Factura' }}
+  </button>
+</mat-dialog-actions>

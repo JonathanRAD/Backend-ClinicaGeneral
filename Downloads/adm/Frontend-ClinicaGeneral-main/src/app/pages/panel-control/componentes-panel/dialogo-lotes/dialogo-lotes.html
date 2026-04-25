@@ -1,0 +1,43 @@
+<div>
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon class="me-2 text-info">visibility</mat-icon>
+    Lotes de {{ data.medicamento.nombre }}
+  </h2>
+
+  <mat-dialog-content>
+    <div *ngIf="data.medicamento.lotes && data.medicamento.lotes.length > 0; else noLotes">
+      <div class="table-responsive mt-3">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th># Lote</th>
+              <th class="text-center">Stock</th>
+              <th>Vencimiento</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let lote of data.medicamento.lotes">
+              <td><strong>{{ lote.numeroLote }}</strong></td>
+              <td class="text-center">
+                <span class="badge bg-success">{{ lote.stock }} unds</span>
+              </td>
+              <td>{{ lote.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <ng-template #noLotes>
+      <div class="alert bg-dark text-secondary text-center my-4 py-4 border border-secondary">
+        <mat-icon style="font-size: 3rem; height: 3rem; width: 3rem;" class="mb-3">inventory_2</mat-icon>
+        <h5>Sin lotes registrados</h5>
+        <p class="mb-0">Este medicamento aún no tiene stock ingresado. Usa el botón verde (+ Lote) para aprovisionar.</p>
+      </div>
+    </ng-template>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="pb-3 px-4">
+    <button mat-stroked-button (click)="cerrar()">Cerrar</button>
+  </mat-dialog-actions>
+</div>

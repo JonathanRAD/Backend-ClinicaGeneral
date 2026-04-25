@@ -1,0 +1,12 @@
+.table {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+.table th, .table td {
+  border-color: rgba(128, 128, 128, 0.2) !important;
+  color: inherit !important;
+}
+.table-hover tbody tr:hover {
+  background-color: rgba(128, 128, 128, 0.1) !important;
+  color: inherit !important;
+}

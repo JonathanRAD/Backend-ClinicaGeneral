@@ -1,0 +1,203 @@
+<!-- dashboard-inventario.html -->
+<div class="inv-dashboard">
+
+  <!-- ── NAV CARDS ─────────────────────────────────────────────────────── -->
+  <div class="inv-nav-grid">
+    <a routerLink="producto" class="inv-nav-card nav-producto">
+      <div class="nav-card-glow"></div>
+      <div class="nav-card-icon-wrap">
+        <mat-icon>medication</mat-icon>
+      </div>
+      <div class="nav-card-body">
+        <span class="nav-card-title">Gestión de Producto</span>
+        <span class="nav-card-sub">Catálogo maestro · {{ totalProductos() }} registros</span>
+      </div>
+      <mat-icon class="nav-card-arrow">arrow_forward</mat-icon>
+    </a>
+
+    <a routerLink="lote" class="inv-nav-card nav-lote">
+      <div class="nav-card-glow"></div>
+      <div class="nav-card-icon-wrap">
+        <mat-icon>inventory_2</mat-icon>
+      </div>
+      <div class="nav-card-body">
+        <span class="nav-card-title">Gestión de Lote</span>
+        <span class="nav-card-sub">Trazabilidad · vencimientos · stock</span>
+      </div>
+      <mat-icon class="nav-card-arrow">arrow_forward</mat-icon>
+    </a>
+
+    <a routerLink="proveedor" class="inv-nav-card nav-proveedor">
+      <div class="nav-card-glow"></div>
+      <div class="nav-card-icon-wrap">
+        <mat-icon>local_shipping</mat-icon>
+      </div>
+      <div class="nav-card-body">
+        <span class="nav-card-title">Gestión de Proveedor</span>
+        <span class="nav-card-sub">Directorio de suministros</span>
+      </div>
+      <mat-icon class="nav-card-arrow">arrow_forward</mat-icon>
+    </a>
+  </div>
+
+  <!-- ── KPI STRIP ──────────────────────────────────────────────────────── -->
+  <div class="inv-kpi-row">
+    <div class="inv-kpi inv-kpi-ok">
+      <mat-icon>check_circle</mat-icon>
+      <div>
+        <span class="kv">{{ productosOk() }}</span>
+        <span class="kl">Stock Óptimo</span>
+      </div>
+    </div>
+    <div class="inv-kpi inv-kpi-warn">
+      <mat-icon>warning_amber</mat-icon>
+      <div>
+        <span class="kv">{{ productosAdvertencia() }}</span>
+        <span class="kl">Stock Bajo</span>
+      </div>
+    </div>
+    <div class="inv-kpi inv-kpi-danger">
+      <mat-icon>error</mat-icon>
+      <div>
+        <span class="kv">{{ productosCriticos() }}</span>
+        <span class="kl">Críticos / Agotados</span>
+      </div>
+    </div>
+    <div class="inv-kpi inv-kpi-expire">
+      <mat-icon>schedule</mat-icon>
+      <div>
+        <span class="kv">{{ lotesProxVencer() }}</span>
+        <span class="kl">Vencen en &lt;60 días</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CHARTS + TABLAS ────────────────────────────────────────────────── -->
+  <div class="inv-content-grid">
+
+    <!-- Chart stock por categoría -->
+    <div class="inv-chart-card inv-chart-bar">
+      <div class="inv-card-header">
+        <mat-icon>bar_chart</mat-icon>
+        <span>Stock por Presentación</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas #stockBarChart></canvas>
+      </div>
+    </div>
+
+    <!-- Chart distribución semáforo -->
+    <div class="inv-chart-card inv-chart-donut">
+      <div class="inv-card-header">
+        <mat-icon>donut_large</mat-icon>
+        <span>Estado del Inventario</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas #estadoDonutChart></canvas>
+      </div>
+    </div>
+
+    <!-- Tabla lotes por vencer -->
+    <div class="inv-table-card span-2">
+      <div class="inv-card-header">
+        <mat-icon>event_busy</mat-icon>
+        <span>Lotes en Riesgo de Vencimiento</span>
+        @if (lotesRiesgo().length > 0) {
+          <span class="badge-count">{{ lotesRiesgo().length }}</span>
+        }
+      </div>
+      <div class="inv-table-wrap">
+        <table class="inv-table">
+          <thead>
+            <tr>
+              <th>Cod</th>
+              <th>Producto</th>
+              <th>Stock</th>
+              <th>Laboratorio / Lote</th>
+              <th>Presentación</th>
+              <th>Proveedor</th>
+              <th>Unidades</th>
+              <th>Días</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (l of lotesRiesgo(); track l.numeroLote) {
+              <tr [class]="getSemaforoClase(l.diasRestantes)">
+                <td><strong>{{ l.medicamentoId }}</strong></td>
+                <td>{{ l.producto }}</td>
+                <td><span class="stock-badge">{{ l.stock }}</span></td>
+                <td><small>{{ l.laboratorio }}</small></td>
+                <td>{{ l.presentacion }}</td>
+                <td>{{ l.proveedor || '—' }}</td>
+                <td>{{ l.unidades }}</td>
+                <td>
+                  <span class="dias-badge" [class]="'dias-' + getSemaforoClase(l.diasRestantes)">
+                    {{ l.diasRestantes < 0 ? 'Vencido' : l.diasRestantes + ' d' }}
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty-row">
+                  <mat-icon>check_circle</mat-icon> Sin lotes en riesgo
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabla stock bajo -->
+    <div class="inv-table-card span-2">
+      <div class="inv-card-header">
+        <mat-icon>production_quantity_limits</mat-icon>
+        <span>Productos con Stock Bajo o Agotado</span>
+        @if (stockBajo().length > 0) {
+          <span class="badge-count danger">{{ stockBajo().length }}</span>
+        }
+      </div>
+      <div class="inv-table-wrap">
+        <table class="inv-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Presentación</th>
+              <th>Concentración</th>
+              <th>Stock Actual</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of stockBajo(); track m.codigo) {
+              <tr [class]="m.stockTotal === 0 ? 'row-danger' : 'row-warn'">
+                <td><code>{{ m.codigo }}</code></td>
+                <td><strong>{{ m.nombre }}</strong></td>
+                <td>{{ m.formaFarmaceutica }}</td>
+                <td>{{ m.concentracion }}</td>
+                <td>
+                  <span class="stock-num" [class]="m.stockTotal === 0 ? 'stock-zero' : 'stock-low'">
+                    {{ m.stockTotal ?? 0 }}
+                  </span>
+                </td>
+                <td>
+                  <span class="estado-pill" [class]="m.stockTotal === 0 ? 'pill-danger' : 'pill-warn'">
+                    {{ m.stockTotal === 0 ? 'AGOTADO' : 'STOCK BAJO' }}
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-row">
+                  <mat-icon>check_circle</mat-icon> Todos los productos tienen stock suficiente
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>

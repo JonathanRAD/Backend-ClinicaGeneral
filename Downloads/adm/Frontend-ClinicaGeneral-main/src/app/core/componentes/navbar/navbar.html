@@ -1,0 +1,110 @@
+<ng-container *ngIf="esPortal">
+  <nav class="portal-navbar">
+    <div class="portal-nav-inner">
+
+      <!-- Brand -->
+      <a class="portal-brand" routerLink="inicio" (click)="closeMenu()">
+        <div class="brand-icon-wrap">
+          <mat-icon>favorite</mat-icon>
+        </div>
+        <span class="brand-name">ClínicaBienestar</span>
+      </a>
+
+      <!-- Links (desktop) -->
+      <ul class="portal-nav-links">
+        <li><a routerLink="inicio" routerLinkActive="active" (click)="closeMenu()">
+          <mat-icon>home</mat-icon><span>Inicio</span>
+        </a></li>
+        <li><a routerLink="mis-citas" routerLinkActive="active" (click)="closeMenu()">
+          <mat-icon>event</mat-icon><span>Mis Citas</span>
+        </a></li>
+        <li><a routerLink="agendar-cita" routerLinkActive="active" (click)="closeMenu()">
+          <mat-icon>add_circle</mat-icon><span>Agendar</span>
+        </a></li>
+        <li><a routerLink="nuestros-medicos" routerLinkActive="active" (click)="closeMenu()">
+          <mat-icon>groups</mat-icon><span>Médicos</span>
+        </a></li>
+        <li><a routerLink="servicios" routerLinkActive="active" (click)="closeMenu()">
+          <mat-icon>medical_services</mat-icon><span>Servicios</span>
+        </a></li>
+      </ul>
+
+      <!-- User section -->
+      <div class="portal-nav-user">
+        <!-- Botón dark mode -->
+        <button class="theme-toggle-btn"
+                (click)="themeService.toggleTheme()"
+                [matTooltip]="themeService.isDarkMode() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+          <mat-icon>{{ themeService.isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        </button>
+
+        <button mat-button [matMenuTriggerFor]="userMenu" class="user-pill">
+          <div class="user-avatar-mini">{{ nombreUsuario.charAt(0) }}</div>
+          <span class="user-name-nav">{{ nombreUsuario }}</span>
+          <mat-icon class="chevron">expand_more</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu" xPosition="before">
+          <a mat-menu-item routerLink="mi-perfil" (click)="closeMenu()">
+            <mat-icon>person</mat-icon><span>Mi Perfil</span>
+          </a>
+          <a mat-menu-item routerLink="mi-historial" (click)="closeMenu()">
+            <mat-icon>history_edu</mat-icon><span>Mi Historial</span>
+          </a>
+          <a mat-menu-item routerLink="mis-conferencias" (click)="closeMenu()">
+            <mat-icon>video_camera_front</mat-icon><span>Mis Conferencias</span>
+          </a>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="cerrarSesion()">
+            <mat-icon>logout</mat-icon><span>Cerrar Sesión</span>
+          </button>
+        </mat-menu>
+      </div>
+
+      <!-- Hamburger (mobile) -->
+      <button class="portal-hamburger" (click)="toggleMenu()" [class.is-open]="isMenuOpen()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div class="portal-mobile-menu" [class.is-open]="isMenuOpen()">
+      <a routerLink="inicio" routerLinkActive="active" (click)="closeMenu()">
+        <mat-icon>home</mat-icon> Inicio
+      </a>
+      <a routerLink="mis-citas" routerLinkActive="active" (click)="closeMenu()">
+        <mat-icon>event</mat-icon> Mis Citas
+      </a>
+      <a routerLink="agendar-cita" routerLinkActive="active" (click)="closeMenu()">
+        <mat-icon>add_circle</mat-icon> Agendar Cita
+      </a>
+      <a routerLink="nuestros-medicos" routerLinkActive="active" (click)="closeMenu()">
+        <mat-icon>groups</mat-icon> Nuestros Médicos
+      </a>
+      <a routerLink="servicios" routerLinkActive="active" (click)="closeMenu()">
+        <mat-icon>medical_services</mat-icon> Servicios
+      </a>
+      <div class="mobile-menu-divider"></div>
+      <a routerLink="mi-perfil" (click)="closeMenu()">
+        <mat-icon>person</mat-icon> Mi Perfil
+      </a>
+      <a routerLink="mi-historial" (click)="closeMenu()">
+        <mat-icon>history_edu</mat-icon> Mi Historial
+      </a>
+      <a routerLink="mis-conferencias" (click)="closeMenu()">
+        <mat-icon>video_camera_front</mat-icon> Mis Conferencias
+      </a>
+      <div class="mobile-menu-divider"></div>
+      <!-- Toggle dark mode en mobile -->
+      <button class="mobile-theme-btn" (click)="themeService.toggleTheme()">
+        <mat-icon>{{ themeService.isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        {{ themeService.isDarkMode() ? 'Modo Claro' : 'Modo Oscuro' }}
+      </button>
+      <button class="mobile-logout-btn" (click)="cerrarSesion()">
+        <mat-icon>logout</mat-icon> Cerrar Sesión
+      </button>
+    </div>
+  </nav>
+</ng-container>
+
+<ng-container *ngIf="!esPortal">
+</ng-container>

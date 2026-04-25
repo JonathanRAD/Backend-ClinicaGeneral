@@ -1,0 +1,409 @@
+/* ══════════════════════════════════════════════════════
+   INVENTARIO DASHBOARD — Clínica Bienestar
+══════════════════════════════════════════════════════ */
+
+.inv-dashboard {
+  padding: 1.5rem;
+  max-width: 1500px;
+  animation: invFadeIn 0.45s ease-out;
+}
+
+@keyframes invFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── NAV CARDS ─────────────────────────────────────────────────────────── */
+.inv-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.inv-nav-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.4rem 1.5rem;
+  border-radius: 18px;
+  text-decoration: none;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+.inv-nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+}
+
+.nav-card-glow {
+  position: absolute;
+  inset: -60px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.inv-nav-card:hover .nav-card-glow { opacity: 0.18; }
+
+.nav-producto {
+  background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%);
+  color: white;
+}
+.nav-producto .nav-card-glow { background: radial-gradient(circle, #82b1ff 0%, transparent 70%); }
+
+.nav-lote {
+  background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+  color: white;
+}
+.nav-lote .nav-card-glow { background: radial-gradient(circle, #69f0ae 0%, transparent 70%); }
+
+.nav-proveedor {
+  background: linear-gradient(135deg, #4527a0 0%, #7b1fa2 100%);
+  color: white;
+}
+.nav-proveedor .nav-card-glow { background: radial-gradient(circle, #ea80fc 0%, transparent 70%); }
+
+.nav-card-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(4px);
+}
+.nav-card-icon-wrap mat-icon {
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+  color: white;
+}
+
+.nav-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.nav-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.2px;
+}
+.nav-card-sub {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.72);
+  margin-top: 3px;
+}
+
+.nav-card-arrow {
+  color: rgba(255,255,255,0.55);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+.inv-nav-card:hover .nav-card-arrow {
+  transform: translateX(4px);
+  color: rgba(255,255,255,0.9);
+}
+
+/* ── KPI STRIP ─────────────────────────────────────────────────────────── */
+.inv-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.inv-kpi {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  border: 1px solid;
+}
+
+.inv-kpi mat-icon {
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.inv-kpi .kv {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.inv-kpi .kl {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.7;
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.inv-kpi-ok {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.22);
+  color: #15803d;
+}
+.inv-kpi-ok mat-icon { color: #22c55e; }
+
+.inv-kpi-warn {
+  background: rgba(234, 179, 8, 0.08);
+  border-color: rgba(234, 179, 8, 0.25);
+  color: #854d0e;
+}
+.inv-kpi-warn mat-icon { color: #eab308; }
+
+.inv-kpi-danger {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.22);
+  color: #991b1b;
+}
+.inv-kpi-danger mat-icon { color: #ef4444; }
+
+.inv-kpi-expire {
+  background: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.22);
+  color: #6b21a8;
+}
+.inv-kpi-expire mat-icon { color: #a855f7; }
+
+/* Dark mode KPIs */
+body.dark-theme .inv-kpi-ok    { color: #86efac; }
+body.dark-theme .inv-kpi-warn  { color: #fde047; }
+body.dark-theme .inv-kpi-danger { color: #fca5a5; }
+body.dark-theme .inv-kpi-expire { color: #d8b4fe; }
+
+/* ── CONTENT GRID ──────────────────────────────────────────────────────── */
+.inv-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.span-2 { grid-column: 1 / -1; }
+
+/* ── CHART CARDS ───────────────────────────────────────────────────────── */
+.inv-chart-card {
+  background: var(--color-fondo-tarjeta, #fff);
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+body.dark-theme .inv-chart-card {
+  background: #1e293b;
+  border-color: rgba(255,255,255,0.07);
+}
+
+.inv-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  color: var(--color-texto-secundario, #6c757d);
+}
+
+body.dark-theme .inv-card-header {
+  border-color: rgba(255,255,255,0.07);
+  color: #64748b;
+}
+
+.inv-card-header mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #1565c0;
+}
+
+.badge-count {
+  margin-left: auto;
+  background: rgba(234,179,8,0.15);
+  color: #854d0e;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 2px 9px;
+}
+.badge-count.danger {
+  background: rgba(239,68,68,0.12);
+  color: #991b1b;
+}
+
+body.dark-theme .badge-count { color: #fde047; }
+body.dark-theme .badge-count.danger { color: #fca5a5; }
+
+.chart-wrap {
+  padding: 1rem 1.25rem 1.25rem;
+  height: 260px;
+  position: relative;
+}
+
+/* ── TABLE CARDS ───────────────────────────────────────────────────────── */
+.inv-table-card {
+  background: var(--color-fondo-tarjeta, #fff);
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+body.dark-theme .inv-table-card {
+  background: #1e293b;
+  border-color: rgba(255,255,255,0.07);
+}
+
+.inv-table-wrap {
+  overflow-x: auto;
+}
+
+.inv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.inv-table th {
+  background: #f8fafc;
+  color: #64748b;
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  white-space: nowrap;
+}
+
+body.dark-theme .inv-table th {
+  background: #111827;
+  color: #475569;
+  border-color: rgba(255,255,255,0.07);
+}
+
+.inv-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  color: var(--color-texto-principal, #1e293b);
+  vertical-align: middle;
+}
+
+body.dark-theme .inv-table td { 
+  color: #e2e8f0; 
+  border-color: rgba(255,255,255,0.05);
+}
+
+/* Semáforo filas */
+.row-danger {
+  background: rgba(239,68,68,0.06) !important;
+  border-left: 3px solid #ef4444;
+}
+.row-warn {
+  background: rgba(234,179,8,0.05) !important;
+  border-left: 3px solid #eab308;
+}
+.row-ok {
+  background: rgba(34,197,94,0.04) !important;
+  border-left: 3px solid #22c55e;
+}
+
+body.dark-theme .row-danger { background: rgba(239,68,68,0.1) !important; }
+body.dark-theme .row-warn   { background: rgba(234,179,8,0.08) !important; }
+body.dark-theme .row-ok     { background: rgba(34,197,94,0.06) !important; }
+
+/* Badges de días */
+.dias-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.dias-row-danger { background: rgba(239,68,68,0.15); color: #dc2626; }
+.dias-row-warn   { background: rgba(234,179,8,0.15); color: #b45309; }
+.dias-row-ok     { background: rgba(34,197,94,0.12); color: #16a34a; }
+
+body.dark-theme .dias-row-danger { background: rgba(239,68,68,0.2); color: #f87171; }
+body.dark-theme .dias-row-warn   { background: rgba(234,179,8,0.2); color: #fde047; }
+body.dark-theme .dias-row-ok     { background: rgba(34,197,94,0.15); color: #86efac; }
+
+.stock-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(21,101,192,0.1);
+  color: #1565c0;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+body.dark-theme .stock-badge { background: rgba(96,165,250,0.15); color: #93c5fd; }
+
+/* Stock numbers */
+.stock-num { font-size: 1rem; font-weight: 800; }
+.stock-zero { color: #dc2626; }
+.stock-low  { color: #d97706; }
+
+/* Estado pills */
+.estado-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.pill-danger { background: rgba(239,68,68,0.12); color: #dc2626; }
+.pill-warn   { background: rgba(234,179,8,0.12); color: #b45309; }
+
+body.dark-theme .pill-danger { background: rgba(239,68,68,0.2); color: #f87171; }
+body.dark-theme .pill-warn   { background: rgba(234,179,8,0.2); color: #fde047; }
+
+/* Empty rows */
+.empty-row {
+  text-align: center;
+  padding: 2rem !important;
+  color: #94a3b8;
+}
+.empty-row mat-icon {
+  vertical-align: middle;
+  margin-right: 6px;
+  color: #22c55e;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .inv-nav-grid { grid-template-columns: 1fr; }
+  .inv-kpi-row  { grid-template-columns: 1fr 1fr; }
+  .inv-content-grid { grid-template-columns: 1fr; }
+  .span-2 { grid-column: auto; }
+}
+
+@media (max-width: 600px) {
+  .inv-dashboard { padding: 1rem; }
+  .inv-kpi-row { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .inv-nav-card { padding: 1rem; }
+}

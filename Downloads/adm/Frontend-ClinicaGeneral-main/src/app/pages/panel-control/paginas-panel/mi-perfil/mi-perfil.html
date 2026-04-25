@@ -1,0 +1,134 @@
+<div class="container-fluid profile-page">
+
+  <div class="profile-header">
+    <div class="profile-avatar">
+      <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=100&auto=format&fit=crop" alt="Foto de perfil">
+    </div>
+    <div class="profile-info">
+      <h1 class="user-name">{{ usuario()?.nombres }} {{ usuario()?.apellidos }}</h1>
+      <p class="user-role">{{ usuario()?.rol | titlecase }}</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <mat-card>
+        <mat-card-header class="d-flex justify-content-between align-items-center">
+          <div>
+            <mat-card-title>Información Personal</mat-card-title>
+            <mat-card-subtitle>Tus datos de usuario</mat-card-subtitle>
+          </div>
+          <button *ngIf="!modoEdicion" mat-icon-button color="primary" (click)="activarEdicion()" matTooltip="Editar perfil">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="perfilForm">
+            <div class="row">
+              <div class="col-md-6">
+                <mat-form-field appearance="outline">
+                  <mat-label>Nombres</mat-label>
+                  <input matInput formControlName="nombres" [readonly]="!modoEdicion">
+                </mat-form-field>
+              </div>
+              <div class="col-md-6">
+                <mat-form-field appearance="outline">
+                  <mat-label>Apellidos</mat-label>
+                  <input matInput formControlName="apellidos" [readonly]="!modoEdicion">
+                </mat-form-field>
+              </div>
+              <div class="col-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Correo Electrónico</mat-label>
+                  <input matInput formControlName="email" readonly>
+                  <mat-icon matSuffix>lock</mat-icon>
+                </mat-form-field>
+              </div>
+              <div class="col-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Miembro desde</mat-label>
+                  <input matInput [value]="usuario()?.fechaRegistro | date:'longDate'" readonly>
+                </mat-form-field>
+              </div>
+            </div>
+          </form>
+        </mat-card-content>
+        <mat-card-actions align="end" *ngIf="modoEdicion">
+          <button mat-stroked-button (click)="cancelarEdicion()">Cancelar</button>
+          <button mat-raised-button color="primary" (click)="guardarPerfil()" [disabled]="perfilForm.invalid">Guardar Cambios</button>
+        </mat-card-actions>
+      </mat-card>
+
+      <!-- ── Zona de Peligro ────────────────────────────────────────────── -->
+      <mat-card class="danger-zone-card mt-4">
+        <mat-card-header>
+          <mat-icon mat-card-avatar class="danger-avatar">warning</mat-icon>
+          <mat-card-title class="danger-title">Zona de Peligro</mat-card-title>
+          <mat-card-subtitle>Acciones irreversibles sobre tu cuenta</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="pt-3">
+          <div class="danger-item">
+            <div class="danger-item-info">
+              <strong>Eliminar mi cuenta</strong>
+              <p class="text-muted mb-0 small">
+                Una vez eliminada, todos tus datos serán borrados permanentemente y no podrás recuperarlos.
+              </p>
+            </div>
+            <button
+              mat-stroked-button
+              class="danger-btn"
+              (click)="eliminarMiCuenta()"
+              [disabled]="eliminandoCuenta">
+              <mat-icon>delete_forever</mat-icon>
+              {{ eliminandoCuenta ? 'Eliminando...' : 'Eliminar cuenta' }}
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="col-lg-5">
+      <mat-card class="mb-4 permissions-card">
+        <mat-card-header>
+          <mat-card-title>Rol y Permisos</mat-card-title>
+          <mat-card-subtitle>Tus capacidades dentro del sistema</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <ul class="permissions-list">
+            <li *ngFor="let permiso of permisos()">
+              <mat-icon>check_circle</mat-icon>
+              <span>{{ permiso }}</span>
+            </li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Seguridad</mat-card-title>
+          <mat-card-subtitle>Cambia tu contraseña</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="contrasenaForm">
+            <mat-form-field appearance="outline">
+              <mat-label>Contraseña Actual</mat-label>
+              <input matInput type="password" formControlName="contrasenaActual">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Nueva Contraseña</mat-label>
+              <input matInput type="password" formControlName="nuevaContrasena">
+              <mat-error *ngIf="contrasenaForm.controls['nuevaContrasena'].hasError('minlength')">Debe tener al menos 8 caracteres</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Confirmar Nueva Contraseña</mat-label>
+              <input matInput type="password" formControlName="confirmarContrasena">
+              <mat-error *ngIf="contrasenaForm.hasError('notSame') && contrasenaForm.controls['confirmarContrasena'].touched">Las contraseñas no coinciden</mat-error>
+            </mat-form-field>
+          </form>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-raised-button color="primary" (click)="cambiarContrasena()" [disabled]="contrasenaForm.invalid">Actualizar Contraseña</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>

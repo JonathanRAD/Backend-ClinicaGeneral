@@ -1,0 +1,95 @@
+/* ── Contenedor ── */
+.reportes-container {
+  padding: 24px;
+  max-width: 1200px;
+}
+
+/* ── Header ── */
+.reportes-header { display: flex; align-items: center; justify-content: space-between; }
+.reportes-title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1.6rem; font-weight: 700; margin: 0;
+}
+.reportes-subtitle { color: var(--mat-sys-on-surface-variant); font-size: 0.9rem; margin: 4px 0 0 42px; }
+
+/* ── Stats rápidas ── */
+.stats-row {
+  display: flex; flex-wrap: wrap; gap: 12px;
+}
+.stat-mini {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;
+}
+.stat-blue   { background: rgba(13,110,253,0.1); color: #0d6efd; }
+.stat-green  { background: rgba(25,135,84,0.1);  color: #198754; }
+.stat-purple { background: rgba(111,66,193,0.1); color: #6f42c1; }
+.stat-red    { background: rgba(220,53,69,0.1);  color: #dc3545; }
+.stat-gray   { background: rgba(108,117,125,0.1);color: #6c757d; }
+
+/* ── Grid de tarjetas ── */
+.reportes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+/* ── Tarjeta de reporte ── */
+.report-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px !important;
+  border: 1px solid rgba(0,0,0,0.07) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06) !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.report-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;
+}
+
+/* Barra de color lateral */
+.report-card-accent {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+}
+.accent-blue   { background: #0d6efd; }
+.accent-green  { background: #198754; }
+.accent-purple { background: #6f42c1; }
+
+/* Icono de la tarjeta */
+.report-icon-wrap {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-left: 8px;
+}
+.report-icon-wrap mat-icon { color: white; font-size: 26px; width: 26px; height: 26px; }
+.icon-blue   { background: linear-gradient(135deg, #0d6efd, #4d9fff); }
+.icon-green  { background: linear-gradient(135deg, #198754, #2abb5b); }
+.icon-purple { background: linear-gradient(135deg, #6f42c1, #9b6edc); }
+
+.report-desc {
+  font-size: 0.88rem;
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.5;
+}
+
+.btn-small {
+  min-width: 40px !important;
+  padding: 0 8px !important;
+}
+
+.split-button-main {
+  border-radius: 4px 0 0 4px !important;
+}
+
+/* Badge crítico */
+.badge-critico {
+  font-size: 0.72rem; font-weight: 600;
+  background: rgba(220,53,69,0.12); color: #dc3545;
+  border-radius: 20px; padding: 2px 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reportes-grid { grid-template-columns: 1fr; }
+  .stats-row { gap: 8px; }
+}

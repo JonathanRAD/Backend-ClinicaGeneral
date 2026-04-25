@@ -1,0 +1,89 @@
+<div class="container mt-4">
+  <div class="page-header">
+    <h1 class="page-title">Mis Citas</h1>
+    <a mat-raised-button color="primary" routerLink="/portal/agendar-cita">
+      <mat-icon>add</mat-icon>
+      <span>Agendar Nueva Cita</span>
+    </a>
+  </div>
+
+  <div *ngIf="cargando()" class="spinner-container">
+    <app-spinner></app-spinner>
+    <p class="mt-2 text-muted">Cargando tus citas...</p>
+  </div>
+
+  <div *ngIf="error()" class="alerta-error">{{ error() }}</div>
+
+  <div *ngIf="!cargando() && !error()" class="timeline-container">
+    
+    <h2 class="timeline-header">Próximas Citas</h2>
+    <ng-container *ngIf="citasProximas().length > 0; else noHayProximas">
+      <div *ngFor="let cita of citasProximas()" class="timeline-item">
+        <div class="timeline-dot"></div>
+        <mat-card class="cita-card" [class.is-expanded]="citaExpandida() === cita.id" (click)="toggleCita(cita.id)" mat-ripple>
+          <div class="cita-summary">
+            <div class="fecha-container">
+              <div class="fecha-dia">{{ cita.fechaHora | date:'d' }}</div>
+              <div class="fecha-mes-ano">{{ cita.fechaHora | date:'MMM yyyy' }}</div>
+            </div>
+            <div class="info-container">
+              <h3 class="medico-nombre">Dr(a). {{ cita.medico.nombres }} {{ cita.medico.apellidos }}</h3>
+              <div class="detalle-cita"><mat-icon>medical_services</mat-icon><span>{{ cita.medico.especialidad }}</span></div>
+              <div class="detalle-cita"><mat-icon>schedule</mat-icon><span>{{ cita.fechaHora | date:'shortTime' }}</span></div>
+            </div>
+            <div class="estado-container">
+              <mat-icon class="expand-icon">{{ citaExpandida() === cita.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </div>
+          </div>
+          <div class="cita-details-wrapper">
+            <div class="cita-details-content">
+              <mat-divider></mat-divider>
+              <div class="detalle-expandido">
+                <div class="detalle-item"><mat-icon>meeting_room</mat-icon><span><strong>Consultorio:</strong> {{ cita.consultorio }}</span></div>
+                <div class="detalle-item"><mat-icon>notes</mat-icon><span><strong>Motivo:</strong> {{ cita.motivo }}</span></div>
+                <div class="detalle-item prep-item"><mat-icon>rule</mat-icon><span><strong>Preparación:</strong> Se recomienda llegar 15 minutos antes.</span></div>
+              </div>
+              <mat-card-actions align="end" class="gap-2">
+                <button mat-stroked-button color="primary" (click)="agregarAlCalendario($event, cita)">
+                  <mat-icon>calendar_add_on</mat-icon><span>Añadir al Calendario</span>
+                </button>
+                <button mat-stroked-button color="warn" (click)="confirmarCancelacion($event, cita)">
+                  <mat-icon>cancel</mat-icon><span>Cancelar</span>
+                </button>
+              </mat-card-actions>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </ng-container>
+    <ng-template #noHayProximas>
+      <div class="no-citas"><mat-icon>event_available</mat-icon><h2>Todo en orden</h2><p>No tienes ninguna cita programada por el momento.</p></div>
+    </ng-template>
+
+    <h2 class="timeline-header">Historial</h2>
+    <ng-container *ngIf="citasPasadas().length > 0; else noHayPasadas">
+      <div *ngFor="let cita of citasPasadas()" class="timeline-item is-past">
+        <div class="timeline-dot"></div>
+        <mat-card class="cita-card" mat-ripple>
+          <div class="cita-summary">
+            <div class="fecha-container">
+              <div class="fecha-dia">{{ cita.fechaHora | date:'d' }}</div>
+              <div class="fecha-mes-ano">{{ cita.fechaHora | date:'MMM yyyy' }}</div>
+            </div>
+            <div class="info-container">
+              <h3 class="medico-nombre">Dr(a). {{ cita.medico.nombres }} {{ cita.medico.apellidos }}</h3>
+              <div class="detalle-cita"><mat-icon>medical_services</mat-icon><span>{{ cita.medico.especialidad }}</span></div>
+            </div>
+            <div class="estado-container">
+              <span class="badge" [ngClass]="getEstadoClass(cita.estado)">{{ cita.estado | titlecase }}</span>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </ng-container>
+    <ng-template #noHayPasadas>
+      <div class="no-citas is-past"><mat-icon>folder_off</mat-icon><h2>Sin Historial</h2><p>Aún no tienes citas pasadas o canceladas.</p></div>
+    </ng-template>
+
+  </div>
+</div>

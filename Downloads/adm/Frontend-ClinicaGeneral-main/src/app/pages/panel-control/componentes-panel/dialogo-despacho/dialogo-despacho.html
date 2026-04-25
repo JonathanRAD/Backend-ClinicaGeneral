@@ -1,0 +1,72 @@
+<div>
+  <h2 mat-dialog-title class="d-flex align-items-center gap-2">
+    <mat-icon color="accent">local_pharmacy</mat-icon>
+    Despacho de Farmacia
+  </h2>
+
+  <mat-dialog-content class="px-4 pt-2">
+    <!-- Datos del Paciente -->
+    <div class="patient-info-bar mb-3">
+      <mat-icon class="me-1">person</mat-icon>
+      <strong>{{ data.pacienteNombre }}</strong>
+      <span class="text-muted ms-2">DNI: {{ data.pacienteDni }}</span>
+    </div>
+
+    <p class="text-muted small mb-3">
+      Selecciona los medicamentos a entregar. El stock se descontará automáticamente del lote más próximo a vencer.
+    </p>
+
+    <mat-divider class="mb-3"></mat-divider>
+
+    <!-- Lista de medicamentos agrupados de todas las recetas -->
+    <div *ngIf="itemsDespacho().length > 0; else sinMedicamentos" class="d-flex flex-column gap-2">
+      <div *ngFor="let item of itemsDespacho()" 
+           class="despacho-item"
+           [class.despacho-item--selected]="item.seleccionado"
+           [class.despacho-item--sin-stock]="getStockActual(item.medicamentoId) < item.cantidad">
+        
+        <div class="d-flex align-items-center gap-3">
+          <mat-checkbox 
+            [(ngModel)]="item.seleccionado"
+            [disabled]="getStockActual(item.medicamentoId) === 0">
+          </mat-checkbox>
+          
+          <div class="flex-grow-1">
+            <span class="fw-semibold">{{ item.nombre }}</span>
+            <div class="d-flex gap-3 mt-1">
+              <small class="text-muted">Cantidad recetada: <strong>{{ item.cantidad }}</strong></small>
+              <small [class.text-success]="getStockActual(item.medicamentoId) >= item.cantidad"
+                     [class.text-danger]="getStockActual(item.medicamentoId) < item.cantidad">
+                Stock farmacia: <strong>{{ getStockActual(item.medicamentoId) }}</strong>
+              </small>
+            </div>
+          </div>
+
+          <!-- Badge de alerta si no hay stock -->
+          <span *ngIf="getStockActual(item.medicamentoId) === 0" 
+                class="badge bg-danger">Sin stock</span>
+          <span *ngIf="getStockActual(item.medicamentoId) > 0 && getStockActual(item.medicamentoId) < item.cantidad" 
+                class="badge bg-warning text-dark">Stock parcial</span>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinMedicamentos>
+      <div class="text-center text-muted py-4">
+        <mat-icon style="font-size: 48px; height: 48px; width: 48px;">medication_liquid</mat-icon>
+        <p class="mt-2">No hay medicamentos en las recetas de esta consulta.</p>
+      </div>
+    </ng-template>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="px-4 pb-3">
+    <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" 
+            (click)="confirmarDespacho()"
+            [disabled]="!hayItemsSeleccionados() || despachando()">
+      <mat-icon class="me-1">{{ despachando() ? 'hourglass_empty' : 'check_circle' }}</mat-icon>
+      {{ despachando() ? 'Despachando...' : 'Confirmar Despacho' }}
+    </button>
+  </mat-dialog-actions>
+</div>

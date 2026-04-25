@@ -1,0 +1,277 @@
+<div class="container-fluid p-4">
+  <div *ngIf="!historia()" class="text-center p-5">
+    <p>Cargando historia clínica...</p>
+  </div>
+
+  <div *ngIf="historia() as h" class="fade-in">
+
+    <mat-card class="mb-4 patient-header-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="patient-avatar">account_circle</mat-icon>
+        <mat-card-title class="fw-bold">{{ h.paciente.nombres }} {{ h.paciente.apellidos }}</mat-card-title>
+        <mat-card-subtitle>DNI: {{ h.paciente.dni }} | Teléfono: {{ h.paciente.telefono }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-actions align="end" class="p-3">
+        <button mat-stroked-button color="primary" routerLink="/panel/pacientes">
+          <mat-icon>arrow_back</mat-icon>
+          Volver a la lista de pacientes
+        </button>
+        <button mat-raised-button color="primary" (click)="imprimirHistoriaCompleta()" style="margin-left:8px">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Imprimir Historia (PDF)
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-tab-group animationDuration="0ms">
+
+      <mat-tab label="Información General">
+        <div class="p-4">
+          <mat-card>
+            <mat-card-header class="d-flex justify-content-between align-items-center">
+              <mat-card-title>Datos de la Historia Clínica</mat-card-title>
+              <div>
+                <button *ngIf="!modoEdicion()" mat-icon-button color="primary" (click)="activarEdicion()" matTooltip="Editar historia">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button *ngIf="modoEdicion()" mat-icon-button color="primary" (click)="guardarCambios()" matTooltip="Guardar cambios">
+                  <mat-icon>save</mat-icon>
+                </button>
+                <button *ngIf="modoEdicion()" mat-icon-button (click)="cancelarEdicion()" matTooltip="Cancelar edición">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </mat-card-header>
+
+            <mat-card-content class="p-4">
+              <div *ngIf="!modoEdicion()">
+                <div class="info-group">
+                  <h6 class="text-muted">Antecedentes</h6>
+                  <p>{{ h.antecedentes || 'No registrados' }}</p>
+                </div>
+                <div class="info-group">
+                  <h6 class="text-muted">Alergias</h6>
+                  <p>{{ h.alergias || 'No registradas' }}</p>
+                </div>
+                <div class="info-group">
+                  <h6 class="text-muted">Enfermedades Crónicas</h6>
+                  <p>{{ h.enfermedadesCronicas || 'No registradas' }}</p>
+                </div>
+              </div>
+
+              <div *ngIf="modoEdicion()">
+                <mat-form-field appearance="outline" class="w-100 mb-3">
+                  <mat-label>Antecedentes Médicos</mat-label>
+                  <textarea matInput [(ngModel)]="h.antecedentes" rows="4"></textarea>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="w-100 mb-3">
+                  <mat-label>Alergias Conocidas</mat-label>
+                  <textarea matInput [(ngModel)]="h.alergias" rows="4"></textarea>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Enfermedades Crónicas</mat-label>
+                  <textarea matInput [(ngModel)]="h.enfermedadesCronicas" rows="4"></textarea>
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Historial de Consultas">
+        <div class="p-4">
+          <div class="d-flex justify-content-end mb-3">
+            <button mat-raised-button color="primary" (click)="abrirFormularioConsulta()">
+              <mat-icon>add</mat-icon>
+              Registrar Nueva Consulta
+            </button>
+          </div>
+
+          <mat-accordion *ngIf="h.consultas && h.consultas.length > 0; else noConsultas">
+            <mat-expansion-panel *ngFor="let consulta of h.consultas; trackBy: trackByConsultaId">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <strong>{{ consulta.fechaConsulta | date:'fullDate' }}</strong>
+                </mat-panel-title>
+                <mat-panel-description>
+                  Atendido por: Dr(a). {{ consulta.medico.nombres }} {{ consulta.medico.apellidos }}
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <div class="info-group">
+                <h6 class="text-muted">Motivo de la Consulta</h6>
+                <p>{{ consulta.motivo }}</p>
+              </div>
+              <div class="info-group">
+                <h6 class="text-muted">Diagnóstico</h6>
+                <p>{{ consulta.diagnostico }}</p>
+              </div>
+              <div class="info-group">
+                <h6 class="text-muted">Tratamiento</h6>
+                <p>{{ consulta.tratamiento }}</p>
+              </div>
+
+              <!-- SIGNOS VITALES DEL TRIAJE -->
+              <div *ngIf="consulta.cita?.triaje as triaje" class="triaje-vitales-card mt-2">
+                <div class="triaje-vitales-header">
+                  <mat-icon>health_and_safety</mat-icon>
+                  <span>Signos Vitales Registrados en Triaje</span>
+                  <small class="ms-auto text-muted">{{ triaje.fechaRegistro | date:'short' }}</small>
+                </div>
+                <div class="triaje-vitales-grid">
+                  <div class="vital-badge">
+                    <mat-icon>thermostat</mat-icon>
+                    <span class="vital-val">{{ triaje.temperatura }}°C</span>
+                    <span class="vital-label">Temperatura</span>
+                  </div>
+                  <div class="vital-badge">
+                    <mat-icon>speed</mat-icon>
+                    <span class="vital-val">{{ triaje.presionArterial }}</span>
+                    <span class="vital-label">Presión</span>
+                  </div>
+                  <div class="vital-badge">
+                    <mat-icon>favorite</mat-icon>
+                    <span class="vital-val">{{ triaje.ritmoCardiaco }} lpm</span>
+                    <span class="vital-label">Frec. Card.</span>
+                  </div>
+                  <div class="vital-badge">
+                    <mat-icon>air</mat-icon>
+                    <span class="vital-val">{{ triaje.saturacionOxigeno }}%</span>
+                    <span class="vital-label">SpO₂</span>
+                  </div>
+                  <div class="vital-badge">
+                    <mat-icon>monitor_weight</mat-icon>
+                    <span class="vital-val">{{ triaje.peso }} kg</span>
+                    <span class="vital-label">Peso</span>
+                  </div>
+                  <div *ngIf="triaje.nivelAzucar" class="vital-badge">
+                    <mat-icon>water_drop</mat-icon>
+                    <span class="vital-val">{{ triaje.nivelAzucar }} mg/dL</span>
+                    <span class="vital-label">Glucemia</span>
+                  </div>
+                </div>
+                <div *ngIf="triaje.notasOpcionales" class="triaje-notas">
+                  <mat-icon class="me-1">notes</mat-icon>
+                  <em>{{ triaje.notasOpcionales }}</em>
+                </div>
+              </div>
+
+              <mat-divider class="my-3"></mat-divider>
+
+              <div class="row">
+                <!-- Columna Ordenes -->
+                <div class="col-md-6 border-end">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="text-muted mb-0">Órdenes de Laboratorio</h6>
+                    <button mat-stroked-button color="primary" (click)="abrirFormularioOrden(consulta.id)">
+                      <mat-icon>science</mat-icon> Nueva Orden
+                    </button>
+                  </div>
+                  <div *ngIf="consulta.ordenesLaboratorio && consulta.ordenesLaboratorio.length > 0; else noOrdenes" class="mt-3">
+                    <div *ngFor="let orden of consulta.ordenesLaboratorio" class="border rounded p-3 mb-2 theme-card">
+                      <p><strong>Examen:</strong> {{ orden.tipoExamen }}</p>
+                      <p class="mb-0"><strong>Observaciones:</strong> {{ orden.observaciones || 'Ninguna' }}</p>
+                      <small class="text-muted">Fecha: {{ orden.fechaOrden | date:'short' }}</small>
+                    </div>
+                  </div>
+                  <ng-template #noOrdenes>
+                    <p class="text-muted mt-2 fst-italic">No hay órdenes para esta consulta.</p>
+                  </ng-template>
+                </div>
+                
+                <!-- Columna Recetas -->
+                <div class="col-md-6 ps-md-4">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="text-muted mb-0">Recetas Médicas</h6>
+                    <button mat-stroked-button color="accent" (click)="abrirFormularioReceta(consulta.id)">
+                      <mat-icon>receipt_long</mat-icon> Emitir Receta
+                    </button>
+                  </div>
+                  <div *ngIf="consulta.recetas && consulta.recetas.length > 0; else noRecetas" class="mt-3">
+                    <div *ngFor="let receta of consulta.recetas" class="border rounded p-3 mb-2 theme-card">
+                      <p *ngIf="receta.indicacionesGenerales" class="mb-1"><strong>Indicaciones:</strong> {{ receta.indicacionesGenerales }}</p>
+                      <hr *ngIf="receta.detalles && receta.detalles.length > 0" class="my-2">
+                      <ul class="mb-0 pl-3 text-secondary text-sm" style="list-style-type: square; padding-left: 20px;">
+                        <li *ngFor="let det of receta.detalles">
+                          <strong>{{ (det.medicamento && det.medicamento.nombre) ? det.medicamento.nombre : ('ID:' + det.medicamentoId) }} x{{ det.cantidadSolicitada }}</strong><br>
+                          Tomar {{ det.dosis }} {{ det.frecuencia }} por {{ det.duracion }}
+                        </li>
+                      </ul>
+                      <div class="d-flex justify-content-between align-items-center mt-2">
+                        <small class="text-muted">Emitida: {{ receta.fechaEmision | date:'short' }}</small>
+                        <button mat-icon-button color="primary" (click)="imprimirReceta(receta, consulta)" matTooltip="Imprimir Receta (PDF)">
+                          <mat-icon>print</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #noRecetas>
+                    <p class="text-muted mt-2 fst-italic">No hay recetas emitidas en esta consulta.</p>
+                  </ng-template>
+                </div>
+              </div>
+              
+            </mat-expansion-panel>
+          </mat-accordion>
+
+          <ng-template #noConsultas>
+            <mat-card class="text-center p-4 text-muted">
+              No hay consultas registradas para este paciente.
+            </mat-card>
+          </ng-template>
+        </div>
+      </mat-tab>
+      
+      <mat-tab label="Seguro Médico">
+        <div class="p-4">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>Información de la Póliza</mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="p-4">
+              
+              <div *ngIf="h.paciente.seguroMedico; else sinSeguro">
+                <div class="info-group">
+                  <h6 class="text-muted">Aseguradora</h6>
+                  <p>{{ h.paciente.seguroMedico.nombreAseguradora }}</p>
+                </div>
+                <div class="info-group">
+                  <h6 class="text-muted">Número de Póliza</h6>
+                  <p>{{ h.paciente.seguroMedico.numeroPoliza }}</p>
+                </div>
+                <div class="info-group">
+                  <h6 class="text-muted">Cobertura</h6>
+                  <p>{{ h.paciente.seguroMedico.cobertura }}</p>
+                </div>
+
+                <div *ngIf="estadoValidacion().verificado" 
+                     [ngClass]="estadoValidacion().valido ? 'alert alert-success' : 'alert alert-danger'">
+                  <strong>Resultado de la validación:</strong> {{ estadoValidacion().mensaje }}
+                </div>
+              </div>
+
+              <ng-template #sinSeguro>
+                <div class="text-center p-4 text-muted">
+                  <mat-icon class="icon-large">assignment_late</mat-icon>
+                  <p class="mt-2">Este paciente no tiene información de seguro registrada.</p>
+                </div>
+              </ng-template>
+
+            </mat-card-content>
+            <mat-card-actions align="end" class="p-3">
+              <button mat-stroked-button (click)="abrirFormularioSeguro()">
+                <mat-icon>edit</mat-icon>
+                {{ h.paciente.seguroMedico ? 'Editar Información' : 'Agregar Seguro' }}
+              </button>
+              <button mat-raised-button color="primary" (click)="validarSeguro()" [disabled]="!h.paciente.seguroMedico">
+                <mat-icon>verified_user</mat-icon>
+                Validar Póliza
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </div>
+</div>

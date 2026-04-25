@@ -1,0 +1,40 @@
+.recuperar-card {
+  max-width: 420px;
+  overflow: hidden;
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card-header-custom {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  padding: 2.5rem 2rem;
+}
+
+.card-header-custom i {
+  font-size: 3.5rem; 
+  display: block;
+}
+
+.card-header-confirmacion i {
+  font-size: 3.5rem;
+  color: #198754;
+}
+
+.vista-contenido {
+  animation: fadeIn 0.4s ease-in-out;
+}
+.link-volver {
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.link-volver:hover {
+  color: #000 !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes popIn {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}

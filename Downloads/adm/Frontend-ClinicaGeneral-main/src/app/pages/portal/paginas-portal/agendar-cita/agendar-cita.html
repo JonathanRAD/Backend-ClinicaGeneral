@@ -1,0 +1,118 @@
+<div class="container mt-4 agendar-cita-page">
+  <div class="page-header">
+    <h1 class="page-title">Agendar una Nueva Cita</h1>
+  </div>
+
+  <mat-card>
+    <mat-card-content>
+
+      <div class="progress-bar-container">
+        <div class="progress-step" [class.completed]="paso() !== 'especialidad'">
+          <div class="progress-dot">
+            <mat-icon *ngIf="paso() !== 'especialidad'">check</mat-icon>
+            <span *ngIf="paso() === 'especialidad'">1</span>
+          </div>
+          <div class="progress-label">Especialidad</div>
+        </div>
+        <div class="progress-line" [class.completed]="paso() === 'medico' || paso() === 'fecha'"></div>
+        <div class="progress-step" [class.active]="paso() === 'medico'" [class.completed]="paso() === 'fecha'">
+          <div class="progress-dot">
+            <mat-icon *ngIf="paso() === 'fecha'">check</mat-icon>
+            <span *ngIf="paso() !== 'fecha'">2</span>
+          </div>
+          <div class="progress-label">Médico</div>
+        </div>
+        <div class="progress-line" [class.completed]="paso() === 'fecha'"></div>
+        <div class="progress-step" [class.active]="paso() === 'fecha'">
+          <div class="progress-dot">3</div>
+          <div class="progress-label">Fecha y Hora</div>
+        </div>
+      </div>
+
+      <div *ngIf="cargandoMedicos()" class="initial-loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Cargando especialistas...</p>
+      </div>
+      <div *ngIf="error() && cargandoMedicos()" class="initial-loading-container">
+         <mat-icon color="warn" class="error-icon">error_outline</mat-icon>
+         <p>{{ error() }}</p>
+      </div>
+
+      <div *ngIf="!cargandoMedicos() && !error()">
+        <div *ngIf="paso() === 'especialidad'" class="wizard-step">
+          <h2 class="step-title">1. ¿Qué especialidad necesitas?</h2>
+          <div class="card-grid">
+            <mat-card *ngFor="let esp of especialidades()" class="selectable-card" (click)="seleccionarEspecialidad(esp)">
+              <mat-card-content>
+                <mat-icon>medical_services</mat-icon>
+                <span>{{ esp }}</span>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+
+        <div *ngIf="paso() === 'medico'" class="wizard-step">
+          <h2 class="step-title">2. Elige un médico en {{ especialidadSeleccionada() }}</h2>
+          <div class="card-grid">
+            <mat-card *ngFor="let medico of medicosFiltrados()" class="selectable-card" (click)="seleccionarMedico(medico.id)">
+              <mat-card-content>
+                <mat-icon>account_circle</mat-icon>
+                <span>Dr(a). {{ medico.nombres }} {{ medico.apellidos }}</span>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          <div class="wizard-actions">
+            <button mat-stroked-button (click)="volverAPaso('especialidad')"><mat-icon>arrow_back</mat-icon> Volver a especialidades</button>
+          </div>
+        </div>
+
+        <div *ngIf="paso() === 'fecha'" class="wizard-step">
+          <h2 class="step-title">3. Selecciona la fecha y hora</h2>
+          
+          <div class="resumen-seleccion">
+            <p><strong>Especialidad:</strong> {{ especialidadSeleccionada() }}</p>
+            <p><strong>Médico:</strong> Dr(a). {{ medicoSeleccionado?.nombres }} {{ medicoSeleccionado?.apellidos }}</p>
+          </div>
+
+          <form [formGroup]="formularioCita" (ngSubmit)="agendarCita()" class="agendar-form">
+            <div class="row g-3">
+              <div class="col-md-7">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Fecha de la Cita</mat-label>
+                  <input matInput [matDatepicker]="picker" formControlName="fecha" [min]="minDate" required>
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                  <mat-error>La fecha es requerida.</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-5">
+                <mat-form-field appearance="outline" class="w-100">
+                  <mat-label>Hora</mat-label>
+                  <mat-select formControlName="hora" required>
+                    <mat-option *ngFor="let hora of horasDisponibles" [value]="hora">{{ hora }}</mat-option>
+                  </mat-select>
+                  <mat-error>La hora es requerida.</mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <mat-form-field appearance="outline">
+              <mat-label>Motivo de la Cita</mat-label>
+              <textarea matInput formControlName="motivo" rows="4" placeholder="Describa brevemente el motivo de su visita..." required></textarea>
+              <mat-error>El motivo es requerido.</mat-error>
+            </mat-form-field>
+
+            <div *ngIf="error() && !cargando()" class="alerta-error">{{ error() }}</div>
+
+            <mat-card-actions align="end" class="gap-2">
+              <button type="button" mat-stroked-button (click)="volverAPaso('medico')"><mat-icon>arrow_back</mat-icon> Cambiar Médico</button>
+              <button type="submit" mat-raised-button color="primary" [disabled]="cargando()">
+                <span *ngIf="!cargando()">Confirmar Cita</span>
+                <mat-spinner *ngIf="cargando()" diameter="20" class="ms-2"></mat-spinner>
+              </button>
+            </mat-card-actions>
+          </form>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

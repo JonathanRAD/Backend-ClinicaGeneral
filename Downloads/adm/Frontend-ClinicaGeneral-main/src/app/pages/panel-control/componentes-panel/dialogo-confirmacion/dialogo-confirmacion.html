@@ -1,0 +1,17 @@
+
+
+<div class="confirm-dialog-header">
+  <mat-icon color="warn">warning</mat-icon>
+  <h2 mat-dialog-title>{{ data.titulo }}</h2>
+</div>
+
+<mat-dialog-content class="mat-typography">
+  <p>{{ data.mensaje }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="onNoClick()">{{ data.textoCancelar || 'Cancelar' }}</button>
+  <button mat-raised-button color="warn" [mat-dialog-close]="true" cdkFocusInitial>
+    {{ data.textoConfirmar || 'Sí, Eliminar' }}
+  </button>
+</mat-dialog-actions>

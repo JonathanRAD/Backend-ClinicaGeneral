@@ -1,0 +1,216 @@
+
+<div class="dashboard-container">
+
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Dashboard de Actividad</h1>
+      <p class="dashboard-subtitle">{{ fechaActual | date:'EEEE, d \'de\' MMMM yyyy' : '' : 'es' }}</p>
+    </div>
+    <div class="header-actions">
+      <button mat-flat-button color="primary" routerLink="../pacientes" id="btn-registrar-paciente">
+        <mat-icon>person_add</mat-icon> Nuevo Paciente
+      </button>
+      <button mat-flat-button color="accent" routerLink="../citas" id="btn-agendar-cita">
+        <mat-icon>event</mat-icon> Nueva Cita
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-pacientes">
+      <div class="kpi-icon"><mat-icon>groups</mat-icon></div>
+      <div class="kpi-info">
+        <span class="kpi-label">Pacientes Totales</span>
+        <span class="kpi-value">{{ totalPacientes() }}</span>
+      </div>
+      <mat-icon class="kpi-bg-icon">groups</mat-icon>
+    </div>
+    <div class="kpi-card kpi-medicos">
+      <div class="kpi-icon"><mat-icon>medical_services</mat-icon></div>
+      <div class="kpi-info">
+        <span class="kpi-label">Médicos Activos</span>
+        <span class="kpi-value">{{ totalMedicos() }}</span>
+      </div>
+      <mat-icon class="kpi-bg-icon">medical_services</mat-icon>
+    </div>
+    <div class="kpi-card kpi-citas-hoy">
+      <div class="kpi-icon"><mat-icon>today</mat-icon></div>
+      <div class="kpi-info">
+        <span class="kpi-label">Citas para Hoy</span>
+        <span class="kpi-value">{{ citasHoy() }}</span>
+      </div>
+      <mat-icon class="kpi-bg-icon">today</mat-icon>
+    </div>
+    <div class="kpi-card kpi-programadas">
+      <div class="kpi-icon"><mat-icon>event_available</mat-icon></div>
+      <div class="kpi-info">
+        <span class="kpi-label">Citas Programadas</span>
+        <span class="kpi-value">{{ citasProgramadas() }}</span>
+      </div>
+      <mat-icon class="kpi-bg-icon">event_available</mat-icon>
+    </div>
+    <div class="kpi-card kpi-ingresos">
+      <div class="kpi-icon"><mat-icon>monetization_on</mat-icon></div>
+      <div class="kpi-info">
+        <span class="kpi-label">Ingresos del Mes</span>
+        <span class="kpi-value">{{ ingresosMesActual() | currency:'S/ ' }}</span>
+      </div>
+      <mat-icon class="kpi-bg-icon">monetization_on</mat-icon>
+    </div>
+    <div class="kpi-card kpi-triaje" routerLink="../triaje" matTooltip="Ver área de triaje">
+      <div class="kpi-icon"><mat-icon>health_and_safety</mat-icon></div>
+      <div class="kpi-info">
+        <span class="kpi-label">Triajes Pendientes Hoy</span>
+        <span class="kpi-value">{{ triajesPendientesHoy() }}</span>
+      </div>
+      <mat-icon class="kpi-bg-icon">health_and_safety</mat-icon>
+    </div>
+    <div class="kpi-card kpi-stock" [class.kpi-alerta]="medicamentosStockCritico() > 0" routerLink="../farmacia" matTooltip="Ver inventario farmacia">
+      <div class="kpi-icon"><mat-icon>medication</mat-icon></div>
+      <div class="kpi-info">
+        <span class="kpi-label">Stock Crítico (< 10)</span>
+        <span class="kpi-value">{{ medicamentosStockCritico() }}</span>
+      </div>
+      <mat-icon class="kpi-bg-icon">medication</mat-icon>
+    </div>
+    <div class="kpi-card kpi-recetas">
+      <div class="kpi-icon"><mat-icon>receipt_long</mat-icon></div>
+      <div class="kpi-info">
+        <span class="kpi-label">Consultas Atendidas Hoy</span>
+        <span class="kpi-value">{{ recetasHoy() }}</span>
+      </div>
+      <mat-icon class="kpi-bg-icon">receipt_long</mat-icon>
+    </div>
+  </div>
+
+  <!-- Alertas operacionales -->
+  <div *ngIf="triajesPendientesHoy() > 0 || medicamentosStockCritico() > 0" class="alertas-grid">
+    <div *ngIf="triajesPendientesHoy() > 0" class="alerta-banner alerta-warning" routerLink="../triaje">
+      <mat-icon>schedule</mat-icon>
+      <div>
+        <strong>{{ triajesPendientesHoy() }} paciente(s) esperando triaje</strong>
+        <span class="d-block text-sm">Hay pacientes en sala de espera sin signos vitales registrados</span>
+      </div>
+      <mat-icon class="ms-auto">chevron_right</mat-icon>
+    </div>
+    <div *ngIf="medicamentosStockCritico() > 0" class="alerta-banner alerta-danger" routerLink="../farmacia">
+      <mat-icon>warning</mat-icon>
+      <div>
+        <strong>{{ medicamentosStockCritico() }} medicamento(s) con stock crítico</strong>
+        <span class="d-block text-sm">Se requiere reposición urgente en farmacia</span>
+      </div>
+      <mat-icon class="ms-auto">chevron_right</mat-icon>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-grid">
+
+    <!-- Gráfico de ingresos (grande) -->
+    <mat-card class="chart-card chart-ingresos">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon class="chart-title-icon">show_chart</mat-icon>
+          Tendencia de Ingresos
+        </mat-card-title>
+        <mat-card-subtitle>Ingresos pagados por mes (S/)</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="chart-container">
+        <canvas #ingresosChart></canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Gráfico donut de estados -->
+    <mat-card class="chart-card chart-donut">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon class="chart-title-icon">donut_large</mat-icon>
+          Estado de Citas
+        </mat-card-title>
+        <mat-card-subtitle>Distribución por estado</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="chart-container">
+        <canvas #citasEstadoChart></canvas>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Gráfico de barras por día -->
+    <mat-card class="chart-card chart-barras">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon class="chart-title-icon">bar_chart</mat-icon>
+          Citas por Día
+        </mat-card-title>
+        <mat-card-subtitle>Total acumulado por día de la semana</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="chart-container">
+        <canvas #citasDiaChart></canvas>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Actividad Reciente -->
+  <div class="activity-grid">
+
+    <!-- Últimos pacientes -->
+    <mat-card class="activity-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon class="chart-title-icon">person</mat-icon>
+          Últimos Pacientes
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="p-0">
+        <div class="activity-list">
+          @for (paciente of ultimosPacientes(); track paciente.id) {
+            <div class="activity-item">
+              <div class="activity-avatar avatar-blue">
+                {{ paciente.nombres.charAt(0) }}{{ paciente.apellidos.charAt(0) }}
+              </div>
+              <div class="activity-details">
+                <span class="activity-name">{{ paciente.nombres }} {{ paciente.apellidos }}</span>
+                <span class="activity-sub">DNI: {{ paciente.dni }}</span>
+              </div>
+              <mat-icon class="activity-arrow">chevron_right</mat-icon>
+            </div>
+          } @empty {
+            <p class="activity-empty">Sin pacientes registrados</p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Próximas citas -->
+    <mat-card class="activity-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon class="chart-title-icon">schedule</mat-icon>
+          Próximas Citas
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="p-0">
+        <div class="activity-list">
+          @for (cita of proximasCitas(); track cita.id) {
+            <div class="activity-item">
+              <div class="activity-avatar avatar-purple">
+                {{ cita.fechaHora | date:'d' }}
+              </div>
+              <div class="activity-details">
+                <span class="activity-name">{{ cita.paciente.nombres }} {{ cita.paciente.apellidos }}</span>
+                <span class="activity-sub">{{ cita.medico.nombres }} · {{ cita.fechaHora | date:'d MMM, HH:mm' }}</span>
+              </div>
+              <span class="badge-programada">{{ cita.estado }}</span>
+            </div>
+          } @empty {
+            <p class="activity-empty">No hay citas próximas</p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+</div>

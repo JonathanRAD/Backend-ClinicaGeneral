@@ -1,0 +1,119 @@
+<div class="dialog-wrap">
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon color="primary">health_and_safety</mat-icon>
+    Registro de Signos Vitales
+  </h2>
+
+  <mat-dialog-content class="px-4 pt-2">
+    <!-- Resumen del Paciente -->
+    <div class="paciente-banner mb-4">
+      <div class="paciente-avatar">{{ data.cita.paciente.nombres[0] }}{{ data.cita.paciente.apellidos[0] }}</div>
+      <div>
+        <div class="paciente-nombre-banner">{{ data.cita.paciente.nombres }} {{ data.cita.paciente.apellidos }}</div>
+        <div class="paciente-meta-banner">
+          <mat-icon class="icon-xs">badge</mat-icon> {{ data.cita.paciente.dni }}
+          &nbsp;·&nbsp;
+          <mat-icon class="icon-xs">stethoscope</mat-icon>
+          Dr(a). {{ data.cita.medico.apellidos }} · {{ data.cita.medico.especialidad }}
+        </div>
+      </div>
+    </div>
+
+    <form [formGroup]="triajeForm">
+
+      <!-- Sección: Medidas Físicas -->
+      <div class="seccion-titulo"><mat-icon>straighten</mat-icon> Medidas Físicas</div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Peso (kg)</mat-label>
+            <input matInput formControlName="peso" type="number" step="0.1" placeholder="Ej: 75.5">
+            <mat-icon matSuffix>monitor_weight</mat-icon>
+            <mat-error *ngIf="triajeForm.get('peso')?.hasError('required')">Requerido</mat-error>
+            <mat-error *ngIf="triajeForm.get('peso')?.hasError('min')">Valor inválido</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Altura (cm)</mat-label>
+            <input matInput formControlName="altura" type="number" placeholder="Ej: 175">
+            <mat-icon matSuffix>height</mat-icon>
+            <mat-error *ngIf="triajeForm.get('altura')?.hasError('required')">Requerido</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Sección: Signos Vitales -->
+      <div class="seccion-titulo"><mat-icon>monitor_heart</mat-icon> Signos Vitales</div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Presión Arterial (mmHg)</mat-label>
+            <input matInput formControlName="presionArterial" placeholder="Ej: 120/80">
+            <mat-icon matSuffix>speed</mat-icon>
+            <mat-hint>Normal: 90/60 – 120/80</mat-hint>
+            <mat-error *ngIf="triajeForm.get('presionArterial')?.hasError('pattern')">Formato: 120/80</mat-error>
+            <mat-error *ngIf="triajeForm.get('presionArterial')?.hasError('required')">Requerido</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Temperatura (°C)</mat-label>
+            <input matInput formControlName="temperatura" type="number" step="0.1" placeholder="Ej: 36.5">
+            <mat-icon matSuffix>thermostat</mat-icon>
+            <mat-hint>Normal: 36°C – 37.5°C</mat-hint>
+            <mat-error *ngIf="triajeForm.get('temperatura')?.hasError('required')">Requerido</mat-error>
+            <mat-error *ngIf="triajeForm.get('temperatura')?.hasError('min') || triajeForm.get('temperatura')?.hasError('max')">Fuera de rango (30–45°C)</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Frecuencia Cardíaca (lpm)</mat-label>
+            <input matInput formControlName="ritmoCardiaco" type="number" placeholder="Ej: 80">
+            <mat-icon matSuffix>favorite</mat-icon>
+            <mat-hint>Normal: 60 – 100 lpm</mat-hint>
+            <mat-error *ngIf="triajeForm.get('ritmoCardiaco')?.hasError('required')">Requerido</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Saturación O₂ (%)</mat-label>
+            <input matInput formControlName="saturacionOxigeno" type="number" placeholder="Ej: 98">
+            <mat-icon matSuffix>air</mat-icon>
+            <mat-hint>Normal: ≥ 95%</mat-hint>
+            <mat-error *ngIf="triajeForm.get('saturacionOxigeno')?.hasError('required')">Requerido</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Glucemia (mg/dL) — Opcional</mat-label>
+            <input matInput formControlName="nivelAzucar" type="number" placeholder="Ej: 90">
+            <mat-icon matSuffix>water_drop</mat-icon>
+            <mat-hint>Normal en ayuno: 70–100 mg/dL</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Sección: Motivo y Notas -->
+      <div class="seccion-titulo"><mat-icon>notes</mat-icon> Motivo y Observaciones</div>
+      <mat-form-field appearance="outline" class="w-100 mb-2">
+        <mat-label>Motivo (según el paciente)</mat-label>
+        <textarea matInput formControlName="motivoConsulta" rows="2"></textarea>
+        <mat-error *ngIf="triajeForm.get('motivoConsulta')?.hasError('required')">Requerido</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Notas de enfermería (opcional)</mat-label>
+        <textarea matInput formControlName="notasOpcionales" rows="2" placeholder="Aspecto general, dolor, movilidad..."></textarea>
+      </mat-form-field>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="px-4 pb-3">
+    <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="guardar()">
+      <mat-icon class="me-1">check_circle</mat-icon>
+      Finalizar Triaje
+    </button>
+  </mat-dialog-actions>
+</div>

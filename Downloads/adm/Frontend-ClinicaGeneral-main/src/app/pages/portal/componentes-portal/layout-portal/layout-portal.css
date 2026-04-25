@@ -1,0 +1,133 @@
+
+.portal-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-fondo-panel);
+}
+
+.portal-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+@media (max-width: 767px) {
+  .portal-content { padding: 0; }
+}
+
+.portal-nav {
+  background-color: var(--color-fondo-tarjeta);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  padding: 0 2rem;
+  height: 70px;
+  position: sticky; top: 0; z-index: 1000;
+}
+.nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-fondo-sidebar);
+}
+.nav-brand .mat-icon {
+  color: var(--color-primario);
+  margin-right: 10px;
+}
+
+.nav-collapsible {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--color-texto-secundario);
+  font-weight: 500;
+  padding: 8px 16px; margin: 0 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.nav-links a:hover { color: var(--color-primario); }
+.nav-links a.active {
+  background-color: var(--portal-nav-active-bg, #eaf3fb);
+  color: var(--color-primario);
+}
+.nav-user button {
+  color: var(--color-texto-principal);
+  font-weight: 500;
+}
+.nav-user .mat-icon { margin-right: 8px; }
+
+
+.nav-toggle-button {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-texto-principal);
+}
+
+@media (max-width: 991.98px) {
+  .portal-nav {
+    padding: 0 1rem;
+  }
+  
+  .nav-toggle-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-collapsible {
+    position: absolute;
+    top: 70px; 
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: var(--color-fondo-tarjeta);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+  }
+
+  .nav-collapsible.is-open {
+    max-height: 500px; 
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .nav-links a {
+    width: 100%;
+    padding: 12px 16px;
+    margin: 4px 0;
+  }
+
+  .nav-user {
+    width: 100%;
+    border-top: 1px solid var(--portal-border-color, #e0e0e0);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .nav-user button {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

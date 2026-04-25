@@ -1,0 +1,19 @@
+<div class="jitsi-wrapper">
+  <div class="jitsi-header d-flex justify-content-between align-items-center p-3">
+    <div>
+      <h3 class="m-0 text-white">Consulta: {{ conferencia?.paciente?.nombres }} {{ conferencia?.paciente?.apellidos }}</h3>
+      <small class="text-white-50">Atendido por: Dr(a). {{ conferencia?.medico?.nombres }} {{ conferencia?.medico?.apellidos }}</small>
+    </div>
+    <button mat-raised-button color="warn" (click)="salir()">
+      <mat-icon>call_end</mat-icon>
+      Finalizar / Salir
+    </button>
+  </div>
+
+  <div *ngIf="cargandoScript" class="d-flex justify-content-center align-items-center h-100 flex-column text-white">
+    <div class="spinner-border text-light mb-3" role="status"></div>
+    <h4>Preparando sala de videoconferencia...</h4>
+  </div>
+
+  <div #jitsiContainer class="jitsi-container"></div>
+</div>

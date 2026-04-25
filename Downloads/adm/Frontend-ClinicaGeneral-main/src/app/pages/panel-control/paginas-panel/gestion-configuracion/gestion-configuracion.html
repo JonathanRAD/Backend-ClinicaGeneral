@@ -1,0 +1,17 @@
+<div class="container-fluid">
+  <h1 class="h3 mb-4 text-gray-800">Configuración</h1>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Apariencia</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="config-options">
+      <div class="option">
+        <span>Modo Oscuro</span>
+        <mat-slide-toggle
+          [checked]="isDarkMode"
+          (change)="onThemeChange()">
+        </mat-slide-toggle>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

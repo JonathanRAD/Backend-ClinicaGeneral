@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>Información del Seguro Médico</h2>
+<mat-dialog-content>
+  <form [formGroup]="seguroForm" class="d-flex flex-column gap-3 mt-3">
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre de la Aseguradora</mat-label>
+      <input matInput formControlName="nombreAseguradora" required>
+      <mat-error>El nombre de la aseguradora es requerido.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Número de Póliza</mat-label>
+      <input matInput formControlName="numeroPoliza" required>
+      <mat-error>El número de póliza es requerido.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Descripción de Cobertura</mat-label>
+      <textarea matInput formControlName="cobertura" rows="4" required></textarea>
+      <mat-error>La cobertura es requerida.</mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="guardar()" [disabled]="seguroForm.invalid">
+    Guardar Información
+  </button>
+</mat-dialog-actions>

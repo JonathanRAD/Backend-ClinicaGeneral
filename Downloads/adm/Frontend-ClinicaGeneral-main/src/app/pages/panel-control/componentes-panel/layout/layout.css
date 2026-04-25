@@ -1,0 +1,105 @@
+
+
+.panel-wrapper {
+  height: 100vh;
+  overflow: hidden;
+}
+
+
+.sidebar {
+  width: 260px;
+  background-color: var(--color-fondo-sidebar);
+  transition: width 0.3s ease;
+}
+
+.sidebar-header {
+  padding-bottom: 0.5rem;
+}
+
+.sidebar-header .fs-4 {
+  font-weight: 600;
+}
+
+.sidebar hr {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+
+.nav-link {
+  font-size: 1rem;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin: 0 10px 4px 10px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link i {
+  margin-right: 12px;
+  font-size: 1.1rem;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-texto-claro);
+}
+
+.nav-link.active {
+  background-color: var(--color-primario);
+  color: var(--color-texto-claro);
+  font-weight: 500;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-dropdown .dropdown-toggle {
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.user-dropdown .dropdown-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.main-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  background-color: var(--color-fondo-panel);
+  transition: background-color 0.3s ease;
+}
+
+/* ── Toggle Dark Mode ───────────────────────────────────────────────────── */
+.btn-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 20px);
+  margin: 0 10px 8px 10px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  text-align: left;
+}
+
+.btn-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.btn-theme-toggle mat-icon {
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+  transition: transform 0.4s ease;
+}
+
+.btn-theme-toggle:hover mat-icon {
+  transform: rotate(20deg);
+}

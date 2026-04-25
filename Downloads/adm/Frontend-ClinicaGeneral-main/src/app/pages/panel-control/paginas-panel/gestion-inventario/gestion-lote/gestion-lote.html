@@ -1,0 +1,93 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1">Gestión de Lotes</h2>
+      <p class="text-secondary">Control de trazabilidad, fechas de vencimiento y stock físico por lote.</p>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="lote-filtros mb-3">
+    <mat-form-field appearance="outline" class="filtro-field">
+      <mat-label>Buscar producto...</mat-label>
+      <input matInput [(ngModel)]="busqueda" placeholder="Nombre o código">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="filtro-field">
+      <mat-label>Filtrar por estado</mat-label>
+      <mat-select [(ngModel)]="filtroEstado">
+        <mat-option value="todos">Todos</mat-option>
+        <mat-option value="vigente">Vigente</mat-option>
+        <mat-option value="por-vencer">Por vencer (60 días)</mat-option>
+        <mat-option value="vencido">Vencido</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Tabla de lotes expandible -->
+  <div class="lote-list">
+    <div *ngFor="let grupo of lotesFiltrados()" class="lote-grupo">
+      <div class="lote-grupo-header" (click)="toggleGrupo(grupo.medicamentoId)">
+        <div class="lote-grupo-info">
+          <span class="lote-med-code">{{ grupo.codigo }}</span>
+          <strong class="lote-med-nombre">{{ grupo.nombre }}</strong>
+          <span class="lote-med-forma">{{ grupo.formaFarmaceutica }}</span>
+        </div>
+        <div class="lote-grupo-stats">
+          <span class="lote-stat lote-stat-stock">
+            <mat-icon>inventory</mat-icon> {{ grupo.stockTotal }} uds
+          </span>
+          <span class="lote-badge" [class]="getLoteEstadoClase(grupo)">
+            {{ getLoteEstadoLabel(grupo) }}
+          </span>
+          <mat-icon class="toggle-icon" [class.rotated]="gruposAbiertos.has(grupo.medicamentoId)">
+            expand_more
+          </mat-icon>
+        </div>
+      </div>
+
+      <div class="lote-grupo-body" *ngIf="gruposAbiertos.has(grupo.medicamentoId)">
+        <table class="lote-table">
+          <thead>
+            <tr>
+              <th>N° Lote</th>
+              <th>Stock</th>
+              <th>Vencimiento</th>
+              <th>Días Restantes</th>
+              <th>Estado</th>
+              <th>Ingresado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let lote of grupo.lotes" [class]="getLoteFila(lote)">
+              <td><code>{{ lote.numeroLote }}</code></td>
+              <td><strong>{{ lote.stock }}</strong></td>
+              <td>{{ lote.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span class="dias-badge" [class]="'dias-' + getLoteFila(lote)">
+                  {{ getDiasRestantes(lote.fechaVencimiento) < 0 ? 'VENCIDO' : getDiasRestantes(lote.fechaVencimiento) + ' días' }}
+                </span>
+              </td>
+              <td>
+                <span class="estado-pill" [class]="'pill-' + getLoteFila(lote)">
+                  {{ getLoteEstadoTexto(lote) }}
+                </span>
+              </td>
+              <td><small class="text-secondary">{{ lote.fechaIngreso | date:'dd/MM/yyyy' }}</small></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="lote-grupo-actions">
+          <button mat-stroked-button color="primary" (click)="onIngresarLote(grupo)">
+            <mat-icon>add_box</mat-icon> Ingresar Nuevo Lote
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="lotesFiltrados().length === 0" class="lote-empty">
+      <mat-icon>search_off</mat-icon>
+      <p>No se encontraron productos con los filtros aplicados.</p>
+    </div>
+  </div>
+</div>

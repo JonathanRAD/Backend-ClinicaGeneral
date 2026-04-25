@@ -1,0 +1,8 @@
+
+
+.factura-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+}

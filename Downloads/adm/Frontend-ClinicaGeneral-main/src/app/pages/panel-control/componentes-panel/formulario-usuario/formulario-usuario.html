@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>{{ esModoEdicion ? 'Editar Usuario' : 'Agregar Nuevo Usuario' }}</h2>
+
+<mat-dialog-content>
+  <p class="mat-body-1 text-muted">Completa los datos del usuario y asigna un rol.</p>
+  
+  <form [formGroup]="usuarioForm" class="d-flex flex-column pt-3 gap-2">
+    <mat-form-field appearance="outline">
+      <mat-label>Nombres</mat-label>
+      <input matInput formControlName="nombres" required>
+      <mat-error>Los nombres son requeridos.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Apellidos</mat-label>
+      <input matInput formControlName="apellidos" required>
+      <mat-error>Los apellidos son requeridos.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Correo Electrónico</mat-label>
+      <input matInput formControlName="email" required type="email">
+      <mat-error *ngIf="usuarioForm.get('email')?.hasError('required')">El correo es requerido.</mat-error>
+      <mat-error *ngIf="usuarioForm.get('email')?.hasError('email')">Debe ser un correo válido.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Rol</mat-label>
+      <mat-select formControlName="rol" required>
+        <mat-option *ngFor="let rol of rolesDisponibles" [value]="rol">
+          {{ rol | titlecase }}
+        </mat-option>
+      </mat-select>
+      <mat-error>El rol es requerido.</mat-error>
+    </mat-form-field>
+
+    <div class="d-flex flex-column mt-2" formArrayName="permisos">
+        <label id="permisos-label" class="mat-body-strong mb-2">Permisos Adicionales</label>
+        <div class="permisos-container" role="group" aria-labelledby="permisos-label">
+            <mat-checkbox 
+                *ngFor="let permiso of permisosDisponibles; let i = index"
+                [formControlName]="i"
+                class="permiso-checkbox">
+                {{ permiso.nombre }}
+            </mat-checkbox>
+        </div>
+    </div>
+    <mat-form-field *ngIf="!esModoEdicion" appearance="outline">
+      <mat-label>Contraseña</mat-label>
+      <input matInput formControlName="password" required type="password">
+      <mat-error *ngIf="usuarioForm.get('password')?.hasError('required')">La contraseña es requerida.</mat-error>
+      <mat-error *ngIf="usuarioForm.get('password')?.hasError('minlength')">Mínimo 8 caracteres.</mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="guardar()" [disabled]="usuarioForm.invalid">
+    {{ esModoEdicion ? 'Actualizar Usuario' : 'Guardar Usuario' }}
+  </button>
+</mat-dialog-actions>

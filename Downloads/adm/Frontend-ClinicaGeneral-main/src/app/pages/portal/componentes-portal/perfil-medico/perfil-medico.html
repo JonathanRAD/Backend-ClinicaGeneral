@@ -1,0 +1,31 @@
+<div class="perfil-header">
+  <h2 mat-dialog-title>Perfil del Médico</h2>
+  <button mat-icon-button (click)="cerrar()" matTooltip="Cerrar">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content>
+  <div class="perfil-contenido">
+    <div class="perfil-avatar">
+      <mat-icon>account_circle</mat-icon>
+    </div>
+    <h3 class="medico-nombre">Dr(a). {{ medico.nombres }} {{ medico.apellidos }}</h3>
+    <p class="medico-especialidad">{{ medico.especialidad }}</p>
+    <mat-divider></mat-divider>
+    <div class="medico-detalles">
+      <h4>Sobre mí</h4>
+      <p>Con más de 10 años de experiencia, el Dr(a). {{ medico.apellidos }} se especializa en el diagnóstico y tratamiento de enfermedades complejas, brindando una atención humana y personalizada a cada uno de sus pacientes.</p>
+      
+      <h4>Horario de Atención</h4>
+      <p>Lunes a Viernes: 9:00 AM - 1:00 PM y 3:00 PM - 7:00 PM</p>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="primary" (click)="agendarCita()">
+    <mat-icon>event</mat-icon>
+    Agendar Cita con este Médico
+  </button>
+</mat-dialog-actions>

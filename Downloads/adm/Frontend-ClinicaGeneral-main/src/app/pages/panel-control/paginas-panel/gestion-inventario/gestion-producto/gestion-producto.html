@@ -1,0 +1,29 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1">Catálogo de Medicamentos</h2>
+      <p class="text-secondary">Registro y gestión del catálogo maestro de productos farmacéuticos.</p>
+    </div>
+  </div>
+
+  <app-tabla-generica
+    [data]="medicamentos()"
+    [columnConfig]="columnas"
+    title="Catálogo de Medicamentos"
+    addButtonText="Registrar Medicamento"
+    (onAdd)="onRegistrarMedicamento()"
+    (onEdit)="onEditMedicamento($event)"
+    (onDelete)="onDeleteMedicamento($event)">
+
+    <!-- Acciones personalizadas: lote + ver lotes -->
+    <ng-template #accionesTemplate let-row>
+      <button mat-icon-button class="text-success" (click)="onIngresarLote(row)" matTooltip="Ingresar Lote (+)">
+        <mat-icon>add_box</mat-icon>
+      </button>
+      <button mat-icon-button class="text-info" (click)="onVerLotes(row)" matTooltip="Ver Lotes">
+        <mat-icon>visibility</mat-icon>
+      </button>
+    </ng-template>
+
+  </app-tabla-generica>
+</div>

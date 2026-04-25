@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Generar Nueva Orden de Laboratorio</h2>
+<mat-dialog-content>
+  <p class="mat-body-1 text-muted">Especifique los detalles del examen requerido.</p>
+  
+  <form [formGroup]="ordenForm" class="mt-4 d-flex flex-column gap-3">
+    
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Tipo de Examen</mat-label>
+      <input matInput formControlName="tipoExamen" required placeholder="Ej: Hemograma completo, Perfil lipídico">
+      <mat-error>El tipo de examen es requerido.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Observaciones Adicionales</mat-label>
+      <textarea matInput formControlName="observaciones" rows="4" placeholder="Ej: Paciente en ayunas de 8 horas..."></textarea>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="guardar()" [disabled]="ordenForm.invalid">
+    Guardar Orden
+  </button>
+</mat-dialog-actions>
