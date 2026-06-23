@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
@@ -161,14 +162,54 @@ public class AuthService {
         } catch (Exception ex) {}
     }
 
-    /**
-     * Registra un nuevo usuario PACIENTE y envía un OTP de verificación por email.
-     * El frontend debe mostrar la pantalla OTP y llamar a /verify-otp para obtener el JWT.
-     */
     public AuthResponse register(RegisterRequest request) {
-         if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("El correo electrónico ya está registrado.");
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(request.getEmail());
+        if (usuarioOpt.isPresent()) {
+            Usuario usuarioExistente = usuarioOpt.get();
+            if (Boolean.TRUE.equals(usuarioExistente.getEmailVerificado())) {
+                throw new IllegalArgumentException("El correo electrónico ya está registrado.");
+            }
+            if (!esContrasenaSegura(request.getPassword())) {
+                throw new IllegalArgumentException("La contraseña no cumple con los requisitos de seguridad.");
+            }
+
+            usuarioExistente.setNombres(request.getNombres());
+            usuarioExistente.setApellidos(request.getApellidos());
+            usuarioExistente.setPassword(passwordEncoder.encode(request.getPassword()));
+            usuarioExistente.setFechaRegistro(LocalDate.now());
+
+            String otpCode = String.format("%06d", new Random().nextInt(1_000_000));
+            usuarioExistente.setOtpCode(otpCode);
+            usuarioExistente.setOtpExpiry(LocalDateTime.now().plusMinutes(OTP_EXPIRACION_MINUTOS));
+
+            Usuario usuarioGuardado = usuarioRepository.save(usuarioExistente);
+
+            if (pacienteRepository.findByUsuarioId(usuarioGuardado.getId()).isEmpty()) {
+                Paciente nuevoPaciente = new Paciente();
+                nuevoPaciente.setNombres(usuarioGuardado.getNombres());
+                nuevoPaciente.setApellidos(usuarioGuardado.getApellidos());
+                nuevoPaciente.setUsuario(usuarioGuardado);
+
+                HistoriaClinica nuevaHistoria = new HistoriaClinica();
+                nuevaHistoria.setFechaCreacion(LocalDate.now());
+                nuevaHistoria.setPaciente(nuevoPaciente);
+                nuevoPaciente.setHistoriaClinica(nuevaHistoria);
+
+                pacienteRepository.save(nuevoPaciente);
+            }
+
+            sendOtpEmail(usuarioGuardado.getNombres(), usuarioGuardado.getEmail(), otpCode);
+
+            try {
+                auditService.registrarEventoSinAuth(AccionAudit.REGISTRO, "USUARIO", usuarioGuardado.getId(), usuarioGuardado.getEmail(), usuarioGuardado.getNombres() + " " + usuarioGuardado.getApellidos(), usuarioGuardado.getRol().name(), "Reenvío de código OTP / Reintento de registro", null, auditService.toJson(usuarioGuardado));
+            } catch (Exception ex) {}
+
+            return AuthResponse.builder()
+                    .requiresOtp(true)
+                    .email(usuarioGuardado.getEmail())
+                    .build();
         }
+
         if (!esContrasenaSegura(request.getPassword())) {
             throw new IllegalArgumentException("La contraseña no cumple con los requisitos de seguridad.");
         }
@@ -182,7 +223,6 @@ public class AuthService {
         usuario.setRol(Rol.PACIENTE);
         usuario.setFechaRegistro(LocalDate.now());
 
-        // ── Generar OTP de 6 dígitos ──────────────────────────────────────────
         String otpCode = String.format("%06d", new Random().nextInt(1_000_000));
         usuario.setOtpCode(otpCode);
         usuario.setOtpExpiry(LocalDateTime.now().plusMinutes(OTP_EXPIRACION_MINUTOS));
@@ -190,7 +230,6 @@ public class AuthService {
 
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
 
-        // Crear historia clínica y perfil de paciente
         if (pacienteRepository.findByUsuarioId(usuarioGuardado.getId()).isEmpty()) {
             Paciente nuevoPaciente = new Paciente();
             nuevoPaciente.setNombres(usuarioGuardado.getNombres());
@@ -205,14 +244,12 @@ public class AuthService {
             pacienteRepository.save(nuevoPaciente);
         }
 
-        // ── Enviar OTP por email ──────────────────────────────────────────────
         sendOtpEmail(usuarioGuardado.getNombres(), usuarioGuardado.getEmail(), otpCode);
 
         try {
-            auditService.registrarEventoSinAuth(AccionAudit.REGISTRO, "USUARIO", usuarioGuardado.getId(), usuarioGuardado.getEmail(), usuarioGuardado.getNombres() + " " + usuarioGuardado.getApellidos(), usuarioGuardado.getRol().name(), "Registro de nuevo usuario paciente (OTP enviado)");
+            auditService.registrarEventoSinAuth(AccionAudit.REGISTRO, "USUARIO", usuarioGuardado.getId(), usuarioGuardado.getEmail(), usuarioGuardado.getNombres() + " " + usuarioGuardado.getApellidos(), usuarioGuardado.getRol().name(), "Registro de nuevo usuario paciente (OTP enviado)", null, auditService.toJson(usuarioGuardado));
         } catch (Exception ex) {}
 
-        // Señalizar al frontend que debe mostrar pantalla OTP
         return AuthResponse.builder()
                 .requiresOtp(true)
                 .email(usuarioGuardado.getEmail())

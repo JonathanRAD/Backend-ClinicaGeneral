@@ -80,6 +80,12 @@ public class AuditService {
     // For login/register where user is not in SecurityContext yet or during auth failures
     public void registrarEventoSinAuth(AccionAudit accion, String entidad, Long usuarioId,
                                         String email, String nombre, String rol, String descripcion) {
+        registrarEventoSinAuth(accion, entidad, usuarioId, email, nombre, rol, descripcion, null, null);
+    }
+
+    public void registrarEventoSinAuth(AccionAudit accion, String entidad, Long usuarioId,
+                                        String email, String nombre, String rol, String descripcion,
+                                        String datosAnteriores, String datosNuevos) {
         try {
             AuditLog auditLog = AuditLog.builder()
                     .usuarioId(usuarioId)
@@ -89,6 +95,8 @@ public class AuditService {
                     .accion(accion)
                     .entidad(entidad)
                     .descripcion(descripcion)
+                    .datosAnteriores(datosAnteriores)
+                    .datosNuevos(datosNuevos)
                     .ipAddress(obtenerIp())
                     .build();
             auditLogRepository.save(auditLog);
