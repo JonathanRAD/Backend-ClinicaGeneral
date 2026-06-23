@@ -63,8 +63,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // URLs del frontend (localhost y Vercel/producción)
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://clinica-saludvida.vercel.app"));
+        // URLs del frontend (localhost y Vercel/producción/preview)
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:4200",
+                "https://clinica-saludvida.vercel.app",
+                "https://*-jonathanrads-projects.vercel.app",
+                "https://frontend-clinica-general-*.vercel.app"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
