@@ -10,6 +10,7 @@ import com.clinicabienestar.api.model.ResultadoLaboratorio;
 import com.clinicabienestar.api.repository.ConsultaRepository;
 import com.clinicabienestar.api.repository.OrdenLaboratorioRepository;
 import com.clinicabienestar.api.repository.ResultadoLaboratorioRepository;
+import com.clinicabienestar.api.model.AccionAudit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class LaboratorioService {
     private final OrdenLaboratorioRepository ordenRepository;
     private final ResultadoLaboratorioRepository resultadoRepository;
     private final ConsultaRepository consultaRepository;
+    private final AuditService auditService;
 
     public OrdenLaboratorio crearOrden(Long consultaId, OrdenLaboratorioDTO ordenDTO) {
         Consulta consulta = consultaRepository.findById(consultaId)
@@ -37,7 +39,11 @@ public class LaboratorioService {
         // Manejando la relación: OrdenLaboratorio pertenece a una Consulta
         nuevaOrden.setConsulta(consulta);
         
-        return ordenRepository.save(nuevaOrden);
+        OrdenLaboratorio guardada = ordenRepository.save(nuevaOrden);
+        try {
+            auditService.registrarEvento(AccionAudit.CREAR, "ORDEN_LABORATORIO", guardada.getId(), "Creación de orden de laboratorio de tipo: " + guardada.getTipoExamen() + " para la consulta ID: " + consultaId, null, auditService.toJson(guardada));
+        } catch (Exception e) {}
+        return guardada;
     }
 
     public ResultadoLaboratorio cargarResultado(Long ordenId, ResultadoLaboratorioDTO resultadoDTO) {
@@ -50,9 +56,12 @@ public class LaboratorioService {
         nuevoResultado.setValores(resultadoDTO.getValores());
         nuevoResultado.setConclusiones(resultadoDTO.getConclusiones());
         
-        // Manejando la relación: ResultadoLaboratorio pertenece a una OrdenLaboratorio
         nuevoResultado.setOrdenLaboratorio(orden);
 
-        return resultadoRepository.save(nuevoResultado);
+        ResultadoLaboratorio guardado = resultadoRepository.save(nuevoResultado);
+        try {
+            auditService.registrarEvento(AccionAudit.CREAR, "RESULTADO_LABORATORIO", guardado.getId(), "Carga de resultado de laboratorio para la orden ID: " + ordenId, null, auditService.toJson(guardado));
+        } catch (Exception e) {}
+        return guardado;
     }
 }

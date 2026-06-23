@@ -8,6 +8,7 @@ import com.clinicabienestar.api.model.Medicamento;
 import com.clinicabienestar.api.model.LoteMedicamento;
 import com.clinicabienestar.api.repository.LoteMedicamentoRepository;
 import com.clinicabienestar.api.repository.MedicamentoRepository;
+import com.clinicabienestar.api.model.AccionAudit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class MedicamentoService {
 
     private final MedicamentoRepository medicamentoRepository;
     private final LoteMedicamentoRepository loteMedicamentoRepository;
+    private final AuditService auditService;
 
     @Transactional(readOnly = true)
     public List<Medicamento> obtenerTodos() {
@@ -61,12 +63,20 @@ public class MedicamentoService {
             }
         }
 
-        return medicamentoRepository.save(med);
+        Medicamento guardado = medicamentoRepository.save(med);
+        try {
+            auditService.registrarEvento(AccionAudit.CREAR, "MEDICAMENTO", guardado.getId(), "Creación de medicamento: " + guardado.getNombre() + " (Código: " + guardado.getCodigo() + ")", null, auditService.toJson(guardado));
+        } catch (Exception e) {}
+        return guardado;
     }
 
     public Medicamento actualizarMedicamento(Long id, MedicamentoDTO dto) {
         Medicamento med = obtenerPorId(id);
-        
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(med);
+        } catch (Exception e) {}
+
         med.setNombre(dto.getNombre());
         med.setDescripcion(dto.getDescripcion());
         med.setFormaFarmaceutica(dto.getFormaFarmaceutica());
@@ -74,7 +84,11 @@ public class MedicamentoService {
         med.setPrecioUnitario(dto.getPrecioUnitario() != null ? dto.getPrecioUnitario() : med.getPrecioUnitario());
         med.setEstado(dto.getEstado() != null ? dto.getEstado() : med.getEstado());
 
-        return medicamentoRepository.save(med);
+        Medicamento guardado = medicamentoRepository.save(med);
+        try {
+            auditService.registrarEvento(AccionAudit.ACTUALIZAR, "MEDICAMENTO", guardado.getId(), "Actualización de medicamento", anteriorJson, auditService.toJson(guardado));
+        } catch (Exception e) {}
+        return guardado;
     }
 
     public Medicamento agregarLote(Long medicamentoId, LoteMedicamentoDTO loteDto) {
@@ -87,9 +101,18 @@ public class MedicamentoService {
         lote.setFechaIngreso(LocalDateTime.now());
         lote.setMedicamento(med);
         
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(med);
+        } catch (Exception e) {}
+
         med.getLotes().add(lote);
 
-        return medicamentoRepository.save(med); // Cascade guarda el anidado
+        Medicamento guardado = medicamentoRepository.save(med); // Cascade guarda el anidado
+        try {
+            auditService.registrarEvento(AccionAudit.ACTUALIZAR, "MEDICAMENTO", guardado.getId(), "Adición de lote a medicamento. Lote N°: " + lote.getNumeroLote() + ", Cantidad: " + lote.getStock(), anteriorJson, auditService.toJson(guardado));
+        } catch (Exception e) {}
+        return guardado;
     }
 
     /**
@@ -121,14 +144,33 @@ public class MedicamentoService {
                 loteMedicamentoRepository.save(lote);
             }
         }
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(despachoDTO);
+        } catch (Exception e) {}
+
         // Devolver el estado actualizado de los medicamentos despachados
-        return despachoDTO.getItems().stream()
+        List<Medicamento> despachados = despachoDTO.getItems().stream()
             .map(i -> obtenerPorId(i.getMedicamentoId()))
             .toList();
+
+        try {
+            auditService.registrarEvento(AccionAudit.CAMBIAR_ESTADO, "MEDICAMENTO", null, "Despacho de medicamentos en farmacia", anteriorJson, auditService.toJson(despachados));
+        } catch (Exception e) {}
+
+        return despachados;
     }
 
     public void eliminarMedicamento(Long id) {
         Medicamento med = obtenerPorId(id);
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(med);
+        } catch (Exception e) {}
+
         medicamentoRepository.delete(med);
+        try {
+            auditService.registrarEvento(AccionAudit.ELIMINAR, "MEDICAMENTO", id, "Eliminación de medicamento (ID: " + id + ", Nombre: " + med.getNombre() + ")", anteriorJson, null);
+        } catch (Exception e) {}
     }
 }

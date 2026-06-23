@@ -30,6 +30,7 @@ public class HistoriaClinicaService {
     private final HistoriaClinicaMapper historiaClinicaMapper;
     private final MedicamentoRepository medicamentoRepository;
     private final RecetaRepository recetaRepository;
+    private final AuditService auditService;
 
     private Usuario getUsuarioActual() {
         return (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -62,11 +63,20 @@ public class HistoriaClinicaService {
         HistoriaClinica historia = historiaClinicaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Historia Clínica no encontrada con ID: " + id));
 
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(historia);
+        } catch (Exception e) {}
+
         historia.setAntecedentes(historiaDTO.getAntecedentes());
         historia.setAlergias(historiaDTO.getAlergias());
         historia.setEnfermedadesCronicas(historiaDTO.getEnfermedadesCronicas());
         
-        return historiaClinicaRepository.save(historia);
+        HistoriaClinica guardada = historiaClinicaRepository.save(historia);
+        try {
+            auditService.registrarEvento(AccionAudit.ACTUALIZAR, "HISTORIA_CLINICA", guardada.getId(), "Actualización de historia clínica del paciente ID: " + guardada.getPaciente().getId(), anteriorJson, auditService.toJson(guardada));
+        } catch (Exception e) {}
+        return guardada;
     }
 
     public Consulta agregarConsulta(Long historiaId, ConsultaDTO consultaDTO) {
@@ -86,7 +96,11 @@ public class HistoriaClinicaService {
         nuevaConsulta.setHistoriaClinica(historia); 
         historia.getConsultas().add(nuevaConsulta);
 
-        return consultaRepository.save(nuevaConsulta);
+        Consulta guardada = consultaRepository.save(nuevaConsulta);
+        try {
+            auditService.registrarEvento(AccionAudit.CREAR, "CONSULTA", guardada.getId(), "Adición de nueva consulta médica en la historia clínica del paciente ID: " + historia.getPaciente().getId() + " por el médico ID: " + medico.getId(), null, auditService.toJson(guardada));
+        } catch (Exception e) {}
+        return guardada;
     }
 
     public Receta agregarReceta(Long consultaId, RecetaDTO recetaDTO) {
@@ -121,7 +135,11 @@ public class HistoriaClinicaService {
         }
         consulta.getRecetas().add(receta);
         
-        return recetaRepository.save(receta);
+        Receta guardada = recetaRepository.save(receta);
+        try {
+            auditService.registrarEvento(AccionAudit.CREAR, "RECETA", guardada.getId(), "Adición de nueva receta médica para la consulta ID: " + consultaId, null, auditService.toJson(guardada));
+        } catch (Exception e) {}
+        return guardada;
     }
 
 }

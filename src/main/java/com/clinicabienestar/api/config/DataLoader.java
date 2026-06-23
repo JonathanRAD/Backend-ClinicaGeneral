@@ -38,7 +38,8 @@ public class DataLoader implements CommandLineRunner {
             "GESTIONAR_FACTURACION", "VER_FACTURACION",
             "GESTIONAR_INVENTARIO", "VER_INVENTARIO",
             "GENERAR_REPORTES",
-            "VER_HISTORIAL_CLINICO", "EDITAR_HISTORIAL_CLINICO"
+            "VER_HISTORIAL_CLINICO", "EDITAR_HISTORIAL_CLINICO",
+            "VER_AUDITORIA"
         };
 
         Arrays.stream(permisosNombres).forEach(nombre -> {

@@ -6,6 +6,7 @@ import com.clinicabienestar.api.model.Paciente;
 import com.clinicabienestar.api.model.SeguroMedico;
 import com.clinicabienestar.api.repository.PacienteRepository;
 import com.clinicabienestar.api.repository.SeguroMedicoRepository;
+import com.clinicabienestar.api.model.AccionAudit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ public class SeguroMedicoService {
 
     private final PacienteRepository pacienteRepository;
     private final SeguroMedicoRepository seguroMedicoRepository;
+    private final AuditService auditService;
 
     public SeguroMedico guardarSeguro(Long pacienteId, SeguroMedicoDTO seguroDTO) {
         // CAMBIO: Usamos el SP para buscar al paciente rápidamente
@@ -32,6 +34,11 @@ public class SeguroMedicoService {
         // Mantenemos la lógica de negocio original
         SeguroMedico seguro = Optional.ofNullable(paciente.getSeguroMedico()).orElse(new SeguroMedico());
 
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(paciente.getSeguroMedico());
+        } catch (Exception e) {}
+
         seguro.setNombreAseguradora(seguroDTO.getNombreAseguradora());
         seguro.setNumeroPoliza(seguroDTO.getNumeroPoliza());
         seguro.setCobertura(seguroDTO.getCobertura());
@@ -40,8 +47,13 @@ public class SeguroMedicoService {
 
         // Usamos save() de JPA porque actualiza Paciente y Seguro en cascada
         Paciente pacienteGuardado = pacienteRepository.save(paciente);
+        
+        SeguroMedico seguroGuardado = pacienteGuardado.getSeguroMedico();
+        try {
+            auditService.registrarEvento(AccionAudit.ACTUALIZAR, "SEGURO_MEDICO", seguroGuardado.getId(), "Registro/guardado de seguro médico para paciente ID: " + pacienteId, anteriorJson, auditService.toJson(seguroGuardado));
+        } catch (Exception e) {}
 
-        return pacienteGuardado.getSeguroMedico();
+        return seguroGuardado;
     }
 
     public SeguroMedico actualizarSeguro(Long seguroId, SeguroMedicoDTO seguroDTO) {
@@ -51,11 +63,20 @@ public class SeguroMedicoService {
             throw new ResourceNotFoundException("Seguro Médico no encontrado con ID: " + seguroId);
         }
         
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(seguro);
+        } catch (Exception e) {}
+
         seguro.setNombreAseguradora(seguroDTO.getNombreAseguradora());
         seguro.setNumeroPoliza(seguroDTO.getNumeroPoliza());
         seguro.setCobertura(seguroDTO.getCobertura());
         
-        return seguroMedicoRepository.save(seguro);
+        SeguroMedico guardado = seguroMedicoRepository.save(seguro);
+        try {
+            auditService.registrarEvento(AccionAudit.ACTUALIZAR, "SEGURO_MEDICO", guardado.getId(), "Actualización de seguro médico", anteriorJson, auditService.toJson(guardado));
+        } catch (Exception e) {}
+        return guardado;
     }
 
     @Transactional(readOnly = true)

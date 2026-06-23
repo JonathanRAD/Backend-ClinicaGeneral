@@ -22,6 +22,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.clinicabienestar.api.model.Rol;
+import com.clinicabienestar.api.model.AccionAudit;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -48,6 +49,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final PermisoRepository permisoRepository;
     private final EmailService emailService;
+    private final AuditService auditService;
 
 
     private static final int MAX_INTENTOS_FALLIDOS = 3;
@@ -65,6 +67,9 @@ public class AuthService {
                 usuario.setBloqueoExpiracion(null);
                 usuarioRepository.save(usuario);
             } else {
+                 try {
+                     auditService.registrarEventoSinAuth(AccionAudit.LOGIN, "USUARIO", usuario.getId(), usuario.getEmail(), usuario.getNombres() + " " + usuario.getApellidos(), usuario.getRol().name(), "Intento de inicio de sesión en cuenta bloqueada");
+                 } catch (Exception ex) {}
                  throw new LockedException("La cuenta está bloqueada temporalmente debido a múltiples intentos fallidos.");
             }
         }
@@ -75,6 +80,9 @@ public class AuthService {
             usuario.setBloqueoExpiracion(null);
             usuarioRepository.save(usuario);
             String token = jwtService.generateToken(usuario);
+            try {
+                auditService.registrarEventoSinAuth(AccionAudit.LOGIN, "USUARIO", usuario.getId(), usuario.getEmail(), usuario.getNombres() + " " + usuario.getApellidos(), usuario.getRol().name(), "Inicio de sesión exitoso");
+            } catch (Exception ex) {}
             return AuthResponse.builder().token(token).build();
         } catch (AuthenticationException e) {
              usuario.setIntentosFallidos(usuario.getIntentosFallidos() == null ? 1 : usuario.getIntentosFallidos() + 1);
@@ -82,6 +90,9 @@ public class AuthService {
                 usuario.setBloqueoExpiracion(LocalDateTime.now().plusMinutes(TIEMPO_BLOQUEO_MINUTOS));
             }
             usuarioRepository.save(usuario);
+            try {
+                auditService.registrarEventoSinAuth(AccionAudit.LOGIN, "USUARIO", usuario.getId(), usuario.getEmail(), usuario.getNombres() + " " + usuario.getApellidos(), usuario.getRol().name(), "Intento fallido de inicio de sesión: " + e.getMessage());
+            } catch (Exception ex) {}
             throw new BadCredentialsException("Usuario o contraseña incorrectos.");
         }
     }
@@ -145,6 +156,9 @@ public class AuthService {
                 pacienteRepository.save(nuevoPaciente);
             }
         }
+        try {
+            auditService.registrarEvento(AccionAudit.CREAR, "USUARIO", usuarioGuardado.getId(), "Administrador creó usuario con email: " + usuarioGuardado.getEmail(), null, auditService.toJson(usuarioGuardado));
+        } catch (Exception ex) {}
     }
 
     /**
@@ -194,6 +208,10 @@ public class AuthService {
         // ── Enviar OTP por email ──────────────────────────────────────────────
         sendOtpEmail(usuarioGuardado.getNombres(), usuarioGuardado.getEmail(), otpCode);
 
+        try {
+            auditService.registrarEventoSinAuth(AccionAudit.REGISTRO, "USUARIO", usuarioGuardado.getId(), usuarioGuardado.getEmail(), usuarioGuardado.getNombres() + " " + usuarioGuardado.getApellidos(), usuarioGuardado.getRol().name(), "Registro de nuevo usuario paciente (OTP enviado)");
+        } catch (Exception ex) {}
+
         // Señalizar al frontend que debe mostrar pantalla OTP
         return AuthResponse.builder()
                 .requiresOtp(true)
@@ -223,6 +241,10 @@ public class AuthService {
         usuario.setOtpExpiry(null);
         usuario.setEmailVerificado(true);
         usuarioRepository.save(usuario);
+
+        try {
+            auditService.registrarEventoSinAuth(AccionAudit.VERIFICAR_OTP, "USUARIO", usuario.getId(), usuario.getEmail(), usuario.getNombres() + " " + usuario.getApellidos(), usuario.getRol().name(), "Código OTP verificado exitosamente");
+        } catch (Exception ex) {}
 
         // Generar y devolver JWT
         String token = jwtService.generateToken(usuario);
@@ -279,6 +301,10 @@ public class AuthService {
         );
         emailService.sendHtmlEmail(usuario.getEmail(), subject, htmlContent);
 
+        try {
+            auditService.registrarEventoSinAuth(AccionAudit.RESET_PASSWORD, "USUARIO", usuario.getId(), usuario.getEmail(), usuario.getNombres() + " " + usuario.getApellidos(), usuario.getRol().name(), "Solicitud de restablecimiento de contraseña iniciada");
+        } catch (Exception ex) {}
+
         System.out.println("DEBUG: Enlace de reseteo HTML enviado a " + email);
     }
 
@@ -300,6 +326,10 @@ public class AuthService {
         usuario.setIntentosFallidos(0);
         usuario.setBloqueoExpiracion(null);
         usuarioRepository.save(usuario);
+
+        try {
+            auditService.registrarEventoSinAuth(AccionAudit.RESET_PASSWORD, "USUARIO", usuario.getId(), usuario.getEmail(), usuario.getNombres() + " " + usuario.getApellidos(), usuario.getRol().name(), "Contraseña restablecida exitosamente usando token");
+        } catch (Exception ex) {}
     }
 
     private boolean esContrasenaSegura(String password) {

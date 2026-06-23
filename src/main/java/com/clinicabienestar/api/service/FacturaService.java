@@ -10,6 +10,7 @@ import com.clinicabienestar.api.model.Paciente;
 import com.clinicabienestar.api.repository.CitaRepository;
 import com.clinicabienestar.api.repository.FacturaRepository;
 import com.clinicabienestar.api.service.EmailService;
+import com.clinicabienestar.api.model.AccionAudit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class FacturaService {
     private final CitaRepository citaRepository;
     private final FacturaMapper facturaMapper;
     private final EmailService emailService;
+    private final AuditService auditService;
 
     @Transactional(readOnly = true)
     public List<Factura> obtenerTodasLasFacturas() {
@@ -57,7 +59,11 @@ public class FacturaService {
             factura.setMonto(facturaDTO.getMonto());
         }
 
-        return facturaRepository.save(factura);
+        Factura guardada = facturaRepository.save(factura);
+        try {
+            auditService.registrarEvento(AccionAudit.CREAR, "FACTURA", guardada.getId(), "Creación de factura para la cita ID: " + guardada.getCita().getId() + " por un monto de: " + guardada.getMonto(), null, auditService.toJson(guardada));
+        } catch (Exception e) {}
+        return guardada;
     }
 
     public Factura actualizarFactura(Long id, FacturaDTO facturaDTO) {
@@ -86,14 +92,31 @@ public class FacturaService {
             factura.setMonto(facturaDTO.getMonto());
         }
 
-        return facturaRepository.save(factura);
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(factura);
+        } catch (Exception e) {}
+
+        Factura guardada = facturaRepository.save(factura);
+        try {
+            auditService.registrarEvento(AccionAudit.ACTUALIZAR, "FACTURA", guardada.getId(), "Actualización de factura", anteriorJson, auditService.toJson(guardada));
+        } catch (Exception e) {}
+        return guardada;
     }
 
     public void eliminarFactura(Long id) {
-        if (!facturaRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Factura no encontrada con ID: " + id);
-        }
+        Factura factura = facturaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Factura no encontrada con ID: " + id));
+
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(factura);
+        } catch (Exception e) {}
+
         facturaRepository.deleteById(id);
+        try {
+            auditService.registrarEvento(AccionAudit.ELIMINAR, "FACTURA", id, "Eliminación de factura (ID: " + id + ", Monto: " + factura.getMonto() + ")", anteriorJson, null);
+        } catch (Exception e) {}
     }
 
     /**
@@ -119,6 +142,10 @@ public class FacturaService {
         String htmlContent = crearHtmlFactura(factura, paciente);
 
         emailService.sendHtmlEmail(emailDestinatario, subject, htmlContent);
+
+        try {
+            auditService.registrarEvento(AccionAudit.ACTUALIZAR, "FACTURA", id, "Envío de factura por correo electrónico al destinatario: " + emailDestinatario, null, null);
+        } catch (Exception e) {}
 
         return "Factura enviada correctamente al correo " + emailDestinatario;
     }

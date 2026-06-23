@@ -10,6 +10,7 @@ import com.clinicabienestar.api.model.Permiso;
 import com.clinicabienestar.api.model.Usuario;
 import com.clinicabienestar.api.repository.PermisoRepository;
 import com.clinicabienestar.api.repository.UsuarioRepository;
+import com.clinicabienestar.api.model.AccionAudit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +35,7 @@ public class UsuarioService {
     private final PermisoRepository permisoRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final AuditService auditService;
 
     private Usuario getUsuarioActual() {
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -57,6 +59,11 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
 
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(usuario);
+        } catch (Exception e) {}
+
         usuario.setNombres(usuarioDTO.getNombres());
         usuario.setApellidos(usuarioDTO.getApellidos());
         usuario.setRol(usuarioDTO.getRol());
@@ -70,6 +77,9 @@ public class UsuarioService {
         }
         
         Usuario updatedUsuario = usuarioRepository.save(usuario);
+        try {
+            auditService.registrarEvento(AccionAudit.ACTUALIZAR, "USUARIO", updatedUsuario.getId(), "Administrador actualizó el usuario con ID: " + id, anteriorJson, auditService.toJson(updatedUsuario));
+        } catch (Exception e) {}
         return usuarioMapper.toUsuarioDTO(updatedUsuario);
     }
 
@@ -80,11 +90,18 @@ public class UsuarioService {
             throw new ForbiddenException("Un administrador no puede eliminarse a sí mismo.");
         }
 
-        if (!usuarioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Usuario no encontrado con ID: " + id);
-        }
+        Usuario usuarioAEliminar = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
+
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(usuarioAEliminar);
+        } catch (Exception e) {}
 
         usuarioRepository.deleteById(id);
+        try {
+            auditService.registrarEvento(AccionAudit.ELIMINAR, "USUARIO", id, "Administrador eliminó el usuario con ID: " + id + " (Email: " + usuarioAEliminar.getEmail() + ")", anteriorJson, null);
+        } catch (Exception e) {}
     }
 
     /**
@@ -129,6 +146,9 @@ public class UsuarioService {
             + "</table></td></tr></table></body></html>";
 
         emailService.sendHtmlEmail(usuarioActual.getEmail(), subject, html);
+        try {
+            auditService.registrarEvento(AccionAudit.RESET_PASSWORD, "USUARIO", usuarioActual.getId(), "Usuario solicitó OTP para confirmar la eliminación de cuenta", null, null);
+        } catch (Exception e) {}
     }
 
     /**
@@ -145,7 +165,15 @@ public class UsuarioService {
             throw new IllegalArgumentException("El código OTP ha expirado. Solicita uno nuevo.");
         }
 
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(usuarioActual);
+        } catch (Exception e) {}
+
         usuarioRepository.deleteById(usuarioActual.getId());
+        try {
+            auditService.registrarEventoSinAuth(AccionAudit.ELIMINAR_CUENTA, "USUARIO", usuarioActual.getId(), usuarioActual.getEmail(), usuarioActual.getNombres() + " " + usuarioActual.getApellidos(), usuarioActual.getRol().name(), "Usuario eliminó su propia cuenta usando verificación OTP");
+        } catch (Exception e) {}
     }
 
     /**
@@ -154,9 +182,17 @@ public class UsuarioService {
      */
     public UsuarioDTO actualizarMiPerfil(UsuarioDTO dto) {
         Usuario usuarioActual = getUsuarioActual();
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(usuarioActual);
+        } catch (Exception e) {}
+
         usuarioActual.setNombres(dto.getNombres());
         usuarioActual.setApellidos(dto.getApellidos());
         Usuario actualizado = usuarioRepository.save(usuarioActual);
+        try {
+            auditService.registrarEvento(AccionAudit.ACTUALIZAR, "USUARIO", actualizado.getId(), "Usuario actualizó su perfil", anteriorJson, auditService.toJson(actualizado));
+        } catch (Exception e) {}
         return usuarioMapper.toUsuarioDTO(actualizado);
     }
 
@@ -173,5 +209,8 @@ public class UsuarioService {
 
         usuarioActual.setPassword(passwordEncoder.encode(request.getNuevaContrasena()));
         usuarioRepository.save(usuarioActual);
+        try {
+            auditService.registrarEvento(AccionAudit.CAMBIAR_CONTRASENA, "USUARIO", usuarioActual.getId(), "Usuario cambió su contraseña", null, null);
+        } catch (Exception e) {}
     }
 }

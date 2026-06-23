@@ -12,6 +12,7 @@ import com.clinicabienestar.api.model.Usuario;
 import com.clinicabienestar.api.repository.CitaRepository;
 import com.clinicabienestar.api.repository.MedicoRepository;
 import com.clinicabienestar.api.repository.PacienteRepository;
+import com.clinicabienestar.api.model.AccionAudit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +32,7 @@ public class CitaService {
     private final CitaRepository citaRepository;
     private final PacienteRepository pacienteRepository;
     private final MedicoRepository medicoRepository;
+    private final AuditService auditService;
     private final EmailService emailService;
 
     @Value("${google.oauth.email-from}")
@@ -96,7 +98,16 @@ public class CitaService {
         cita.setMotivo(citaDTO.getMotivo());
         cita.setConsultorio(asignarConsultorio(medico.getEspecialidad()));
 
-        return citaRepository.save(cita);
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(cita);
+        } catch (Exception e) {}
+
+        Cita guardada = citaRepository.save(cita);
+        try {
+            auditService.registrarEvento(AccionAudit.ACTUALIZAR, "CITA", guardada.getId(), "Actualización de cita médica", anteriorJson, auditService.toJson(guardada));
+        } catch (Exception e) {}
+        return guardada;
     }
 
     public void cancelarMiCita(Long id) {
@@ -109,16 +120,33 @@ public class CitaService {
             throw new ForbiddenException("No tiene permiso para cancelar una cita que no es suya.");
         }
 
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(cita);
+        } catch (Exception e) {}
+
         // USANDO SP para eliminar
         citaRepository.eliminarCitaSP(id);
+        try {
+            auditService.registrarEvento(AccionAudit.ELIMINAR, "CITA", id, "Paciente canceló/eliminó su propia cita médica", anteriorJson, null);
+        } catch (Exception e) {}
     }
 
     public void eliminarCita(Long id) {
-        if (citaRepository.buscarPorIdSP(id) == null) {
+        Cita cita = citaRepository.buscarPorIdSP(id);
+        if (cita == null) {
             throw new ResourceNotFoundException("Cita no encontrada con ID: " + id);
         }
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(cita);
+        } catch (Exception e) {}
+
         // USANDO SP
         citaRepository.eliminarCitaSP(id);
+        try {
+            auditService.registrarEvento(AccionAudit.ELIMINAR, "CITA", id, "Eliminación de cita médica por administración", anteriorJson, null);
+        } catch (Exception e) {}
     }
 
     public Cita registrarTriaje(Long id, com.clinicabienestar.api.dto.TriajeDTO triajeDTO) {
@@ -146,7 +174,16 @@ public class CitaService {
         cita.setTriaje(triaje);
         cita.setEstado("lista_consulta");
 
-        return citaRepository.save(cita);
+        String anteriorJson = null;
+        try {
+            anteriorJson = auditService.toJson(cita);
+        } catch (Exception e) {}
+
+        Cita guardada = citaRepository.save(cita);
+        try {
+            auditService.registrarEvento(AccionAudit.CAMBIAR_ESTADO, "CITA", guardada.getId(), "Registro de triaje para la cita. Estado cambiado a lista_consulta.", anteriorJson, auditService.toJson(guardada));
+        } catch (Exception e) {}
+        return guardada;
     }
 
     // --- Métodos privados de lógica de negocio ---
@@ -169,16 +206,20 @@ public class CitaService {
 
         Cita citaGuardada = citaRepository.save(cita);
 
+        try {
+            auditService.registrarEvento(AccionAudit.CREAR, "CITA", citaGuardada.getId(), "Creación de cita médica para el paciente: " + paciente.getNombres() + " " + paciente.getApellidos() + " con el médico: Dr(a). " + medico.getNombres() + " " + medico.getApellidos(), null, auditService.toJson(citaGuardada));
+        } catch (Exception e) {}
+
         // --- Notificaciones por email (asíncronas, no bloquean la respuesta) ---
-        String nombrePaciente = paciente.getNombres() + " " + paciente.getApellidos();
-        String nombreMedico = "Dr(a). " + medico.getNombres() + " " + medico.getApellidos();
+        String nombrePacienteEmail = paciente.getNombres() + " " + paciente.getApellidos();
+        String nombreMedicoEmail = "Dr(a). " + medico.getNombres() + " " + medico.getApellidos();
 
         // Correo al paciente (solo si tiene usuario con email registrado)
         if (paciente.getUsuario() != null && paciente.getUsuario().getEmail() != null) {
             emailService.sendCitaConfirmationEmail(
                     paciente.getUsuario().getEmail(),
-                    nombrePaciente,
-                    nombreMedico,
+                    nombrePacienteEmail,
+                    nombreMedicoEmail,
                     medico.getEspecialidad(),
                     citaGuardada.getFechaHora(),
                     citaGuardada.getMotivo(),
@@ -191,8 +232,8 @@ public class CitaService {
         // Correo al administrador
         emailService.sendCitaConfirmationEmail(
                 adminEmail,
-                nombrePaciente,
-                nombreMedico,
+                nombrePacienteEmail,
+                nombreMedicoEmail,
                 medico.getEspecialidad(),
                 citaGuardada.getFechaHora(),
                 citaGuardada.getMotivo(),
