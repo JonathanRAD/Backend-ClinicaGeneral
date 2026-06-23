@@ -14,6 +14,7 @@ public class ApiApplication {
 	}
 
 	public static void main(String[] args) {
+		TimeZone.setDefault(TimeZone.getTimeZone("America/Lima"));
 		SpringApplication.run(ApiApplication.class, args);
 	}
 
