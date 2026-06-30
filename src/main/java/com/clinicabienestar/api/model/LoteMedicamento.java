@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,6 +34,8 @@ public class LoteMedicamento {
     @Column(name = "FECHA_INGRESO", nullable = false)
     private LocalDateTime fechaIngreso;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEDICAMENTO_ID", nullable = false)
     @JsonIgnore

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +38,8 @@ public class Medicamento {
 
     private String estado; // Ej: ACTIVO, INACTIVO
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "medicamento", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LoteMedicamento> lotes = new ArrayList<>();
 

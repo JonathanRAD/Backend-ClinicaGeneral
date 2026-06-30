@@ -6,9 +6,11 @@ import com.clinicabienestar.api.dto.RegisterRequest;
 import com.clinicabienestar.api.dto.ResetPasswordDTO;
 import com.clinicabienestar.api.exception.ResourceNotFoundException;
 import com.clinicabienestar.api.model.Paciente;
+import com.clinicabienestar.api.model.Medico;
 import com.clinicabienestar.api.model.Permiso;
 import com.clinicabienestar.api.model.Usuario;
 import com.clinicabienestar.api.repository.PacienteRepository;
+import com.clinicabienestar.api.repository.MedicoRepository;
 import com.clinicabienestar.api.repository.PermisoRepository;
 import com.clinicabienestar.api.repository.UsuarioRepository;
 import com.clinicabienestar.api.model.HistoriaClinica;
@@ -45,6 +47,7 @@ public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
     private final PacienteRepository pacienteRepository;
+    private final MedicoRepository medicoRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -156,6 +159,14 @@ public class AuthService {
 
                 pacienteRepository.save(nuevoPaciente);
             }
+        } else if (usuarioGuardado.getRol() == Rol.MEDICO) {
+            Medico nuevoMedico = new Medico();
+            nuevoMedico.setNombres(usuarioGuardado.getNombres());
+            nuevoMedico.setApellidos(usuarioGuardado.getApellidos());
+            nuevoMedico.setEspecialidad("Medicina General");
+            nuevoMedico.setCmp("PENDIENTE");
+            nuevoMedico.setFechaNacimiento(LocalDate.of(1980, 1, 1));
+            medicoRepository.save(nuevoMedico);
         }
         try {
             auditService.registrarEvento(AccionAudit.CREAR, "USUARIO", usuarioGuardado.getId(), "Administrador creó usuario con email: " + usuarioGuardado.getEmail(), null, auditService.toJson(usuarioGuardado));

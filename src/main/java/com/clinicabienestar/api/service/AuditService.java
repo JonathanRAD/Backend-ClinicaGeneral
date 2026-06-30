@@ -45,7 +45,8 @@ public class AuditService {
     public void registrarEvento(AccionAudit accion, String entidad, Long entidadId,
                                  String descripcion, String datosAnteriores, String datosNuevos) {
         try {
-            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = (auth != null) ? auth.getPrincipal() : null;
             Usuario usuario = null;
             if (principal instanceof Usuario) {
                 usuario = (Usuario) principal;
@@ -120,8 +121,8 @@ public class AuditService {
         if (obj == null) return null;
         try {
             return objectMapper.writeValueAsString(obj);
-        } catch (Exception e) {
-            return obj.toString();
+        } catch (Throwable t) {
+            return "Error serializando " + obj.getClass().getSimpleName() + ": " + t.getMessage();
         }
     }
 
