@@ -1,0 +1,48 @@
+<div>
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon class="me-2 text-success">add_box</mat-icon>
+    Ingresar Nuevo Lote
+  </h2>
+
+  <mat-dialog-content>
+    <div class="alert alert-secondary py-2 mt-2 mb-3">
+      <strong>Medicamento:</strong> {{ data.medicamento.nombre }} ({{ data.medicamento.concentracion }})
+    </div>
+
+    <form [formGroup]="loteForm" class="row">
+      <!-- Número de Lote -->
+      <div class="col-md-12 mb-3">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Número de Lote (Identificador)</mat-label>
+          <input matInput formControlName="numeroLote" placeholder="Ej: LOTE-2024-X1">
+          <mat-error *ngIf="loteForm.get('numeroLote')?.hasError('required')">Requerido</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Cantidad de Stock -->
+      <div class="col-md-6 mb-3">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Unidades Ingresadas</mat-label>
+          <input matInput type="number" formControlName="stock" min="1">
+          <mat-error *ngIf="loteForm.get('stock')?.hasError('required')">Requerido</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Fecha de Vencimiento -->
+      <div class="col-md-6 mb-3">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Fecha de Vencimiento</mat-label>
+          <input matInput formControlName="fechaVencimiento" type="date">
+          <mat-error *ngIf="loteForm.get('fechaVencimiento')?.hasError('required')">Requerido</mat-error>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="pb-3 px-4">
+    <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="guardar()">
+      <mat-icon class="me-2">add_box</mat-icon> Añadir Lote al Stock
+    </button>
+  </mat-dialog-actions>
+</div>

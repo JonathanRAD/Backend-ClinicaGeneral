@@ -1,0 +1,128 @@
+
+.detail-card {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 0;
+  border-radius: 12px;
+}
+
+.no-selection-template {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+}
+
+.placeholder-icon {
+  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
+  color: #dee2e6;
+}
+
+.detail-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: #0d6efd;
+}
+
+.info-section {
+  padding: 1rem 0;
+}
+.section-title {
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.info-section p {
+  margin-bottom: 0.5rem;
+  color: #212529;
+}
+
+.badge {
+  padding: 0.4em 0.8em;
+  border-radius: 1em;
+  font-weight: 600;
+  color: white;
+}
+.badge.pagada { background-color: #198754; }
+.badge.pendiente { background-color: #ffc107; color: #000; }
+.badge.anulada { background-color: #6c757d; }
+
+.details-table {
+  font-size: 0.9rem;
+}
+
+.total-section {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+body.dark-theme .detail-card,
+body.dark-theme .total-section {
+  background-color: #1e1e1e;
+}
+body.dark-theme .info-section p {
+  color: #f1f1f1;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.detail-card-content {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.detail-card-content.animating-out {
+  animation: fadeOutDown 0.15s ease-in forwards;
+}
+
+.no-details-template {
+  text-align: center;
+  padding: 1.5rem;
+  color: #6c757d;
+}
+
+.placeholder-icon-small {
+  font-size: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #e0e0e0;
+}
+
+body.dark-theme .detail-card,
+body.dark-theme .total-section {
+  background-color: #1e1e1e;
+}
+body.dark-theme .info-section p {
+  color: #f1f1f1;
+}
+body.dark-theme .placeholder-icon-small {
+  color: #4a4a4a;
+}

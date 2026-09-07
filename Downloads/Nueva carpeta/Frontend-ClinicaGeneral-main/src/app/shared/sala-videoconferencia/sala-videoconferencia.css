@@ -1,0 +1,125 @@
+.jitsi-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #0f172a;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+}
+
+.jitsi-header {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border-bottom: 1px solid #334155;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  height: 75px;
+  z-index: 10;
+}
+
+.jitsi-container {
+  flex: 1;
+  width: 100%;
+  background-color: #0f172a;
+}
+
+/* Sala de Espera Virtual */
+.waiting-room {
+  background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+  width: 100%;
+  height: 100%;
+  flex: 1;
+}
+
+/* Icono médico de pulsación cardiaca */
+.telehealth-pulse-icon {
+  font-size: 64px !important;
+  width: 64px;
+  height: 64px;
+  color: #ef4444;
+  animation: pulse-icon 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes pulse-icon {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+    text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* Punto Rojo Pulsante (Transmisión En Vivo) */
+.live-dot-pulse {
+  width: 10px;
+  height: 10px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: pulse-live 1.4s infinite;
+}
+
+@keyframes pulse-live {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* Sombras Pulsantes para los badges de estado del participante */
+.shadow-success-pulse {
+  box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+  animation: pulse-success 1.6s infinite;
+}
+
+@keyframes pulse-success {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(25, 135, 84, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(25, 135, 84, 0);
+  }
+}
+
+.shadow-warning-pulse {
+  box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+  animation: pulse-warning 1.6s infinite;
+}
+
+@keyframes pulse-warning {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(255, 193, 7, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+  }
+}

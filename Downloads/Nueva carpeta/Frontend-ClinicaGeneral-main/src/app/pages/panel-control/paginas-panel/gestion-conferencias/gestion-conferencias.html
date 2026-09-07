@@ -1,0 +1,120 @@
+<div class="container-fluid p-4" *ngIf="!conferenciaActiva">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Gestión de Conferencias (Telemedicina)</h2>
+    <button mat-raised-button color="primary" (click)="abrirModalProgramar()">
+      <mat-icon>add_call</mat-icon>
+      Programar Conferencia
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-table [dataSource]="conferencias()" class="mat-elevation-z2 w-100">
+
+      <ng-container matColumnDef="fecha">
+        <mat-header-cell *matHeaderCellDef> Fecha Programada </mat-header-cell>
+        <mat-cell *matCellDef="let c"> {{ c.fechaProgramada | date:'short' }} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="paciente">
+        <mat-header-cell *matHeaderCellDef> Paciente </mat-header-cell>
+        <mat-cell *matCellDef="let c"> {{ c.paciente?.nombres }} {{ c.paciente?.apellidos }} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="medico">
+        <mat-header-cell *matHeaderCellDef> Médico </mat-header-cell>
+        <mat-cell *matCellDef="let c"> Dr(a). {{ c.medico?.nombres }} {{ c.medico?.apellidos }} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="duracion">
+        <mat-header-cell *matHeaderCellDef> Duración </mat-header-cell>
+        <mat-cell *matCellDef="let c"> {{ c.duracionMinutos }} min </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="estado">
+        <mat-header-cell *matHeaderCellDef> Estado </mat-header-cell>
+        <mat-cell *matCellDef="let c">
+          <span class="badge" [ngClass]="{
+            'bg-warning': c.estado === 'PROGRAMADA',
+            'bg-success': c.estado === 'FINALIZADA',
+            'bg-danger': c.estado === 'CANCELADA'
+          }">{{ c.estado }}</span>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <mat-header-cell *matHeaderCellDef class="text-end"> Acciones </mat-header-cell>
+        <mat-cell *matCellDef="let c" class="text-end justify-content-end">
+          <button mat-icon-button color="primary" matTooltip="Unirse a la Sala" (click)="unirseSala(c)" [disabled]="c.estado === 'FINALIZADA' || c.estado === 'CANCELADA'">
+            <mat-icon>videocam</mat-icon>
+          </button>
+          <button mat-icon-button color="accent" matTooltip="Marcar Finalizada" (click)="cambiarEstado(c, 'FINALIZADA')" *ngIf="c.estado === 'PROGRAMADA'">
+            <mat-icon>check_circle</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" matTooltip="Cancelar" (click)="cambiarEstado(c, 'CANCELADA')" *ngIf="c.estado === 'PROGRAMADA'">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="columnasMostrar"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: columnasMostrar;"></mat-row>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell text-center py-4 text-muted" colspan="6">
+          No hay conferencias programadas.
+        </td>
+      </tr>
+    </mat-table>
+  </mat-card>
+</div>
+
+<!-- Modal para programar conferencia -->
+<ng-template #modalProgramar>
+  <h2 mat-dialog-title>Programar Videoconferencia</h2>
+  <mat-dialog-content>
+    <form [formGroup]="formProgramar" class="d-flex flex-column gap-3 mt-2">
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Paciente</mat-label>
+        <mat-select formControlName="pacienteId">
+          <mat-option *ngFor="let p of pacientes()" [value]="p.id">
+            {{ p.nombres }} {{ p.apellidos }} (DNI: {{ p.dni }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Médico</mat-label>
+        <mat-select formControlName="medicoId">
+          <mat-option *ngFor="let m of medicos()" [value]="m.id">
+            Dr(a). {{ m.nombres }} {{ m.apellidos }} - {{ m.especialidad }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha y Hora</mat-label>
+        <input matInput type="datetime-local" formControlName="fechaProgramada">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Duración (Minutos)</mat-label>
+        <input matInput type="number" formControlName="duracionMinutos">
+      </mat-form-field>
+
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancelar</button>
+    <button mat-raised-button color="primary" (click)="guardarConferencia()" [disabled]="formProgramar.invalid">Guardar</button>
+  </mat-dialog-actions>
+</ng-template>
+
+<!-- Jitsi Meet Room -->
+<app-sala-videoconferencia
+  *ngIf="conferenciaActiva"
+  [conferencia]="conferenciaActiva"
+  [nombreUsuario]="nombreAdmin"
+  backRoute="/panel/conferencias"
+  (click)="cerrarSala()">
+</app-sala-videoconferencia>

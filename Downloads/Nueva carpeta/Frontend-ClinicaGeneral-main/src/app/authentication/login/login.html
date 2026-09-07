@@ -1,0 +1,169 @@
+<div class="container-fluid vh-100 p-0 login-page">
+  <div class="row g-0 h-100">
+    <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-center align-items-center text-white info-panel">
+      <div class="info-content d-flex flex-column align-items-center text-center p-5">
+        <div class="info-logo mb-4">
+          <i class="bi bi-hospital-fill"></i>
+        </div>
+        <h1 class="fw-bold mb-3">Gestión de Salud, Simplificada</h1>
+        <p class="lead">Una plataforma integral para optimizar la atención y el bienestar de cada paciente.</p>
+      </div>
+    </div>
+
+    <div class="col-lg-7 d-flex flex-column justify-content-center align-items-center form-panel">
+      <div class="form-container p-4 p-md-5">
+
+        <div *ngIf="mensajeError()" class="alert alert-danger d-flex align-items-center mb-4">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <div>{{ mensajeError() }}</div>
+        </div>
+
+        <!-- ── LOGIN ─────────────────────────────────────────────────── -->
+        <div *ngIf="modo() === 'login'">
+          <h2 class="fw-bold text-center mb-2">Iniciar Sesión</h2>
+          <p class="text-muted text-center mb-4">Bienvenido, por favor ingresa tus credenciales.</p>
+          <form [formGroup]="formularioLogin" (ngSubmit)="enviarFormulario()">
+            <div class="mb-3">
+              <div class="input-wrapper">
+                <input id="login-email" type="email" class="form-control" formControlName="email" required placeholder="Correo Electrónico">
+                <i class="bi bi-envelope-fill input-icon-right"></i>
+              </div>
+              <div *ngIf="loginCtls['email'].invalid && (loginCtls['email'].dirty || loginCtls['email'].touched)" class="validation-error">
+                <div *ngIf="loginCtls['email'].errors?.['required']">El correo es requerido.</div>
+                <div *ngIf="loginCtls['email'].errors?.['email']">Ingrese un correo válido.</div>
+              </div>
+            </div>
+            <div class="mb-4">
+              <div class="input-wrapper">
+                <input id="login-password" [type]="mostrarContrasena ? 'text' : 'password'" class="form-control" formControlName="password" required placeholder="Contraseña">
+                <i class="bi input-icon-right toggle-password" [ngClass]="mostrarContrasena ? 'bi-eye-slash' : 'bi-eye'" (click)="toggleMostrarContrasena()"></i>
+              </div>
+              <div *ngIf="loginCtls['password'].invalid && (loginCtls['password'].dirty || loginCtls['password'].touched)" class="validation-error">
+                <div *ngIf="loginCtls['password'].errors?.['required']">La contraseña es requerida.</div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="remember-me" [(ngModel)]="recordarme" [ngModelOptions]="{standalone: true}">
+                <label class="form-check-label" for="remember-me">Recordarme</label>
+              </div>
+              <a routerLink="/recuperar-contrasena" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg" [disabled]="formularioLogin.invalid || cargando()">
+                {{ cargando() ? 'Ingresando...' : 'Ingresar al Panel' }}
+              </button>
+            </div>
+          </form>
+          <div class="text-center mt-4">
+            <p class="text-muted">¿No tienes una cuenta? <a href="#" (click)="cambiarModo(); $event.preventDefault()">Regístrate aquí</a></p>
+          </div>
+        </div>
+
+        <!-- ── REGISTRO ───────────────────────────────────────────────── -->
+        <div *ngIf="modo() === 'registro'">
+           <h2 class="fw-bold text-center mb-2">Crear Cuenta</h2>
+          <p class="text-muted text-center mb-4">Completa los campos para registrarte.</p>
+          <form [formGroup]="formularioRegistro" (ngSubmit)="enviarFormulario()">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <input id="reg-nombres" type="text" class="form-control" formControlName="nombres" required placeholder="Nombres">
+                    <div *ngIf="registroCtls['nombres'].invalid && (registroCtls['nombres'].dirty || registroCtls['nombres'].touched)" class="validation-error">
+                        <div *ngIf="registroCtls['nombres'].errors?.['required']">El nombre es requerido.</div>
+                        <div *ngIf="registroCtls['nombres'].errors?.['maxlength']">Máximo {{ maxNombreApellidoLength }} caracteres.</div>
+                        <div *ngIf="registroCtls['nombres'].errors?.['pattern']">Solo puede contener letras y espacios.</div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <input id="reg-apellidos" type="text" class="form-control" formControlName="apellidos" required placeholder="Apellidos">
+                    <div *ngIf="registroCtls['apellidos'].invalid && (registroCtls['apellidos'].dirty || registroCtls['apellidos'].touched)" class="validation-error">
+                        <div *ngIf="registroCtls['apellidos'].errors?.['required']">El apellido es requerido.</div>
+                        <div *ngIf="registroCtls['apellidos'].errors?.['maxlength']">Máximo {{ maxNombreApellidoLength }} caracteres.</div>
+                        <div *ngIf="registroCtls['apellidos'].errors?.['pattern']">Solo puede contener letras y espacios.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="input-wrapper">
+                  <input id="reg-email" type="email" class="form-control" formControlName="email" required placeholder="Correo Electrónico">
+                  <i class="bi bi-envelope-fill input-icon-right"></i>
+                </div>
+            </div>
+            <div class="mb-4">
+                <div class="input-wrapper">
+                  <input id="reg-password" [type]="mostrarContrasena ? 'text' : 'password'" class="form-control" formControlName="password" required placeholder="Contraseña">
+                  <i class="bi input-icon-right toggle-password" [ngClass]="mostrarContrasena ? 'bi-eye-slash' : 'bi-eye'" (click)="toggleMostrarContrasena()"></i>
+                </div>
+                <div *ngIf="registroCtls['password'].invalid && (registroCtls['password'].dirty || registroCtls['password'].touched)" class="validation-error">
+                    <div *ngIf="registroCtls['password'].errors?.['required']">La contraseña es requerida.</div>
+                    <div *ngIf="registroCtls['password'].errors?.['minlength']">Mínimo 8 caracteres.</div>
+                    <div *ngIf="registroCtls['password'].errors?.['contrasenaInsegura']">Debe incluir mayúscula, minúscula, número y un caracter especial (ej: @$!%*?&_#).</div>
+                </div>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg" [disabled]="formularioRegistro.invalid || cargando()">
+                {{ cargando() ? 'Registrando...' : 'Crear Cuenta' }}
+              </button>
+            </div>
+          </form>
+          <div class="text-center mt-4">
+            <p class="text-muted">¿Ya tienes una cuenta? <a href="#" (click)="cambiarModo(); $event.preventDefault()">Inicia sesión</a></p>
+          </div>
+        </div>
+
+        <!-- ── VERIFICACIÓN OTP ───────────────────────────────────────── -->
+        <div *ngIf="modo() === 'otp'" class="otp-container">
+          <div class="otp-icon-wrapper mb-3">
+            <i class="bi bi-shield-lock-fill otp-icon"></i>
+          </div>
+          <h2 class="fw-bold text-center mb-2">Verifica tu cuenta</h2>
+          <p class="text-muted text-center mb-1">
+            Hemos enviado un código de 6 dígitos a:
+          </p>
+          <p class="otp-email text-center mb-4">
+            <strong>{{ emailPendienteOtp() }}</strong>
+          </p>
+
+          <!-- 6 inputs individuales -->
+          <div class="otp-inputs-row mb-4" (paste)="onOtpPaste($event)">
+            <input
+              *ngFor="let digit of otpDigits; let i = index"
+              [id]="'otp-' + i"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              class="otp-input"
+              [value]="otpDigits[i]"
+              (input)="onOtpInput($event, i)"
+              (keydown)="onOtpKeydown($event, i)"
+              autocomplete="one-time-code"
+            >
+          </div>
+
+          <div class="d-grid mb-3">
+            <button
+              class="btn btn-primary btn-lg"
+              (click)="verificarOtp()"
+              [disabled]="!otpCompleto || cargando()">
+              {{ cargando() ? 'Verificando...' : 'Verificar Código' }}
+            </button>
+          </div>
+
+          <div class="text-center">
+            <p class="text-muted mb-1">¿No recibiste el código?</p>
+            <a href="#" class="text-decoration-none fw-semibold" (click)="reenviarOtp(); $event.preventDefault()">
+              Reenviar código
+            </a>
+          </div>
+
+          <div class="text-center mt-3">
+            <a href="#" class="text-muted small" (click)="cambiarModo(); $event.preventDefault()">
+              ← Volver al registro
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

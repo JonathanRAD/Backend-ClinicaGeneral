@@ -1,0 +1,68 @@
+<div class="container mt-4 portal-page" *ngIf="!conferenciaActiva">
+  <div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title m-0">Mis Conferencias (Telemedicina)</h1>
+  </div>
+
+  <mat-card>
+    <mat-table [dataSource]="conferencias()" class="mat-elevation-z2 w-100">
+
+      <ng-container matColumnDef="fecha">
+        <mat-header-cell *matHeaderCellDef> Fecha Programada </mat-header-cell>
+        <mat-cell *matCellDef="let c"> {{ c.fechaProgramada | date:'medium' }} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="medico">
+        <mat-header-cell *matHeaderCellDef> Médico </mat-header-cell>
+        <mat-cell *matCellDef="let c"> Dr(a). {{ c.medico?.nombres }} {{ c.medico?.apellidos }} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="duracion">
+        <mat-header-cell *matHeaderCellDef> Duración </mat-header-cell>
+        <mat-cell *matCellDef="let c"> {{ c.duracionMinutos }} min </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="estado">
+        <mat-header-cell *matHeaderCellDef> Estado </mat-header-cell>
+        <mat-cell *matCellDef="let c">
+          <span class="badge" [ngClass]="{
+            'bg-warning': c.estado === 'PROGRAMADA',
+            'bg-success': c.estado === 'FINALIZADA',
+            'bg-danger': c.estado === 'CANCELADA'
+          }">{{ c.estado }}</span>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <mat-header-cell *matHeaderCellDef class="text-end"> Acciones </mat-header-cell>
+        <mat-cell *matCellDef="let c" class="text-end justify-content-end">
+          <button mat-raised-button color="primary" 
+                  matTooltip="Unirse a la llamada" 
+                  (click)="unirseSala(c)" 
+                  [disabled]="c.estado === 'FINALIZADA' || c.estado === 'CANCELADA'">
+            <mat-icon>videocam</mat-icon>
+            Unirse
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="columnasMostrar"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: columnasMostrar;"></mat-row>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell text-center py-4 text-muted" colspan="5">
+          No tienes conferencias programadas.
+        </td>
+      </tr>
+    </mat-table>
+  </mat-card>
+</div>
+
+<!-- Jitsi Meet Room -->
+<app-sala-videoconferencia
+  *ngIf="conferenciaActiva"
+  [conferencia]="conferenciaActiva"
+  [nombreUsuario]="nombrePaciente"
+  [isPaciente]="true"
+  backRoute="/portal/mis-conferencias"
+  (click)="cerrarSala()">
+</app-sala-videoconferencia>

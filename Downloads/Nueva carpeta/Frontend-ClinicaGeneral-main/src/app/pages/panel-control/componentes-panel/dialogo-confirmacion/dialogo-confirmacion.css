@@ -1,0 +1,29 @@
+
+
+.confirm-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #c9302c; 
+  padding: 20px 24px 0 24px;
+}
+
+.confirm-dialog-header .mat-icon {
+  font-size: 28px;
+  height: 28px;
+  width: 28px;
+}
+
+.confirm-dialog-header h2 {
+  margin: 0;
+  font-weight: 600;
+}
+
+mat-dialog-content {
+  padding-top: 16px;
+  color: #333;
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+}

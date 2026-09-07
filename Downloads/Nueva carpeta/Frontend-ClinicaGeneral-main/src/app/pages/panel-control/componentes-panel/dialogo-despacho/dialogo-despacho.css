@@ -1,0 +1,25 @@
+.patient-info-bar {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(13, 110, 253, 0.08);
+  border-left: 4px solid var(--mdc-outlined-text-field-focus-outline-color, #0d6efd);
+}
+
+.despacho-item {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.despacho-item--selected {
+  border-color: rgba(13, 110, 253, 0.4);
+  background: rgba(13, 110, 253, 0.04);
+}
+
+.despacho-item--sin-stock {
+  opacity: 0.6;
+}

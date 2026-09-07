@@ -1,0 +1,46 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1">Gestión de Proveedores</h2>
+      <p class="text-secondary">Directorio de entidades de suministro farmacéutico.</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="onAgregar()">
+      <mat-icon>add</mat-icon> Nuevo Proveedor
+    </button>
+  </div>
+
+  <!-- Grid de proveedores -->
+  <div class="prov-grid" *ngIf="proveedores().length > 0; else sinProveedores">
+    <div *ngFor="let p of proveedores()" class="prov-card">
+      <div class="prov-avatar" [style.background]="getColor(p.nombre)">
+        {{ p.nombre.charAt(0) }}
+      </div>
+      <div class="prov-info">
+        <h4 class="prov-nombre">{{ p.nombre }}</h4>
+        <p class="prov-dato"><mat-icon>badge</mat-icon> RUC: {{ p.ruc || '—' }}</p>
+        <p class="prov-dato"><mat-icon>phone</mat-icon> {{ p.telefono || '—' }}</p>
+        <p class="prov-dato"><mat-icon>email</mat-icon> {{ p.email || '—' }}</p>
+        <p class="prov-dato"><mat-icon>location_on</mat-icon> {{ p.direccion || '—' }}</p>
+      </div>
+      <div class="prov-actions">
+        <button mat-icon-button color="primary" (click)="onEditar(p)" matTooltip="Editar">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="onEliminar(p)" matTooltip="Eliminar">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #sinProveedores>
+    <div class="prov-empty">
+      <mat-icon>local_shipping</mat-icon>
+      <h3>Sin proveedores registrados</h3>
+      <p>Agrega tu primer proveedor para gestionar el suministro de medicamentos.</p>
+      <button mat-raised-button color="primary" (click)="onAgregar()">
+        <mat-icon>add</mat-icon> Agregar Proveedor
+      </button>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,110 @@
+<h2 mat-dialog-title class="dialog-header-custom border-bottom pb-2">
+  <mat-icon class="align-middle me-2 text-primary">person_add_alt</mat-icon>
+  {{ esModoEdicion ? 'Editar Perfil y Permisos' : 'Registrar Nuevo Colaborador' }}
+</h2>
+
+<mat-dialog-content class="pt-3 dialog-content-custom">
+  <p class="mat-body-2 text-muted mb-3">
+    Asigna los datos básicos del colaborador, su rol principal, y personaliza sus permisos de acceso clínico.
+  </p>
+  
+  <form [formGroup]="usuarioForm" class="d-flex flex-column gap-3">
+    <!-- Fila de Nombres y Apellidos -->
+    <div class="row g-2">
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Nombres</mat-label>
+          <input matInput formControlName="nombres" required placeholder="Ej. Juan Carlos">
+          <mat-icon matSuffix class="text-secondary">badge</mat-icon>
+          <mat-error>Los nombres son obligatorios.</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Apellidos</mat-label>
+          <input matInput formControlName="apellidos" required placeholder="Ej. Pérez García">
+          <mat-icon matSuffix class="text-secondary">badge</mat-icon>
+          <mat-error>Los apellidos son obligatorios.</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Correo y Rol -->
+    <div class="row g-2">
+      <div class="col-md-7">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Correo Electrónico</mat-label>
+          <input matInput formControlName="email" required type="email" placeholder="nombre@clinica.com">
+          <mat-icon matSuffix class="text-secondary">mail</mat-icon>
+          <mat-error *ngIf="usuarioForm.get('email')?.hasError('required')">El correo es obligatorio.</mat-error>
+          <mat-error *ngIf="usuarioForm.get('email')?.hasError('email')">Debe ser un correo válido.</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-md-5">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Rol Clínico</mat-label>
+          <mat-select formControlName="rol" required>
+            <mat-option *ngFor="let rol of rolesDisponibles" [value]="rol">
+              {{ rol | titlecase }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix class="text-secondary">assignment_ind</mat-icon>
+          <mat-error>El rol es obligatorio.</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Contraseña (Solo en creación) -->
+    <div *ngIf="!esModoEdicion" class="row">
+      <div class="col-12">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Contraseña Inicial de Acceso</mat-label>
+          <input matInput formControlName="password" required type="password" placeholder="Mínimo 8 caracteres">
+          <mat-icon matSuffix class="text-secondary">lock</mat-icon>
+          <mat-error *ngIf="usuarioForm.get('password')?.hasError('required')">La contraseña es obligatoria.</mat-error>
+          <mat-error *ngIf="usuarioForm.get('password')?.hasError('minlength')">Debe tener al menos 8 caracteres.</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Sección Modular de Permisos Categorizados -->
+    <div class="permisos-seccion mt-1">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <label class="mat-body-strong m-0 text-primary d-flex align-items-center">
+          <mat-icon class="me-2">shield</mat-icon> Módulos y Permisos Autorizados
+        </label>
+        <span class="badge bg-light text-primary border px-2 py-1 rounded-pill" style="font-size: 11px; font-weight: 500;">
+          Sugerencias aplicadas por Rol
+        </span>
+      </div>
+      
+      <div class="permisos-acordeon" formGroupName="permisos">
+        <div *ngFor="let categoria of categoriasPermisos" class="categoria-box mb-3 p-3 border rounded shadow-sm bg-white">
+          <div class="categoria-header d-flex align-items-center mb-3 pb-2 border-bottom">
+            <mat-icon class="text-primary me-2">{{ categoria.icon }}</mat-icon>
+            <span class="mat-subtitle-2 font-weight-bold text-dark">{{ categoria.titulo }}</span>
+          </div>
+          
+          <div class="categoria-grid d-flex flex-column gap-3">
+            <div *ngFor="let permiso of categoria.permisos" class="permiso-row">
+              <mat-checkbox 
+                *ngIf="tienePermisoDisponible(permiso.nombre)"
+                [formControlName]="permiso.nombre"
+                class="permiso-checkbox-custom d-block">
+                <span class="permiso-label-text" style="margin-left: 6px;">{{ permiso.label }}</span>
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="border-top pt-2 mt-3 dialog-actions-custom">
+  <button mat-stroked-button (click)="cancelar()" class="px-4">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="guardar()" [disabled]="usuarioForm.invalid" class="px-4 ms-2">
+    <mat-icon class="me-1">save</mat-icon>
+    {{ esModoEdicion ? 'Actualizar Colaborador' : 'Crear Colaborador' }}
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,97 @@
+<div>
+  <h2 mat-dialog-title class="dialog-title">
+    <mat-icon class="me-2 text-primary">receipt_long</mat-icon>
+    Emitir Receta Médica
+  </h2>
+  
+  <mat-dialog-content class="px-4 pt-3">
+    <form [formGroup]="recetaForm" class="d-flex flex-column gap-3">
+      
+      <!-- Indicaciones Generales -->
+      <mat-form-field appearance="outline" class="w-100 mb-2">
+        <mat-label>Indicaciones Generales (Reposo, Dieta, Cuidados)</mat-label>
+        <textarea matInput formControlName="indicacionesGenerales" rows="3" placeholder="Recomendaciones generales para el paciente..."></textarea>
+      </mat-form-field>
+
+      <!-- Lista de Medicamentos -->
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0 text-primary d-flex align-items-center">
+          <mat-icon class="me-1">medication</mat-icon> Prescripción de Fármacos
+        </h4>
+        <button mat-flat-button color="accent" type="button" (click)="agregarMedicamento()">
+          <mat-icon>add</mat-icon> Añadir Medicamento
+        </button>
+      </div>
+
+      <div formArrayName="detalles" class="d-flex flex-column gap-3">
+        <div *ngFor="let det of detalles.controls; let i=index" [formGroupName]="i" class="card p-3 position-relative theme-card">
+          
+          <button mat-icon-button color="warn" type="button" class="position-absolute top-0 end-0" style="margin-top: -10px; margin-right: -10px;" (click)="removerMedicamento(i)" *ngIf="detalles.length > 1">
+            <mat-icon>cancel</mat-icon>
+          </button>
+
+          <div class="row g-2">
+            <!-- Seleccion de Medicamento -->
+            <div class="col-md-5">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Medicamento</mat-label>
+                <mat-select formControlName="medicamentoId">
+                  <mat-option *ngFor="let med of medicamentoService.medicamentos()" [value]="med.id">
+                    {{ med.nombre }} ({{ med.concentracion }} {{ med.formaFarmaceutica }})
+                  </mat-option>
+                </mat-select>
+                <mat-hint [class.text-danger]="getStock(det.get('medicamentoId')?.value) === 0" [class.text-success]="getStock(det.get('medicamentoId')?.value) > 0">
+                  Stock actual en Farmacia: {{ getStock(det.get('medicamentoId')?.value) }} und.
+                </mat-hint>
+              </mat-form-field>
+            </div>
+
+            <!-- Cantidad Solicitada -->
+            <div class="col-md-2">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Cantidad</mat-label>
+                <input matInput type="number" min="1" formControlName="cantidadSolicitada">
+              </mat-form-field>
+            </div>
+
+            <!-- Dosis -->
+            <div class="col-md-5">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Dosis (Ej. 1 Tableta)</mat-label>
+                <input matInput formControlName="dosis">
+              </mat-form-field>
+            </div>
+            
+            <!-- Frecuencia -->
+            <div class="col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Frecuencia (Ej. Cada 8 horas)</mat-label>
+                <input matInput formControlName="frecuencia">
+              </mat-form-field>
+            </div>
+
+            <!-- Duracion -->
+            <div class="col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Duración (Ej. Por 5 días)</mat-label>
+                <input matInput formControlName="duracion">
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="detalles.length === 0" class="text-muted text-center py-3">
+        No se ha añadido ningún medicamento. Clic en "Añadir Medicamento" si desea prescribir fármacos.
+      </div>
+      
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="pb-3 px-4">
+    <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="guardar()" [disabled]="recetaForm.invalid">
+      <mat-icon class="me-2">verified</mat-icon> Confirmar Receta
+    </button>
+  </mat-dialog-actions>
+</div>

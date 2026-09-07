@@ -1,0 +1,159 @@
+.patient-header-card {
+  background-color: #f8f9fa;
+  transition: background-color 0.3s ease;
+}
+
+.patient-avatar {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #0d6efd;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.info-group {
+  margin-bottom: 1.5rem;
+}
+
+.info-group h6 {
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.info-group p {
+  white-space: pre-wrap;
+  color: #343a40;
+  transition: color 0.2s ease;
+}
+
+.icon-large {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+}
+
+/* ── Dark Mode ── */
+body.dark-theme .patient-header-card {
+  background-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+}
+
+body.dark-theme .patient-header-card h2,
+body.dark-theme .patient-header-card p,
+body.dark-theme .patient-header-card small {
+  color: #94a3b8 !important;
+}
+
+body.dark-theme .info-group h6 { color: #94a3b8 !important; }
+body.dark-theme .info-group p   { color: #e2e8f0 !important; }
+
+/* Tarjeta de consulta individual (expansión) */
+body.dark-theme .mat-expansion-panel {
+  background-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+}
+
+body.dark-theme .mat-expansion-panel-header-title,
+body.dark-theme .mat-expansion-panel-header-description {
+  color: #f1f5f9 !important;
+}
+
+body.dark-theme .mat-expansion-panel-header:hover {
+  background-color: rgba(255,255,255,0.04) !important;
+}
+
+body.dark-theme .mat-expansion-indicator::after {
+  color: #94a3b8 !important;
+}
+
+/* Si usa mat-card o divs con fondo blanco para cada consulta */
+body.dark-theme .consulta-card,
+body.dark-theme .historial-item {
+  background-color: #1f2937 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  color: #f1f5f9 !important;
+}
+
+/* ── Signos Vitales (Triaje) en Historia Clínica ── */
+.triaje-vitales-card {
+  border-radius: 10px;
+  border: 1px solid rgba(13, 110, 253, 0.2);
+  background: rgba(13, 110, 253, 0.04);
+  padding: 14px;
+}
+
+.triaje-vitales-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0d6efd;
+  margin-bottom: 12px;
+}
+
+.triaje-vitales-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.vital-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 6px;
+  border-radius: 8px;
+  background: rgba(13, 110, 253, 0.08);
+  text-align: center;
+  gap: 2px;
+}
+
+.vital-badge mat-icon {
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+  color: #0d6efd;
+}
+
+.vital-val {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.vital-label {
+  font-size: 0.7rem;
+  opacity: 0.65;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.triaje-notas {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  opacity: 0.75;
+}
+
+/* Dark mode vitales */
+body.dark-theme .triaje-vitales-card {
+  background: rgba(13, 110, 253, 0.08);
+  border-color: rgba(13, 110, 253, 0.3);
+}
+
+body.dark-theme .vital-badge {
+  background: rgba(13, 110, 253, 0.12);
+}

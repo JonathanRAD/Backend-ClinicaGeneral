@@ -1,0 +1,9 @@
+.mat-column-acciones {
+  max-width: 150px;
+}
+.badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.85rem;
+}

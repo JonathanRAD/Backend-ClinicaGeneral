@@ -1,0 +1,184 @@
+<div class="historial-imprimible">
+
+  <div class="print-header">
+    <h1>ClínicaBienestar — Historial Clínico</h1>
+  </div>
+
+  <div class="historial-page">
+
+    <!-- Header de página -->
+    <div class="historial-page-header">
+      <div class="historial-title-wrap">
+        <mat-icon class="header-icon">medical_information</mat-icon>
+        <div>
+          <h1 class="historial-title">Mi Panel de Salud</h1>
+          <p class="historial-subtitle">Resumen completo de tu historial médico</p>
+        </div>
+      </div>
+      <button mat-raised-button color="primary" (click)="imprimirHistorial()" class="btn-imprimir">
+        <mat-icon>print</mat-icon> <span>Imprimir PDF</span>
+      </button>
+    </div>
+
+    <!-- Cargando -->
+    <div *ngIf="cargando()" class="loading-state">
+      <app-spinner></app-spinner>
+      <p>Cargando tu historial...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error() && !cargando()" class="alerta-error">
+      <mat-icon>error_outline</mat-icon> {{ error() }}
+    </div>
+
+    <!-- Contenido -->
+    <div *ngIf="!cargando() && historia() as hist" class="fade-in">
+
+      <!-- Cards de condiciones clínicas -->
+      <div class="conditions-grid">
+
+        <div class="condition-card card-allergy">
+          <div class="cond-icon-wrap">
+            <mat-icon>warning_amber</mat-icon>
+          </div>
+          <div class="cond-body">
+            <h3>Alergias</h3>
+            <p>{{ hist.alergias || 'No se han registrado alergias conocidas.' }}</p>
+          </div>
+        </div>
+
+        <div class="condition-card card-chronic">
+          <div class="cond-icon-wrap">
+            <mat-icon>monitor_heart</mat-icon>
+          </div>
+          <div class="cond-body">
+            <h3>Enfermedades Crónicas</h3>
+            <p>{{ hist.enfermedadesCronicas || 'Sin enfermedades crónicas registradas.' }}</p>
+          </div>
+        </div>
+
+        <div class="condition-card card-history">
+          <div class="cond-icon-wrap">
+            <mat-icon>assignment</mat-icon>
+          </div>
+          <div class="cond-body">
+            <h3>Antecedentes</h3>
+            <p>{{ hist.antecedentes || 'Sin antecedentes registrados.' }}</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Historial de consultas -->
+      <div class="consultas-section">
+        <div class="section-header">
+          <mat-icon>history_edu</mat-icon>
+          <h2>Historial de Consultas</h2>
+          <span class="consultas-count" *ngIf="hist.consultas?.length">
+            {{ hist.consultas!.length }} consulta(s)
+          </span>
+        </div>
+
+        <mat-accordion multi *ngIf="hist.consultas && hist.consultas.length > 0; else noConsultas">
+          <div *ngFor="let consulta of hist.consultas; let i = index" class="consulta-item">
+            <div class="timeline-dot"></div>
+            <mat-expansion-panel class="consulta-panel">
+              <mat-expansion-panel-header>
+                <mat-panel-title class="panel-title">
+                  <mat-icon>event</mat-icon>
+                  <span>{{ consulta.fechaConsulta | date:'d MMMM yyyy':'':'es' }}</span>
+                </mat-panel-title>
+                <mat-panel-description class="panel-desc">
+                  Dr(a). {{ consulta.medico.apellidos }} · {{ consulta.medico.especialidad }}
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <div class="consulta-contenido">
+
+                <!-- Médico -->
+                <div class="consulta-medico-row">
+                  <div class="medico-avatar-small" style="background: linear-gradient(135deg,#1565c0,#00acc1)">
+                    {{ consulta.medico.nombres.charAt(0) }}{{ consulta.medico.apellidos.charAt(0) }}
+                  </div>
+                  <div>
+                    <strong>Dr(a). {{ consulta.medico.nombres }} {{ consulta.medico.apellidos }}</strong>
+                    <p class="text-muted mb-0">{{ consulta.medico.especialidad }}</p>
+                  </div>
+                </div>
+
+                <mat-divider class="my-3"></mat-divider>
+
+                <!-- Datos clínicos -->
+                <div class="datos-grid">
+                  <div class="dato-item">
+                    <span class="dato-label"><mat-icon>notes</mat-icon> Motivo</span>
+                    <p>{{ consulta.motivo }}</p>
+                  </div>
+                  <div class="dato-item">
+                    <span class="dato-label"><mat-icon>diagnosis</mat-icon> Diagnóstico</span>
+                    <p>{{ consulta.diagnostico }}</p>
+                  </div>
+                  <div class="dato-item dato-full">
+                    <span class="dato-label"><mat-icon>medication</mat-icon> Tratamiento</span>
+                    <p>{{ consulta.tratamiento }}</p>
+                  </div>
+                </div>
+
+                <!-- Recetas médicas -->
+                <div *ngIf="consulta.recetas && consulta.recetas.length > 0" class="recetas-section">
+                  <mat-divider class="my-3"></mat-divider>
+                  <div class="sub-section-title">
+                    <mat-icon>receipt_long</mat-icon>
+                    <span>Recetas Emitidas</span>
+                  </div>
+                  <div *ngFor="let receta of consulta.recetas" class="receta-card">
+                    <p *ngIf="receta.indicacionesGenerales" class="receta-indicaciones">
+                      {{ receta.indicacionesGenerales }}
+                    </p>
+                    <ul class="medicamentos-list" *ngIf="receta.detalles?.length">
+                      <li *ngFor="let det of receta.detalles">
+                        <mat-icon>local_pharmacy</mat-icon>
+                        <span>
+                          <strong>{{ det.nombreMedicamento || ('Medicamento #' + det.medicamentoId) }}</strong>
+                           × {{ det.cantidadSolicitada }} —
+                          {{ det.dosis }} · {{ det.frecuencia }} por {{ det.duracion }}
+                        </span>
+                      </li>
+                    </ul>
+                    <small class="text-muted">Emitida: {{ receta.fechaEmision | date:'shortDate' }}</small>
+                  </div>
+                </div>
+
+                <!-- Órdenes de laboratorio -->
+                <div *ngIf="consulta.ordenesLaboratorio && consulta.ordenesLaboratorio.length > 0" class="ordenes-section">
+                  <mat-divider class="my-3"></mat-divider>
+                  <div class="sub-section-title">
+                    <mat-icon>science</mat-icon>
+                    <span>Órdenes de Laboratorio</span>
+                  </div>
+                  <div *ngFor="let orden of consulta.ordenesLaboratorio" class="orden-card">
+                    <mat-icon>biotech</mat-icon>
+                    <div>
+                      <strong>{{ orden.tipoExamen }}</strong>
+                      <p *ngIf="orden.observaciones">{{ orden.observaciones }}</p>
+                      <small class="text-muted">{{ orden.fechaOrden | date:'shortDate' }}</small>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </mat-expansion-panel>
+          </div>
+        </mat-accordion>
+
+        <ng-template #noConsultas>
+          <div class="empty-state">
+            <mat-icon>folder_off</mat-icon>
+            <h3>Sin Consultas</h3>
+            <p>Aún no tienes consultas registradas en tu historial médico.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

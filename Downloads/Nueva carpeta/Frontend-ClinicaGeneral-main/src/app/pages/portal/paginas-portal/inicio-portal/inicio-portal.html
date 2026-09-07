@@ -1,0 +1,187 @@
+<div class="portal-inicio">
+
+  <!-- ╔═══════════════════════════════════════╗ -->
+  <!-- ║      HERO / BIENVENIDA               ║ -->
+  <!-- ╚═══════════════════════════════════════╝ -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-greeting">
+        <div class="greeting-chip">
+          <mat-icon>waving_hand</mat-icon>
+          <span>Bienvenido de vuelta</span>
+        </div>
+        <h1 class="hero-title">Hola, <span class="hero-name">{{ nombreUsuario() }}</span></h1>
+        <p class="hero-subtitle">Tu salud es nuestra prioridad. Aquí tienes todo lo que necesitas.</p>
+        <div class="hero-actions">
+          <a mat-raised-button routerLink="/portal/agendar-cita" class="btn-hero-primary" id="btn-agendar-hero">
+            <mat-icon>add_circle</mat-icon> Agendar Cita
+          </a>
+          <a mat-stroked-button routerLink="/portal/mis-citas" class="btn-hero-secondary" id="btn-mis-citas-hero">
+            <mat-icon>event</mat-icon> Mis Citas
+          </a>
+        </div>
+      </div>
+      <div class="hero-illustration">
+        <div class="hero-blob">
+          <mat-icon class="blob-icon">health_and_safety</mat-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Strip -->
+    <div class="kpi-strip">
+      <div class="kpi-chip">
+        <mat-icon class="kpi-chip-icon kpi-green">science</mat-icon>
+        <div>
+          <span class="kpi-chip-val">{{ resultadosPendientes() }}</span>
+          <span class="kpi-chip-label">Resultados</span>
+        </div>
+      </div>
+      <div class="kpi-chip">
+        <mat-icon class="kpi-chip-icon kpi-orange">receipt_long</mat-icon>
+        <div>
+          <span class="kpi-chip-val">{{ recetasActivas() }}</span>
+          <span class="kpi-chip-label">Recetas activas</span>
+        </div>
+      </div>
+      <div class="kpi-chip">
+        <mat-icon class="kpi-chip-icon kpi-blue">forum</mat-icon>
+        <div>
+          <span class="kpi-chip-val">{{ mensajesNoLeidos() }}</span>
+          <span class="kpi-chip-label">Mensajes</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ╔═══════════════════════════════════════╗ -->
+  <!-- ║         GRID PRINCIPAL              ║ -->
+  <!-- ╚═══════════════════════════════════════╝ -->
+  <section class="main-grid">
+
+    <!-- Próxima Cita -->
+    <div class="grid-card card-proxima-cita">
+      <div class="card-label">
+        <mat-icon>event</mat-icon>
+        <span>Próxima Cita</span>
+      </div>
+      <ng-container *ngIf="proximaCita() as cita; else noCita">
+        <div class="cita-fecha-block">
+          <div class="fecha-num">{{ cita.fechaHora | date:'d' }}</div>
+          <div class="fecha-mes">{{ cita.fechaHora | date:'MMMM' }}</div>
+          <div class="fecha-hora">{{ cita.fechaHora | date:'HH:mm' }}</div>
+        </div>
+        <div class="cita-info-block">
+          <h3>{{ cita.medico.especialidad }}</h3>
+          <p>Dr(a). {{ cita.medico.nombres }} {{ cita.medico.apellidos }}</p>
+          <div class="cita-badge-row">
+            <span class="cita-status-badge">Programada</span>
+          </div>
+        </div>
+        <a routerLink="/portal/mis-citas" class="cita-action-btn" matTooltip="Ver detalles">
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+      </ng-container>
+      <ng-template #noCita>
+        <div class="no-cita-placeholder">
+          <mat-icon>event_available</mat-icon>
+          <p>Sin citas próximas</p>
+          <a mat-stroked-button routerLink="/portal/agendar-cita" class="mt-2">Agendar ahora</a>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Actividades Diarias -->
+    <div class="grid-card card-actividades">
+      <div class="card-label">
+        <mat-icon>track_changes</mat-icon>
+        <span>Progreso del Día</span>
+      </div>
+      <div class="actividades-layout">
+        <div class="progreso-wrap">
+          <svg viewBox="0 0 36 36" class="progreso-svg">
+            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <path class="circle-fill" [style.stroke-dasharray]="progresoActividades() + ', 100'"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <text x="18" y="20.35" class="progreso-pct">{{ progresoActividades() }}%</text>
+          </svg>
+          <span class="progreso-label">completado</span>
+        </div>
+        <ul class="actividades-list">
+          <li *ngFor="let a of actividadesDiarias()"
+              (click)="toggleActividad(a.id)"
+              [class.done]="a.completado">
+            <mat-icon class="check">{{ a.completado ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            <div class="act-icon"><mat-icon>{{ a.icono }}</mat-icon></div>
+            <span>{{ a.descripcion }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Consejo del Día -->
+    <div class="grid-card card-consejo" *ngIf="consejoDelDia() as consejo">
+      <div class="consejo-icon-wrap">
+        <mat-icon>{{ consejo.icono }}</mat-icon>
+      </div>
+      <div class="consejo-texto">
+        <h3>{{ consejo.titulo }}</h3>
+        <p>{{ consejo.contenido }}</p>
+      </div>
+      <div class="consejo-wave"></div>
+    </div>
+
+    <!-- Accesos Rápidos -->
+    <div class="grid-card card-accesos">
+      <div class="card-label">
+        <mat-icon>apps</mat-icon>
+        <span>Accesos Rápidos</span>
+      </div>
+      <div class="accesos-grid">
+        <a routerLink="/portal/agendar-cita" class="acceso-btn" id="quick-agendar">
+          <div class="acceso-icon-wrap" style="background:rgba(13,110,253,0.1);color:#0d6efd">
+            <mat-icon>event_available</mat-icon>
+          </div>
+          <span>Agendar Cita</span>
+        </a>
+        <a routerLink="/portal/mi-historial" class="acceso-btn" id="quick-historial">
+          <div class="acceso-icon-wrap" style="background:rgba(25,135,84,0.1);color:#198754">
+            <mat-icon>history_edu</mat-icon>
+          </div>
+          <span>Mi Historial</span>
+        </a>
+        <a routerLink="/portal/mi-perfil" class="acceso-btn" id="quick-perfil">
+          <div class="acceso-icon-wrap" style="background:rgba(111,66,193,0.1);color:#6f42c1">
+            <mat-icon>account_circle</mat-icon>
+          </div>
+          <span>Mi Perfil</span>
+        </a>
+        <a routerLink="/portal/nuestros-medicos" class="acceso-btn" id="quick-medicos">
+          <div class="acceso-icon-wrap" style="background:rgba(253,126,20,0.1);color:#fd7e14">
+            <mat-icon>groups</mat-icon>
+          </div>
+          <span>Médicos</span>
+        </a>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<ng-template #missingDataDialog let-data>
+  <h2 mat-dialog-title>Faltan datos en tu perfil</h2>
+  <mat-dialog-content>
+    <p>Hemos detectado que faltan los siguientes datos importantes en tu ficha:</p>
+    <ul>
+      <li *ngIf="data.faltantes.faltaDni"><strong>DNI</strong></li>
+      <li *ngIf="data.faltantes.faltaTelefono"><strong>Teléfono</strong></li>
+      <li *ngIf="data.faltantes.faltaPeso"><strong>Peso</strong></li>
+      <li *ngIf="data.faltantes.faltaAltura"><strong>Altura</strong></li>
+    </ul>
+    <p>Por favor, regístralos para brindarte una mejor atención médica.</p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Recordármelo más tarde</button>
+    <button mat-raised-button color="primary" mat-dialog-close routerLink="/portal/mi-perfil">Completar ahora</button>
+  </mat-dialog-actions>
+</ng-template>

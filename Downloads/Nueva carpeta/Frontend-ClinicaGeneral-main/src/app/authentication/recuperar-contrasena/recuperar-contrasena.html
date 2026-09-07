@@ -1,0 +1,58 @@
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light-subtle">
+  <div class="card shadow border-0 rounded-4 text-center recuperar-card">
+
+    <div *ngIf="solicitudEnviada()" class="vista-contenido p-4 p-md-5">
+      <div class="card-header-confirmacion">
+        <i class="bi bi-check-lg"></i>
+      </div>
+      <h2 class="fw-bold mb-2 mt-4">Solicitud Enviada</h2>
+      <p class="text-muted mb-4">
+        Si el correo <strong>{{ correoEnviado }}</strong> está registrado, recibirás un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada (y spam).
+      </p>
+      <a routerLink="/login" class="btn btn-primary w-100 py-2">
+        Volver a Iniciar Sesión
+      </a>
+    </div>
+
+    <div *ngIf="!solicitudEnviada()" class="vista-contenido">
+      <div class="card-header-custom text-white">
+        <i class="bi bi-shield-lock-fill"></i>
+        <h2 class="fw-bold mb-1 mt-3">Recuperar Contraseña</h2>
+        <p class="opacity-75 mb-0">Ingresa tu correo para recibir un enlace.</p>
+      </div>
+
+      <div class="card-body-custom p-4 p-md-5">
+         <div *ngIf="mensajeError()" class="alert alert-danger d-flex align-items-center mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <div>{{ mensajeError() }}</div>
+        </div>
+
+        <form #requestForm="ngForm" (ngSubmit)="enviarSolicitud(requestForm)">
+          <div class="mb-3 text-start">
+            <label for="email" class="form-label fw-semibold">Correo Electrónico</label>
+            <input id="email" type="email" class="form-control"
+                   [(ngModel)]="email" name="email"
+                   placeholder="tu.correo@ejemplo.com" required email #emailInput="ngModel"
+                   [class.is-invalid]="emailInput.invalid && (emailInput.dirty || emailInput.touched)">
+            <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="invalid-feedback">
+                <div *ngIf="emailInput.errors?.['required']">El correo es obligatorio.</div>
+                <div *ngIf="emailInput.errors?.['email']">Ingrese un correo válido.</div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mt-3" [disabled]="requestForm.invalid || cargando()">
+            <span *ngIf="!cargando()">Enviar Enlace</span>
+            <span *ngIf="cargando()" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span *ngIf="cargando()"> Enviando...</span>
+          </button>
+        </form>
+
+        <div class="mt-4">
+          <a routerLink="/login" class="link-volver text-muted fw-semibold">
+            Cancelar y volver
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

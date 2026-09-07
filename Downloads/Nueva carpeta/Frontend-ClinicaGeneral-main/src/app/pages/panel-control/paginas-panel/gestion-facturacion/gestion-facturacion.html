@@ -1,0 +1,113 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Gestión de Facturación</h1>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <app-tabla-generica
+        [data]="facturas()"
+        [columnConfig]="columnasFacturacion"
+        title="Listado de Facturas Emitidas"
+        addButtonText="Registrar Nuevo Pago"
+        [nameProperties]="['cita.paciente.nombres', 'cita.paciente.apellidos']"
+
+        [permissionManage]="'GESTIONAR_FACTURACION'"
+        (onRowClicked)="onSeleccionarFactura($event)"
+        (onAdd)="onAgregarFactura()"
+        (onEdit)="onEditarFactura($event)"
+        (onDelete)="onEliminarFactura($event)">
+      </app-tabla-generica>
+    </div>
+
+    <div class="col-lg-5">
+      <mat-card class="h-100 detail-card">
+        <div *ngIf="facturaSeleccionada() as factura; else noSelection" 
+             class="detail-card-content" 
+             [class.animating-out]="isAnimatingOut()">
+          
+          <mat-card-header class="pb-3">
+            <mat-icon mat-card-avatar class="detail-icon">receipt_long</mat-icon>
+            <mat-card-title class="fw-bold">Detalle de la Factura</mat-card-title>
+            <mat-card-subtitle>ID: {{ factura.id }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content class="pt-3">
+            <div class="info-section">
+              <h6 class="section-title">Paciente</h6>
+              <p><strong>Nombre:</strong> {{ factura.cita.paciente.nombres }} {{ factura.cita.paciente.apellidos }}</p>
+              <p><strong>DNI:</strong> {{ factura.cita.paciente.dni }}</p>
+            </div>
+            <mat-divider></mat-divider>
+            
+            <div class="info-section">
+              <h6 class="section-title">Datos de la Factura</h6>
+              <p><strong>Fecha de Emisión:</strong> {{ factura.fechaEmision | date:'dd/MM/yyyy' }}</p>
+              <p><strong>Estado:</strong> <span class="badge" [ngClass]="factura.estado">{{ factura.estado | titlecase }}</span></p>
+            </div>
+            <mat-divider></mat-divider>
+
+            <div class="info-section">
+              <h6 class="section-title">Servicios</h6>
+              <div *ngIf="factura.detalles && factura.detalles.length > 0; else noDetalles">
+                <table class="table table-sm details-table">
+                  <thead>
+                    <tr>
+                      <th>Descripción</th>
+                      <th class="text-end">Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let detalle of factura.detalles">
+                      <td>{{ detalle.descripcionServicio }}</td>
+                      <td class="text-end">{{ detalle.precioUnitario * detalle.cantidad | currency:'S/ ' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <ng-template #noDetalles>
+                <div class="no-details-template">
+                  <mat-icon class="placeholder-icon-small">inventory_2</mat-icon>
+                  <p class="text-muted">No hay detalles de servicios para esta factura.</p>
+                </div>
+              </ng-template>
+            </div>
+
+            <div class="total-section text-end">
+              <p class="mb-1"><strong>Monto Total:</strong> {{ factura.monto | currency:'S/ ' }}</p>
+              <p *ngIf="factura.montoPagado > 0" class="mb-0 text-success">
+                <strong>Monto Pagado:</strong> {{ factura.montoPagado | currency:'S/ ' }}
+              </p>
+            </div>
+
+          </mat-card-content>
+
+          <mat-divider></mat-divider>
+          <mat-card-actions class="p-3 d-flex flex-column gap-2">
+
+            <!-- Botón: Enviar por Correo -->
+            <button mat-stroked-button color="primary" class="w-100"
+                    (click)="enviarFacturaPorCorreo(factura)"
+                    [disabled]="enviandoCorreo()">
+              <mat-icon class="me-1">{{ enviandoCorreo() ? 'hourglass_empty' : 'email' }}</mat-icon>
+              {{ enviandoCorreo() ? 'Enviando...' : 'Enviar Factura por Correo' }}
+            </button>
+
+            <!-- Botón: Despachar Farmacia -->
+            <button mat-raised-button color="accent" class="w-100" (click)="abrirDespachoFarmacia(factura)">
+              <mat-icon class="me-1">local_pharmacy</mat-icon>
+              Despachar Medicamentos de Receta
+            </button>
+          </mat-card-actions>
+
+        </div>
+        <ng-template #noSelection>
+            <div class="no-selection-template">
+              <mat-icon class="placeholder-icon">touch_app</mat-icon>
+              <p class="text-muted">Seleccione una factura de la lista para ver sus detalles.</p>
+            </div>
+        </ng-template>
+      </mat-card>
+    </div>
+  </div>
+</div>

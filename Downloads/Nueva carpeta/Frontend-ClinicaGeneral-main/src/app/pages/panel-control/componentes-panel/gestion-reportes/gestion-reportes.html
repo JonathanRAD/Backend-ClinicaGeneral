@@ -1,0 +1,120 @@
+<div class="reportes-container">
+
+  <!-- Header -->
+  <div class="reportes-header mb-4">
+    <div>
+      <h1 class="reportes-title">
+        <mat-icon>bar_chart</mat-icon>
+        Generación de Reportes
+      </h1>
+      <p class="reportes-subtitle">Exporta datos del sistema en formato Excel o CSV</p>
+    </div>
+  </div>
+
+  <!-- Stats rápidas -->
+  <div class="stats-row mb-4">
+    <div class="stat-mini stat-blue">
+      <mat-icon>event</mat-icon>
+      <span><strong>{{ totalCitas }}</strong> citas totales</span>
+    </div>
+    <div class="stat-mini stat-green">
+      <mat-icon>health_and_safety</mat-icon>
+      <span><strong>{{ totalTriajes }}</strong> triajes registrados</span>
+    </div>
+    <div class="stat-mini stat-purple">
+      <mat-icon>medication</mat-icon>
+      <span><strong>{{ totalMedicamentos }}</strong> medicamentos</span>
+    </div>
+    <div class="stat-mini" [class.stat-red]="stockCritico > 0" [class.stat-gray]="stockCritico === 0">
+      <mat-icon>warning</mat-icon>
+      <span><strong>{{ stockCritico }}</strong> con stock crítico</span>
+    </div>
+  </div>
+
+  <!-- Tarjetas de reportes -->
+  <div class="reportes-grid">
+
+    <!-- Reporte de Citas -->
+    <mat-card class="report-card">
+      <div class="report-card-accent accent-blue"></div>
+      <mat-card-header>
+        <div class="report-icon-wrap icon-blue" mat-card-avatar>
+          <mat-icon>summarize</mat-icon>
+        </div>
+        <mat-card-title>Reporte General de Citas</mat-card-title>
+        <mat-card-subtitle>{{ totalCitas }} registros disponibles</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="px-4 pb-2">
+        <p class="report-desc">Lista completa de citas con paciente, médico, fecha, estado y motivo.</p>
+      </mat-card-content>
+      <mat-card-actions class="px-4 pb-3" align="end">
+        <button mat-stroked-button (click)="previsualizarReporteCitas()">
+          <mat-icon>visibility</mat-icon> Previsualizar
+        </button>
+        <button mat-raised-button color="primary" class="split-button-main" (click)="descargarReporteCitasXLSX()">
+          <mat-icon>download</mat-icon> Excel
+        </button>
+        <button mat-raised-button color="primary" class="btn-small" [matMenuTriggerFor]="menuCitas">
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #menuCitas="matMenu">
+          <button mat-menu-item (click)="descargarReporteCitasXLSX()">
+            <mat-icon>description</mat-icon> <span>Exportar a Excel (.xlsx)</span>
+          </button>
+          <button mat-menu-item (click)="descargarReporteCitasCSV()">
+            <mat-icon>grid_on</mat-icon> <span>Exportar a CSV</span>
+          </button>
+        </mat-menu>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Reporte de Triajes -->
+    <mat-card class="report-card">
+      <div class="report-card-accent accent-green"></div>
+      <mat-card-header>
+        <div class="report-icon-wrap icon-green" mat-card-avatar>
+          <mat-icon>health_and_safety</mat-icon>
+        </div>
+        <mat-card-title>Reporte de Triajes y Signos Vitales</mat-card-title>
+        <mat-card-subtitle>{{ totalTriajes }} triajes registrados</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="px-4 pb-2">
+        <p class="report-desc">Registro completo de signos vitales por paciente: temperatura, presión, ritmo cardíaco, SpO₂ y glucemia.</p>
+      </mat-card-content>
+      <mat-card-actions class="px-4 pb-3" align="end">
+        <button mat-stroked-button (click)="previsualizarReporteTriajes()">
+          <mat-icon>visibility</mat-icon> Previsualizar
+        </button>
+        <button mat-raised-button color="primary" (click)="descargarReporteTriajesXLSX()">
+          <mat-icon>download</mat-icon> Descargar Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Reporte de Inventario -->
+    <mat-card class="report-card">
+      <div class="report-card-accent accent-purple"></div>
+      <mat-card-header>
+        <div class="report-icon-wrap icon-purple" mat-card-avatar>
+          <mat-icon>inventory_2</mat-icon>
+        </div>
+        <mat-card-title>Inventario de Farmacia</mat-card-title>
+        <mat-card-subtitle>{{ totalMedicamentos }} medicamentos
+          <span *ngIf="stockCritico > 0" class="badge-critico ms-2">{{ stockCritico }} críticos</span>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="px-4 pb-2">
+        <p class="report-desc">Stock actual por medicamento con indicadores de alerta. Filas en rojo = agotado, amarillo = stock crítico (&lt;10).</p>
+      </mat-card-content>
+      <mat-card-actions class="px-4 pb-3" align="end">
+        <button mat-stroked-button (click)="previsualizarReporteInventario()">
+          <mat-icon>visibility</mat-icon> Previsualizar
+        </button>
+        <button mat-raised-button color="primary" (click)="descargarReporteInventarioXLSX()">
+          <mat-icon>download</mat-icon> Descargar Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+  </div>
+</div>

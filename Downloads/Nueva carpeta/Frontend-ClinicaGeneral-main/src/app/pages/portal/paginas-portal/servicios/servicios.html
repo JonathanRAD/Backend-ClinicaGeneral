@@ -1,0 +1,60 @@
+<div class="services-container">
+
+  <div class="services-menu">
+    <div class="menu-header">
+      <h1 class="page-title">Nuestros Servicios</h1>
+      <p>Selecciona una especialidad para ver más detalles.</p>
+    </div>
+    <div class="menu-list">
+      <a *ngFor="let servicio of servicios" 
+         class="menu-item"
+         [class.active]="servicioActivo() === servicio"
+         (click)="servicioActivo.set(servicio)">
+        <mat-icon>{{ servicio.icon }}</mat-icon>
+        <span>{{ servicio.nombre }}</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="services-display" *ngIf="servicioActivo() as servicio">
+    <div class="display-background" [style.background-image]="'url(' + servicio.imageUrl + ')'"></div>
+    <div class="display-overlay"></div>
+    <div class="display-content">
+      
+      <h2 class="display-title">{{ servicio.nombre }}</h2>
+      
+      <div class="info-widgets-grid">
+        <div class="widget highlight-widget">
+          <span class="highlight-value">{{ servicio.datoDestacado.valor }}</span>
+          <span class="highlight-label">{{ servicio.datoDestacado.etiqueta }}</span>
+        </div>
+
+        <div class="widget list-widget">
+          <h3 class="widget-title">Condiciones Frecuentes</h3>
+          <ul>
+            <li *ngFor="let item of servicio.condiciones">
+              <mat-icon>{{ item.icon }}</mat-icon>
+              <span>{{ item.nombre }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="widget list-widget">
+          <h3 class="widget-title">Procedimientos Principales</h3>
+          <ul>
+            <li *ngFor="let item of servicio.procedimientos">
+              <mat-icon>{{ item.icon }}</mat-icon>
+              <span>{{ item.nombre }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <button mat-flat-button color="primary" class="find-specialist-button" (click)="verMedicosPorEspecialidad(servicio.nombre)">
+        Encontrar un Especialista
+      </button>
+
+    </div>
+  </div>
+
+</div>

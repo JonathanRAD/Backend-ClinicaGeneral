@@ -1,0 +1,53 @@
+<div class="jitsi-wrapper">
+  <!-- Cabecera Premium de Telemedicina -->
+  <div class="jitsi-header d-flex justify-content-between align-items-center px-4 py-3">
+    <div class="d-flex align-items-center gap-3">
+      <!-- Pulsing Indicator Live -->
+      <span class="live-dot-pulse"></span>
+      <div>
+        <h4 class="m-0 text-white font-weight-bold" style="font-size: 15px; letter-spacing: 0.5px;">
+          Consulta de Telemedicina · {{ conferencia?.paciente?.nombres }} {{ conferencia?.paciente?.apellidos }}
+        </h4>
+        <small class="text-white-50">
+          Atendido por: Dr(a). {{ conferencia?.medico?.nombres }} {{ conferencia?.medico?.apellidos }} · 
+          <span class="text-info font-weight-bold ms-1">Duración: {{ timerTexto }}</span>
+        </small>
+      </div>
+    </div>
+    
+    <div class="d-flex align-items-center gap-3">
+      <!-- Pulsing Connection Badge -->
+      <span class="badge px-3 py-2 rounded-pill d-flex align-items-center gap-1"
+            [ngClass]="pacienteEnLinea ? 'bg-success shadow-success-pulse' : 'bg-warning shadow-warning-pulse'"
+            style="font-size: 12px; font-weight: 600; letter-spacing: 0.3px;">
+        <mat-icon style="font-size: 14px; width: 14px; height: 14px; margin-right: 4px;" class="align-middle">
+          {{ pacienteEnLinea ? 'check_circle' : 'hourglass_empty' }}
+        </mat-icon>
+        {{ pacienteEnLinea ? 'Paciente en línea' : 'Esperando paciente...' }}
+      </span>
+
+      <!-- End Call Button -->
+      <button mat-raised-button color="warn" (click)="salir()" class="rounded-pill px-4">
+        <mat-icon class="me-1">call_end</mat-icon>
+        Terminar Consulta
+      </button>
+    </div>
+  </div>
+
+  <!-- Sala de Espera Virtual Premium -->
+  <div *ngIf="cargandoScript" class="waiting-room text-white d-flex justify-content-center align-items-center">
+    <div class="d-flex flex-column align-items-center text-center px-4">
+      <div class="glow-container mb-4">
+        <mat-icon class="telehealth-pulse-icon">emergency</mat-icon>
+      </div>
+      <h3 class="font-weight-bold mb-2 text-white" style="letter-spacing: 0.5px;">Preparando Consultorio Virtual</h3>
+      <p class="text-white-50 mb-4" style="max-width: 450px; font-size: 14px; line-height: 1.6;">
+        Estableciendo conexión encriptada de extremo a extremo. Configurando el canal de videoconferencia HD...
+      </p>
+      <div class="spinner-border text-light mt-2" style="width: 2.5rem; height: 2.5rem;" role="status"></div>
+    </div>
+  </div>
+
+  <!-- Jitsi meet viewport -->
+  <div #jitsiContainer class="jitsi-container" [class.d-none]="cargandoScript"></div>
+</div>

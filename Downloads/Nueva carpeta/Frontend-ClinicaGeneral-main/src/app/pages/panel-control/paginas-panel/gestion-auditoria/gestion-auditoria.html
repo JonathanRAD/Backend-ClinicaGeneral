@@ -1,0 +1,283 @@
+<div class="auditoria-container container-fluid py-4 animate fadeInUp">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <div class="header-icon-wrapper me-3">
+          <i class="bi bi-shield-lock-fill text-white fs-3"></i>
+        </div>
+        <div>
+          <h1 class="h3 mb-1 text-primary-dark font-weight-bold">Auditoría del Sistema</h1>
+          <p class="text-muted mb-0">Visualiza y analiza el historial de acciones y cambios inmutables del sistema.</p>
+        </div>
+      </div>
+      <button class="btn btn-primary d-flex align-items-center btn-export" (click)="exportarPDF()">
+        <i class="bi bi-file-earmark-pdf-fill me-2"></i> Exportar Reporte PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards Row -->
+  <div class="row mb-4" *ngIf="estadisticas()">
+    <div class="col-xl-3 col-md-6 mb-4 mb-xl-0">
+      <div class="stat-card card-total">
+        <div class="stat-card-body">
+          <div class="stat-icon bg-blue-glow">
+            <i class="bi bi-activity text-blue"></i>
+          </div>
+          <div class="stat-content">
+            <h5 class="stat-label">Total Eventos</h5>
+            <h2 class="stat-value">{{ estadisticas()?.totalEventos || 0 }}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4 mb-xl-0">
+      <div class="stat-card card-today">
+        <div class="stat-card-body">
+          <div class="stat-icon bg-green-glow">
+            <i class="bi bi-calendar-check text-green"></i>
+          </div>
+          <div class="stat-content">
+            <h5 class="stat-label">Eventos Hoy</h5>
+            <h2 class="stat-value">{{ estadisticas()?.eventosHoy || 0 }}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4 mb-md-0">
+      <div class="stat-card card-week">
+        <div class="stat-card-body">
+          <div class="stat-icon bg-orange-glow">
+            <i class="bi bi-calendar-week text-orange"></i>
+          </div>
+          <div class="stat-content">
+            <h5 class="stat-label">Esta Semana</h5>
+            <h2 class="stat-value">{{ estadisticas()?.eventosSemana || 0 }}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-card card-users">
+        <div class="stat-card-body">
+          <div class="stat-icon bg-purple-glow">
+            <i class="bi bi-people text-purple"></i>
+          </div>
+          <div class="stat-content">
+            <h5 class="stat-label">Usuarios Activos</h5>
+            <h2 class="stat-value">{{ totalUsuariosActivos() }}</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Panel -->
+  <div class="card shadow-sm border-0 mb-4 filter-panel animate fadeInUp">
+    <div class="card-body p-4">
+      <h5 class="card-title mb-3 text-secondary d-flex align-items-center">
+        <i class="bi bi-funnel-fill me-2 text-primary"></i> Filtros de Búsqueda
+      </h5>
+      <div class="row g-3">
+        <!-- Text Search -->
+        <div class="col-lg-3 col-md-12 col-sm-12">
+          <mat-form-field appearance="outline" class="w-100 no-subscript">
+            <mat-label>Búsqueda Rápida</mat-label>
+            <input matInput type="text" placeholder="Usuario, email, descripción..."
+                   [ngModel]="filtros().busqueda" (ngModelChange)="updateFiltro('busqueda', $event)">
+            <mat-icon matSuffix class="text-muted">search</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <!-- Role Select -->
+        <div class="col-lg-3 col-md-4 col-sm-12">
+          <mat-form-field appearance="outline" class="w-100 no-subscript">
+            <mat-label>Rol del Usuario</mat-label>
+            <mat-select [ngModel]="filtros().rol || ''" (ngModelChange)="updateFiltro('rol', $event)">
+              <mat-option value="">Todos los roles</mat-option>
+              <mat-option *ngFor="let rol of roles" [value]="rol">{{ rol }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Action Select -->
+        <div class="col-lg-3 col-md-4 col-sm-12">
+          <mat-form-field appearance="outline" class="w-100 no-subscript">
+            <mat-label>Acción</mat-label>
+            <mat-select [ngModel]="filtros().accion || ''" (ngModelChange)="updateFiltro('accion', $event)">
+              <mat-option value="">Todas las acciones</mat-option>
+              <mat-option *ngFor="let accion of acciones" [value]="accion">{{ accion }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Entity Select -->
+        <div class="col-lg-3 col-md-4 col-sm-12">
+          <mat-form-field appearance="outline" class="w-100 no-subscript">
+            <mat-label>Módulo/Entidad</mat-label>
+            <mat-select [ngModel]="filtros().entidad || ''" (ngModelChange)="updateFiltro('entidad', $event)">
+              <mat-option value="">Todos los módulos</mat-option>
+              <mat-option *ngFor="let entidad of entidades" [value]="entidad">{{ entidad }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Date Range: Desde -->
+        <div class="col-lg-3 col-md-6 col-sm-12">
+          <mat-form-field appearance="outline" class="w-100 no-subscript">
+            <mat-label>Desde</mat-label>
+            <input matInput [matDatepicker]="pickerInicio" [ngModel]="parseDate(filtros().fechaInicio)" (ngModelChange)="updateFiltroFecha('fechaInicio', $event)">
+            <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+            <mat-datepicker #pickerInicio></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <!-- Date Range: Hasta -->
+        <div class="col-lg-3 col-md-6 col-sm-12">
+          <mat-form-field appearance="outline" class="w-100 no-subscript">
+            <mat-label>Hasta</mat-label>
+            <input matInput [matDatepicker]="pickerFin" [ngModel]="parseDate(filtros().fechaFin)" (ngModelChange)="updateFiltroFecha('fechaFin', $event)">
+            <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+            <mat-datepicker #pickerFin></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="col-lg-6 col-md-12 col-sm-12 d-flex justify-content-end gap-2 align-self-center mt-3 mt-lg-0">
+          <button mat-stroked-button color="accent" (click)="limpiarFiltros()" class="px-4 py-2">
+            <mat-icon>restart_alt</mat-icon> Limpiar
+          </button>
+          <button mat-raised-button color="primary" (click)="aplicarFiltros()" class="px-4 py-2">
+            <mat-icon>filter_alt</mat-icon> Filtrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <div class="card shadow-sm border-0 table-card position-relative">
+    <div class="card-body p-0">
+      <!-- Loading Overlay -->
+      <div class="loading-overlay d-flex justify-content-center align-items-center" *ngIf="isLoading()">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light-head">
+            <tr>
+              <th scope="col" style="width: 17%">Fecha / Hora</th>
+              <th scope="col" style="width: 18%">Usuario</th>
+              <th scope="col" style="width: 12%">Rol</th>
+              <th scope="col" style="width: 13%">Acción</th>
+              <th scope="col" style="width: 12%">Módulo</th>
+              <th scope="col" style="width: 20%">Descripción</th>
+              <th scope="col" style="width: 8%">Dirección IP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let log of logs()">
+              <!-- Data Row -->
+              <tr class="log-row" [class.row-expanded]="expandedRowId() === log.id" (click)="toggleDetalle(log.id)">
+                <td class="font-monospace text-secondary fs-7">
+                  {{ formatDate(log.fecha) }}
+                </td>
+                <td>
+                  <div class="d-flex flex-column">
+                    <span class="font-weight-semibold text-dark">{{ log.usuarioNombre }}</span>
+                    <span class="text-muted fs-8">{{ log.usuarioEmail }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="getRolColor(log.rol)">
+                    {{ log.rol }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge d-inline-flex align-items-center" [ngClass]="getAccionColor(log.accion)">
+                    <i class="bi me-1" [ngClass]="getAccionIcon(log.accion)"></i>
+                    {{ log.accion }}
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex flex-column">
+                    <span class="font-weight-medium text-dark">{{ log.entidad }}</span>
+                    <span class="text-muted fs-8" *ngIf="log.entidadId">ID: {{ log.entidadId }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="text-wrap d-block text-truncate-custom">{{ log.descripcion }}</span>
+                </td>
+                <td class="font-monospace text-muted fs-8">
+                  {{ log.ipAddress }}
+                </td>
+              </tr>
+
+              <!-- Expanded Detail Row -->
+              <tr class="detail-row" *ngIf="expandedRowId() === log.id">
+                <td colspan="7" class="p-0 border-0">
+                  <div class="detail-container p-4 bg-light-gray animate fadeIn">
+                    <div class="row g-3">
+                      <!-- Left Panel: Previous Data -->
+                      <div class="col-md-6">
+                        <div class="card border-0 shadow-xs h-100">
+                          <div class="card-header bg-white border-bottom-0 py-3">
+                            <span class="font-weight-bold text-muted fs-7 text-uppercase d-flex align-items-center">
+                              <i class="bi bi-arrow-left-circle-fill text-danger me-2"></i> Datos Anteriores
+                            </span>
+                          </div>
+                          <div class="card-body p-0">
+                            <pre class="json-code p-3 mb-0"><code>{{ formatJson(log.datosAnteriores) }}</code></pre>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Right Panel: New Data -->
+                      <div class="col-md-6">
+                        <div class="card border-0 shadow-xs h-100">
+                          <div class="card-header bg-white border-bottom-0 py-3">
+                            <span class="font-weight-bold text-muted fs-7 text-uppercase d-flex align-items-center">
+                              <i class="bi bi-arrow-right-circle-fill text-success me-2"></i> Datos Nuevos
+                            </span>
+                          </div>
+                          <div class="card-body p-0">
+                            <pre class="json-code p-3 mb-0"><code>{{ formatJson(log.datosNuevos) }}</code></pre>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+
+            <!-- Empty State -->
+            <tr *ngIf="logs().length === 0 && !isLoading()">
+              <td colspan="7" class="text-center py-5">
+                <div class="empty-state py-4">
+                  <i class="bi bi-shield-slash display-3 text-muted mb-3"></i>
+                  <h4 class="font-weight-semibold text-secondary">No se encontraron registros</h4>
+                  <p class="text-muted">Prueba a cambiar los filtros de búsqueda o el rango de fechas.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginator -->
+      <mat-paginator class="border-top"
+                     [length]="totalElements()"
+                     [pageSize]="pageSize()"
+                     [pageIndex]="currentPage()"
+                     (page)="cambiarPagina($event)"
+                     [pageSizeOptions]="[10, 20, 50, 100]"
+                     aria-label="Seleccionar página de registros">
+      </mat-paginator>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,83 @@
+<div class="triaje-container">
+
+  <!-- Header -->
+  <div class="triaje-header mb-4">
+    <div>
+      <h2 class="triaje-title">
+        <mat-icon class="title-icon">health_and_safety</mat-icon>
+        Área de Triaje
+      </h2>
+      <p class="triaje-subtitle">Registro de signos vitales · {{ fechaHoy | date:'EEEE, d MMMM yyyy' : '' : 'es' }}</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-chip stat-blue">
+        <mat-icon>schedule</mat-icon>
+        <span><strong>{{ citasParaTriaje().length }}</strong> en espera</span>
+      </div>
+      <div class="stat-chip stat-green">
+        <mat-icon>check_circle</mat-icon>
+        <span><strong>{{ citasAtendidas() }}</strong> atendidas hoy</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cola de pacientes -->
+  <div *ngIf="citasParaTriaje().length > 0; else sinPacientes" class="pacientes-grid">
+    
+    <div *ngFor="let cita of citasParaTriaje()" 
+         class="paciente-card"
+         [class.tiene-triaje]="cita.triaje">
+
+      <!-- Prioridad / Turno -->
+      <div class="card-turno">
+        <span class="turno-num">{{ cita.numeroTurno || '—' }}</span>
+        <span class="turno-label">Turno</span>
+      </div>
+
+      <!-- Información del paciente -->
+      <div class="card-info">
+        <div class="paciente-nombre">{{ cita.paciente.nombres }} {{ cita.paciente.apellidos }}</div>
+        <div class="paciente-meta">
+          <mat-icon class="meta-icon">badge</mat-icon> {{ cita.paciente.dni }}
+          <mat-icon class="meta-icon ms-2">access_time</mat-icon> {{ cita.fechaHora | date:'hh:mm a' }}
+        </div>
+        <div class="paciente-meta mt-1">
+          <mat-icon class="meta-icon">stethoscope</mat-icon>
+          Dr(a). {{ cita.medico.nombres }} {{ cita.medico.apellidos }}
+          <span class="especialidad-badge ms-1">{{ cita.medico.especialidad }}</span>
+        </div>
+      </div>
+
+      <!-- Estado + Acción -->
+      <div class="card-actions">
+        <div *ngIf="cita.triaje; else sinTriaje" class="triaje-done">
+          <mat-icon color="primary">verified</mat-icon>
+          <span class="triaje-done-text">Triaje completo</span>
+          <div class="vitales-mini">
+            <span>{{ cita.triaje.temperatura }}°C</span>
+            <span>{{ cita.triaje.presionArterial }} mmHg</span>
+            <span>{{ cita.triaje.ritmoCardiaco }} lpm</span>
+          </div>
+        </div>
+        <ng-template #sinTriaje>
+          <button mat-raised-button color="accent" class="btn-iniciar" (click)="onRegistrarTriaje(cita)">
+            <mat-icon>assignment_ind</mat-icon>
+            Registrar Triaje
+          </button>
+        </ng-template>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Estado vacío -->
+  <ng-template #sinPacientes>
+    <div class="empty-state">
+      <mat-icon class="empty-icon">event_available</mat-icon>
+      <h3>Sin pacientes en espera</h3>
+      <p class="text-muted">No hay citas programadas para triaje en este momento.</p>
+    </div>
+  </ng-template>
+
+</div>

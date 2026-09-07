@@ -1,0 +1,22 @@
+.container-fluid {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.table .btn-sm {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}

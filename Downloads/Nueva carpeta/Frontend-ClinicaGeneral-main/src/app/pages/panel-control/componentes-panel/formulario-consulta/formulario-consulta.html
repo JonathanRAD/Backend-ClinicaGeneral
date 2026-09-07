@@ -1,0 +1,44 @@
+<h2 mat-dialog-title>Registrar Nueva Consulta</h2>
+
+<mat-dialog-content>
+  <p class="mat-body-1 text-muted">Complete los detalles de la atención médica.</p>
+  
+  <form [formGroup]="consultaForm" class="mt-4 d-flex flex-column gap-3">
+    
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Médico Tratante</mat-label>
+      <mat-select formControlName="medicoId">
+        <mat-option *ngFor="let medico of medicos()" [value]="medico.id">
+          Dr(a). {{ medico.nombres }} {{ medico.apellidos }}
+        </mat-option>
+      </mat-select>
+      <mat-error>Debe seleccionar un médico.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Motivo de la Consulta</mat-label>
+      <textarea matInput formControlName="motivo" rows="3" required></textarea>
+      <mat-error>El motivo es requerido.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Diagnóstico</mat-label>
+      <textarea matInput formControlName="diagnostico" rows="5" required></textarea>
+      <mat-error>El diagnóstico es requerido.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Tratamiento y Receta</mat-label>
+      <textarea matInput formControlName="tratamiento" rows="5" required></textarea>
+      <mat-error>El tratamiento es requerido.</mat-error>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="guardar()" [disabled]="consultaForm.invalid">
+    Guardar Consulta
+  </button>
+</mat-dialog-actions>

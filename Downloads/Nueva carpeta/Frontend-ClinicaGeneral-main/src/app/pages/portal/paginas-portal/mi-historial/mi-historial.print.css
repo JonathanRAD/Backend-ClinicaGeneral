@@ -1,0 +1,66 @@
+
+@media print {
+
+  body * {
+    visibility: hidden;
+  }
+
+  .historial-imprimible, .historial-imprimible * {
+    visibility: visible;
+  }
+
+  .historial-imprimible {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  .historial-imprimible {
+    font-family: 'Times New Roman', Times, serif;
+    color: #000;
+    background-color: #fff;
+  }
+  .print-header {
+    text-align: center;
+    border-bottom: 2px solid #000;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .print-header h1 {
+    margin: 0;
+  }
+
+  .print-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    -webkit-print-color-adjust: exact;
+  }
+
+  h2, h3, h4, h5, h6 {
+    color: #000 !important;
+  }
+
+  .mat-expansion-panel {
+    box-shadow: none !important;
+    border: 1px solid #ccc;
+    margin-bottom: 1rem;
+    page-break-inside: avoid; 
+  }
+
+  .mat-expansion-panel-header {
+    font-size: 14pt;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+  }
+  .mat-expansion-indicator {
+    display: none !important;
+  }
+
+  p, strong {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+}

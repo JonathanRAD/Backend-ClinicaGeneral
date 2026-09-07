@@ -1,0 +1,42 @@
+.perfil-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+mat-dialog-content {
+  text-align: center;
+}
+
+.perfil-avatar .mat-icon {
+  font-size: 100px;
+  width: 100px;
+  height: 100px;
+  color: var(--portal-icon-muted, #dee2e6);
+}
+
+.medico-nombre {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.medico-especialidad {
+  color: var(--color-primario);
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.medico-detalles {
+  text-align: left;
+  margin-top: 1.5rem;
+  color: var(--color-texto-secundario);
+}
+
+.medico-detalles h4 {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-texto-principal);
+  margin-bottom: 0.5rem;
+}
